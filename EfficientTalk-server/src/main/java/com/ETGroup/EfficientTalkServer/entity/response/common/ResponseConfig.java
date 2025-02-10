@@ -1,4 +1,4 @@
-package com.ETGroup.EfficientTalkServer.entity.response;
+package com.ETGroup.EfficientTalkServer.entity.response.common;
 
 import lombok.Getter;
 
@@ -38,9 +38,8 @@ public enum ResponseConfig {
     private final int code;
     private final String msg;
     
-    ResponseConfig(int code,
-                   String msg) {
+    ResponseConfig(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
-    }
+}

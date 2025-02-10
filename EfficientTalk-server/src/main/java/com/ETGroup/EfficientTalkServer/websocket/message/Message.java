@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
  */
 @Data
 public class Message {
+    // 消息ID
+    private String id;
     // 发送人ID
     private String sender;
     // 接收人ID

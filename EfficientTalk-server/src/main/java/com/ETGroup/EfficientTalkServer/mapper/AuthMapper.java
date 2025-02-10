@@ -2,7 +2,7 @@ package com.ETGroup.EfficientTalkServer.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
-import com.ETGroup.EfficientTalkServer.entity.auth.dto.UserLoginDTO;
+import com.ETGroup.EfficientTalkServer.entity.DTO.auth.UserLoginDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -24,6 +24,6 @@ public interface AuthMapper extends BaseMapper<UserPO> {
      * @param userId 用户id
      * @return 用户id信息
      */
-    @Select("SELECT id as userId, username as userName, avatar as avatar FROM users WHERE id=#{userId}")
+    @Select("SELECT id as userId, username as userName, avatar as userAvatar FROM users WHERE id=#{userId}")
     UserLoginDTO getUserLoginDTO(@Param("userId") String userId);
 }

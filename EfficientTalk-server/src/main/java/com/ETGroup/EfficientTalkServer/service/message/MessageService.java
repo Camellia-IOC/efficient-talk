@@ -2,9 +2,9 @@ package com.ETGroup.EfficientTalkServer.service.message;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ETGroup.EfficientTalkServer.entity.PO.MessagePO;
-import com.ETGroup.EfficientTalkServer.entity.message.request.CreateMessageQueryParam;
-import com.ETGroup.EfficientTalkServer.entity.message.request.GetMessageListQueryParam;
-import com.ETGroup.EfficientTalkServer.entity.message.response.MessageListResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.request.message.CreateMessageQueryParam;
+import com.ETGroup.EfficientTalkServer.entity.request.message.GetMessageListQueryParam;
+import com.ETGroup.EfficientTalkServer.entity.response.message.MessageListResponseVO;
 import org.springframework.stereotype.Service;
 
 @Service

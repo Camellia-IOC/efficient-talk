@@ -1,4 +1,4 @@
-package com.ETGroup.EfficientTalkServer.entity.response;
+package com.ETGroup.EfficientTalkServer.entity.response.common;
 
 import lombok.Data;
 

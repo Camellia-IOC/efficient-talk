@@ -1,11 +1,11 @@
 package com.ETGroup.EfficientTalkServer.controller;
 
-import com.ETGroup.EfficientTalkServer.entity.auth.request.LoginRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.auth.request.RegisterRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.auth.response.LoginResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.auth.response.RegisterResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.ResponseConfig;
-import com.ETGroup.EfficientTalkServer.entity.response.ResponseData;
+import com.ETGroup.EfficientTalkServer.entity.request.auth.LoginRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.request.auth.RegisterRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.response.auth.LoginResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.auth.RegisterResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
+import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.service.auth.AuthService;
 import com.ETGroup.EfficientTalkServer.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +14,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "用户认证接口", description = "用户登录、用户注册")
+@Tag(name = "鉴权相关接口", description = "鉴权相关接口")
 @Slf4j
 @CrossOrigin
 @RestController

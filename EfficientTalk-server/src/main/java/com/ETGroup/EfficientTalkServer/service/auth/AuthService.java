@@ -2,10 +2,10 @@ package com.ETGroup.EfficientTalkServer.service.auth;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
-import com.ETGroup.EfficientTalkServer.entity.auth.request.LoginRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.auth.request.RegisterRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.auth.response.LoginResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.auth.response.RegisterResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.request.auth.LoginRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.request.auth.RegisterRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.response.auth.LoginResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.auth.RegisterResponseVO;
 import org.springframework.stereotype.Service;
 
 @Service

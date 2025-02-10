@@ -1,4 +1,4 @@
-package com.ETGroup.EfficientTalkServer.entity.message.response;
+package com.ETGroup.EfficientTalkServer.entity.response.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

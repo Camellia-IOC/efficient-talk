@@ -1,6 +1,5 @@
 package com.ETGroup.EfficientTalkServer.websocket;
 
-import com.ETGroup.EfficientTalkServer.utils.ChatMessageUtils;
 import com.ETGroup.EfficientTalkServer.websocket.message.Message;
 import com.alibaba.fastjson2.JSON;
 import jakarta.websocket.*;
@@ -28,6 +27,7 @@ public class ChatEndpoint {
      */
     @OnOpen
     public void onOpen(@PathParam("userId") String userId, Session session) throws IOException {
+        // TODO 检查是否有缓存的消息，如果有则取出发送
         //        this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         
         //        String user = (String) this.httpSession.getAttribute("currentUser");
@@ -43,7 +43,6 @@ public class ChatEndpoint {
 //               .sendText("连接成功");
         
         // 通知所有用户，当前用户上线了
-        //        String message = ChatMessageUtils.getMessage(true, null, "");
         //        broadcastAllUsers(message);
     }
     
@@ -73,6 +72,7 @@ public class ChatEndpoint {
      */
     @OnMessage
     public void onMessage(String message) {
+        // TODO 检查用户是否在线，不在线则缓存消息
         log.error("收到消息:{}", message);
         try {
             // 提取消息
@@ -94,7 +94,6 @@ public class ChatEndpoint {
             // 获取消息接收方用户对象的 session 对象
             //            Session session = onlineUsers.get(toName);
             //            String currentUser = (String) this.httpSession.getAttribute("currentUser");
-            //            String messageToSend = ChatMessageUtils.getMessage(false, currentUser, tempMessage);
             
             //            session.getBasicRemote()
             //                   .sendText(messageToSend);
@@ -125,7 +124,6 @@ public class ChatEndpoint {
         
         // 2.通知其他用户，当前用户已下线
         // 注意：不是发送类似于 xxx 已下线的消息，而是向在线用户重新发送一次当前在线的所有用户
-        String message = ChatMessageUtils.getMessage(true, null, "");
-        broadcastAllUsers(message);
+//        broadcastAllUsers(message);
     }
 }

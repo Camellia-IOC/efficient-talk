@@ -2,7 +2,7 @@ package com.ETGroup.EfficientTalkServer.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ETGroup.EfficientTalkServer.entity.PO.MessagePO;
-import com.ETGroup.EfficientTalkServer.entity.message.response.MessageResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.message.MessageResponseVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
