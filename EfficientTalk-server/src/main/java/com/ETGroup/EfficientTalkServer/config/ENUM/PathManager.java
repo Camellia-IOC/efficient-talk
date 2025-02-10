@@ -1,4 +1,4 @@
-package com.pigstory.config.ENUM;
+package com.ETGroup.EfficientTalkServer.config.ENUM;
 
 import lombok.Getter;
 

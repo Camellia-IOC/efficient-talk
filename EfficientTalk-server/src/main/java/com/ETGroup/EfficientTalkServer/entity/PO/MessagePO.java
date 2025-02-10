@@ -1,4 +1,4 @@
-package com.pigstory.entity.PO;
+package com.ETGroup.EfficientTalkServer.entity.PO;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -12,16 +12,16 @@ import java.time.LocalDateTime;
 @TableName("messages")
 public class MessagePO {
     @TableId(value = "id",type = IdType.AUTO)
-    private Long id;
+    private String id;
     
     @TableField("type")
     private Integer type;
     
     @TableField("origin")
-    private Long origin;
+    private String origin;
     
     @TableField("receiver")
-    private Long receiver;
+    private String receiver;
     
     @TableField("title")
     private String title;

@@ -1,4 +1,4 @@
-package com.pigstory.entity.auth.response;
+package com.ETGroup.EfficientTalkServer.entity.auth.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class RegisterResponseVO {
     @JsonProperty("userId")
-    private Long userId;
+    private String userId;
 }

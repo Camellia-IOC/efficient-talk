@@ -1,4 +1,4 @@
-package com.pigstory.entity.message.response;
+package com.ETGroup.EfficientTalkServer.entity.message.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

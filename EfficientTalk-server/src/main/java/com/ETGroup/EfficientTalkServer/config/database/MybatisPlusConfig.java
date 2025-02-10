@@ -1,4 +1,4 @@
-package com.pigstory.config.database;
+package com.ETGroup.EfficientTalkServer.config.database;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

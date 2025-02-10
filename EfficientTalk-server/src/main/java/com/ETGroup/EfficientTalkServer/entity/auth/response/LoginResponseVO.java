@@ -1,7 +1,7 @@
-package com.pigstory.entity.auth.response;
+package com.ETGroup.EfficientTalkServer.entity.auth.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pigstory.entity.auth.dto.UserLoginDTO;
+import com.ETGroup.EfficientTalkServer.entity.auth.dto.UserLoginDTO;
 import lombok.Data;
 
 @Data

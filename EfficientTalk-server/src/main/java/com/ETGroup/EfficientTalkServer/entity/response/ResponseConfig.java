@@ -1,4 +1,4 @@
-package com.pigstory.entity.response;
+package com.ETGroup.EfficientTalkServer.entity.response;
 
 import lombok.Getter;
 

@@ -1,12 +1,12 @@
-package com.pigstory.service.message;
+package com.ETGroup.EfficientTalkServer.service.message;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.pigstory.config.ENUM.BasicMessageTitleManager;
-import com.pigstory.entity.PO.MessagePO;
-import com.pigstory.entity.message.request.CreateMessageQueryParam;
-import com.pigstory.entity.message.request.GetMessageListQueryParam;
-import com.pigstory.entity.message.response.MessageListResponseVO;
-import com.pigstory.mapper.MessageMapper;
+import com.ETGroup.EfficientTalkServer.config.ENUM.BasicMessageTitleManager;
+import com.ETGroup.EfficientTalkServer.entity.PO.MessagePO;
+import com.ETGroup.EfficientTalkServer.entity.message.request.CreateMessageQueryParam;
+import com.ETGroup.EfficientTalkServer.entity.message.request.GetMessageListQueryParam;
+import com.ETGroup.EfficientTalkServer.entity.message.response.MessageListResponseVO;
+import com.ETGroup.EfficientTalkServer.mapper.MessageMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -62,10 +62,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, MessagePO> im
      * @return 注册消息
      */
     @Override
-    public boolean createRegisterMessage (Long userId, String username) {
+    public boolean createRegisterMessage (String userId, String username) {
         CreateMessageQueryParam message = new CreateMessageQueryParam();
         message.setType(0);
-        message.setOrigin(0L);
+        message.setOrigin("0");
         message.setReceiver(userId);
         message.setTitle(BasicMessageTitleManager.TITLE_REGISTER_MESSAGE.getTitle());
         message.setContent(this.getRegisterMessage(userId, username));
@@ -82,7 +82,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, MessagePO> im
      * @return 是否成功创建关注消息
      */
     @Override
-    public boolean createFollowMessage (Long userId, Long followerId) {
+    public boolean createFollowMessage (String userId, String followerId) {
         CreateMessageQueryParam message = new CreateMessageQueryParam();
         message.setType(0);
         message.setOrigin(followerId);
@@ -103,7 +103,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, MessagePO> im
      * @return 注册成功消息内容
      */
     @Override
-    public String getRegisterMessage (Long userId, String username) {
+    public String getRegisterMessage (String userId, String username) {
         return "Hello " +
                        username +
                        "!" +

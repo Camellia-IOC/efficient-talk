@@ -1,11 +1,11 @@
-package com.pigstory.service.auth;
+package com.ETGroup.EfficientTalkServer.service.auth;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.pigstory.entity.PO.UserPO;
-import com.pigstory.entity.auth.request.LoginRequestParam;
-import com.pigstory.entity.auth.request.RegisterRequestParam;
-import com.pigstory.entity.auth.response.LoginResponseVO;
-import com.pigstory.entity.auth.response.RegisterResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
+import com.ETGroup.EfficientTalkServer.entity.auth.request.LoginRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.auth.request.RegisterRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.auth.response.LoginResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.auth.response.RegisterResponseVO;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,0 +1,33 @@
+server:
+  port: 18080
+
+spring:
+  application:
+    name: efficient-talk-server
+  datasource:
+    url: jdbc:mysql://47.122.40.126:3306/efficient_talk
+    username: efficient_talk
+    password: aIUKaryCc0520.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 10000
+      validation-timeout: 3000
+      idle-timeout: 60000
+      login-timeout: 5
+      max-lifetime: 60000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      read-only: false
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN

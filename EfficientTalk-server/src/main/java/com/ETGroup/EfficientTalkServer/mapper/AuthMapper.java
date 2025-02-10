@@ -1,8 +1,8 @@
-package com.pigstory.mapper;
+package com.ETGroup.EfficientTalkServer.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pigstory.entity.PO.UserPO;
-import com.pigstory.entity.auth.dto.UserLoginDTO;
+import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
+import com.ETGroup.EfficientTalkServer.entity.auth.dto.UserLoginDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -16,14 +16,14 @@ public interface AuthMapper extends BaseMapper<UserPO> {
      *
      * @return 用户信息
      */
-    @Select("SELECT password as password FROM users WHERE user_id = #{userId}")
-    UserPO getPasswordById (@Param("userId") Long userId);
+    @Select("SELECT password as password FROM users WHERE id = #{userId}")
+    UserPO getPasswordById (@Param("userId") String userId);
     
     /**
      * 登录时返回用户id信息
      * @param userId 用户id
      * @return 用户id信息
      */
-    @Select("SELECT user_id as userId,zone as zoneId FROM users WHERE user_id=#{userId}")
-    UserLoginDTO getUserLoginDTO(@Param("userId") Long userId);
+    @Select("SELECT id as userId, username as userName, avatar as avatar FROM users WHERE id=#{userId}")
+    UserLoginDTO getUserLoginDTO(@Param("userId") String userId);
 }

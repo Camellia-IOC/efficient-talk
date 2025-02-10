@@ -1,14 +1,13 @@
-package com.pigstory.controller;
+package com.ETGroup.EfficientTalkServer.controller;
 
-import com.pigstory.entity.auth.request.LoginRequestParam;
-import com.pigstory.entity.auth.request.RegisterRequestParam;
-import com.pigstory.entity.auth.response.LoginResponseVO;
-import com.pigstory.entity.auth.response.RegisterResponseVO;
-import com.pigstory.entity.response.ResponseData;
-import com.pigstory.entity.response.ResponseConfig;
-import com.pigstory.logger.LoggerFactory;
-import com.pigstory.service.auth.AuthService;
-import com.pigstory.service.message.MessageService;
+import com.ETGroup.EfficientTalkServer.entity.auth.request.LoginRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.auth.request.RegisterRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.auth.response.LoginResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.auth.response.RegisterResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.ResponseConfig;
+import com.ETGroup.EfficientTalkServer.entity.response.ResponseData;
+import com.ETGroup.EfficientTalkServer.service.auth.AuthService;
+import com.ETGroup.EfficientTalkServer.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -44,7 +43,7 @@ public class AuthController {
         else {
             // 创建新用户注册消息
             if (!messageService.createRegisterMessage(response.getUserId(),param.getUsername())) {
-                LoggerFactory.logger.warn("注册消息生成失败");
+                log.warn("注册消息生成失败");
             }
             
             return ResponseData.success(response);

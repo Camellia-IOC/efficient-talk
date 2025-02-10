@@ -1,12 +1,12 @@
-package com.pigstory.service.auth;
+package com.ETGroup.EfficientTalkServer.service.auth;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.pigstory.entity.PO.UserPO;
-import com.pigstory.entity.auth.request.LoginRequestParam;
-import com.pigstory.entity.auth.request.RegisterRequestParam;
-import com.pigstory.entity.auth.response.LoginResponseVO;
-import com.pigstory.entity.auth.response.RegisterResponseVO;
-import com.pigstory.mapper.AuthMapper;
+import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
+import com.ETGroup.EfficientTalkServer.entity.auth.request.LoginRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.auth.request.RegisterRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.auth.response.LoginResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.auth.response.RegisterResponseVO;
+import com.ETGroup.EfficientTalkServer.mapper.AuthMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -58,9 +58,6 @@ public class AuthServiceImpl extends ServiceImpl<AuthMapper, UserPO> implements 
         
         user.setUsername(param.getUsername());
         user.setPassword(param.getPassword());
-        
-        // TODO:临时使用,记得删除
-        user.setZone(1L);
         
         if (authMapper.insert(user) == 1) {
             registerResponseVO.setUserId(user.getUserId());

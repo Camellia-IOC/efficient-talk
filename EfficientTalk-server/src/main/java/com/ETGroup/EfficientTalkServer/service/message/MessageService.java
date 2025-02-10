@@ -1,10 +1,10 @@
-package com.pigstory.service.message;
+package com.ETGroup.EfficientTalkServer.service.message;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.pigstory.entity.PO.MessagePO;
-import com.pigstory.entity.message.request.CreateMessageQueryParam;
-import com.pigstory.entity.message.request.GetMessageListQueryParam;
-import com.pigstory.entity.message.response.MessageListResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.PO.MessagePO;
+import com.ETGroup.EfficientTalkServer.entity.message.request.CreateMessageQueryParam;
+import com.ETGroup.EfficientTalkServer.entity.message.request.GetMessageListQueryParam;
+import com.ETGroup.EfficientTalkServer.entity.message.response.MessageListResponseVO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,7 +35,7 @@ public interface MessageService extends IService<MessagePO> {
      *
      * @return 注册消息
      */
-    boolean createRegisterMessage (Long userId, String username);
+    boolean createRegisterMessage (String userId, String username);
     
     /**
      * 创建关注消息
@@ -45,7 +45,7 @@ public interface MessageService extends IService<MessagePO> {
      *
      * @return 是否成功创建关注消息
      */
-    boolean createFollowMessage (Long userId, Long followerId);
+    boolean createFollowMessage (String userId, String followerId);
     
     /**
      * 获取注册成功消息内容
@@ -55,5 +55,5 @@ public interface MessageService extends IService<MessagePO> {
      *
      * @return 注册成功消息内容
      */
-    String getRegisterMessage (Long userId, String username);
+    String getRegisterMessage (String userId, String username);
 }

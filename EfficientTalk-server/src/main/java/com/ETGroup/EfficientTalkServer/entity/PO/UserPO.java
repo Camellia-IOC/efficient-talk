@@ -1,18 +1,17 @@
-package com.pigstory.entity.PO;
+package com.ETGroup.EfficientTalkServer.entity.PO;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @TableName("users")
 public class UserPO {
-    @TableId(value = "user_id",type= IdType.AUTO)
-    private Long userId;
+    @TableId(value = "id")
+    private String userId;
     
     @TableField("username")
     private String username;
@@ -23,20 +22,14 @@ public class UserPO {
     @TableField("avatar")
     private String avatar;
     
-    @TableField("intro")
-    private String intro;
+    @TableField("register_time")
+    private LocalDateTime registerTime;
     
     @TableField("sex")
     private Integer sex;
     
-    @TableField("mate")
-    private Long mate;
-    
-    @TableField("zone")
-    private Long zone;
-    
-    @TableField("birthday")
-    private Date birthday;
+    @TableField("state")
+    private Integer state;
     
     @TableField("token")
     private String token;

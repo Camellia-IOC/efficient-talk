@@ -1,4 +1,4 @@
-package com.pigstory.entity.auth.dto;
+package com.ETGroup.EfficientTalkServer.entity.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -6,8 +6,11 @@ import lombok.Data;
 @Data
 public class UserLoginDTO {
     @JsonProperty("userId")
-    private Long userId;
+    private String userId;
     
-    @JsonProperty("zoneId")
-    private Long zoneId;
+    @JsonProperty("userName")
+    private String userName;
+    
+    @JsonProperty("avatar")
+    private String avatar;
 }

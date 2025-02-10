@@ -1,4 +1,4 @@
-package com.pigstory.entity.auth.request;
+package com.ETGroup.EfficientTalkServer.entity.auth.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

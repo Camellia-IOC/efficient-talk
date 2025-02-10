@@ -1,4 +1,4 @@
-package com.pigstory.entity.message.request;
+package com.ETGroup.EfficientTalkServer.entity.message.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -9,10 +9,10 @@ public class CreateMessageQueryParam {
     private Integer type;
     
     @JsonProperty("origin")
-    private Long origin;
+    private String origin;
     
     @JsonProperty("receiver")
-    private Long receiver;
+    private String receiver;
     
     @JsonProperty("title")
     private String title;
