@@ -3,6 +3,14 @@ import Dexie from "dexie";
 export const db = new Dexie("EfficientTalk");
 db.version(1).stores({
     /**
+     * 当前登录的用户信息
+     * @param {string} key 唯一键
+     * @param {string} id 用户id
+     * @param {string} username 用户名
+     * @param {string} avatar 用户头像
+     */
+    curUser: "key, user_id, username, avatar",
+    /**
      * 登录过的用户信息
      * @param {string} id 用户id
      * @param {string} username 用户名

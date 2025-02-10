@@ -13,12 +13,16 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-/*主题色*/
-$theme-color: #1677FF;
+/*单行文本截断*/
+.single-line-ellipsis {
+	white-space: nowrap; /* 防止文本换行 */
+	overflow: hidden; /* 隐藏溢出的文本 */
+	text-overflow: ellipsis; /* 显示省略号 */
+}
 
 /*主题背景色*/
 .theme-background-color {
-	background-color: $theme-color;
+	background-color: #1677FF;
 }
 
 /*可拖拽区域*/

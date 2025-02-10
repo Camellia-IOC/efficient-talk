@@ -3,6 +3,7 @@
     <div v-for="(item,index) in chatList"
          :key="index"
          class="chat-list-item"
+         :class="{'chat-list-item-active': curChatId === item.userId}"
          @click="handleSelectChat(index)"
          @contextmenu="handleContextMenu"
     >
@@ -18,7 +19,7 @@
           <div class="time">{{ item.lastMessageTime }}</div>
         </div>
         <div class="detail-content">
-          <div class="detail-message"
+          <div class="detail-message single-line-ellipsis"
                :class="{ 'detail-message-unread': item.unreadCount!==0 }"
           >{{ item.lastMessage }}
           </div>
@@ -52,9 +53,13 @@
         saveChatList,
         getChatList
     } from "../../database/chat-list.js";
-    import { useUserDataStore } from "../../store/UserDataStore.js";
+    import { getCurUserData } from "../../database/cur-user.js";
 
-    const userDataStore = useUserDataStore();
+    // 当前登录的用户信息
+    const curLoginUser = ref({});
+    const updateCurLoginUser = async () => {
+        curLoginUser.value = await getCurUserData();
+    };
 
     // 当前聊天对象的ID
     const curChatId = ref("");
@@ -62,7 +67,7 @@
     // 保存聊天列表
     const handleSaveChatList = (chatList) => {
         const chatListJson = JSON.stringify(chatList);
-        saveChatList(userDataStore.userId, chatListJson);
+        saveChatList(curLoginUser.value.userId, chatListJson);
     };
 
     // 接收消息
@@ -180,14 +185,19 @@
         // 订阅消息发送
         window.addEventListener("messageSend", handleMessageSend);
 
+        // 初始化当前登录的用户信息
+        await updateCurLoginUser();
+
         // 读取聊天列表
-        chatList.value = await getChatList(userDataStore.userId);
+        chatList.value = await getChatList(curLoginUser.value.userId);
     });
 </script>
 
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .chat-list {
     display: flex;
     flex-direction: column;
@@ -195,6 +205,14 @@
     width: 100%;
     height: 100%;
     overflow-y: auto;
+
+    .chat-list-item-active {
+      background-color: rgba(global-variable.$theme-color, 0.1);
+
+      &:hover {
+        background-color: rgba(global-variable.$theme-color, 0.1) !important;
+      }
+    }
 
     .chat-list-item {
       display: flex;
@@ -276,7 +294,7 @@
       }
 
       &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: rgba(0, 0, 0, 0.05);
         cursor: pointer;
       }
     }

@@ -47,10 +47,9 @@
     import { CloseOutlined } from "@ant-design/icons-vue";
     import AuthApi from "../api/modules/AuthApi.js";
     import { db } from "../database/db.js";
-    import { useUserDataStore} from "../store/UserDataStore.js";
+    import { saveCurUserData } from "../database/cur-user.js";
 
     const router = useRouter();
-    const userDataStore = useUserDataStore();
 
     const accountInput = ref("");
     const passwordInput = ref("");
@@ -65,7 +64,7 @@
         AuthApi.userLogin({
             userId: accountInput.value,
             password: passwordInput.value
-        }).then((res) => {
+        }).then(async (res) => {
             if (res.code === 0) {
                 if (res.data.permission === true) {
                     const data = res.data.userData;
@@ -73,19 +72,10 @@
                     // windowController.hide();
                     // appController.login();
 
-                    // 初始化当前登录的用户信息
-                    userDataStore.initUserData(data);
+                    // 保存当前登录用户信息到数据库中
+                    await saveCurUserData(data.userId, data.userName, data.userAvatar);
 
-                    // 将用户信息保存到数据库中
-                    db.users.put({
-                        id: data.userId,
-                        username: data.userName,
-                        avatar: data.avatar
-                    }).catch((error) => {
-                        console.error(error);
-                    });
-
-                    router.push("/app/chat");
+                    await router.push("/app/chat");
                     // windowController.show();
                 }
             }

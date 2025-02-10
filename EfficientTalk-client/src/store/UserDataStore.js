@@ -12,7 +12,7 @@ export const useUserDataStore = defineStore("user-data-store", () => {
     const initUserData = (userData) => {
         userId.value = userData.userId;
         userName.value = userData.userName;
-        userAvatar.value = userData.avatar;
+        userAvatar.value = userData.userAvatar;
     };
 
     return {

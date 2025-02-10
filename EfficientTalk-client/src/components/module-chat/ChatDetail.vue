@@ -22,7 +22,7 @@
            v-for="(item,index) in chatHistory"
            :key="index"
       >
-        <div v-if="item.sender !== userDataStore.userId"
+        <div v-if="item.sender !== curLoginUser.userId"
              class="others-message"
         >
           <div class="message-avatar">
@@ -57,7 +57,7 @@
         >
           <div class="message-info">
             <div class="user-name">
-              {{ userDataStore.userName }}
+              {{ curLoginUser.userName }}
             </div>
             <div class="message-content-container">
               <div class="message-content">
@@ -77,7 +77,7 @@
           </div>
           <div class="message-avatar">
             <img class="avatar"
-                 :src="userDataStore.userAvatar"
+                 :src="curLoginUser.userAvatar"
                  alt="avatar"
             >
           </div>
@@ -136,23 +136,26 @@
         notification
     } from "ant-design-vue";
     import {
-        SmileOutlined,
         FolderOutlined,
-        HistoryOutlined
+        HistoryOutlined,
+        SmileOutlined
     } from "@ant-design/icons-vue";
     import dayjs from "dayjs";
     import { UUID } from "uuidjs";
-    import { useUserDataStore } from "../../store/UserDataStore.js";
     import { useWebSocketStore } from "../../store/WebSocketStore.js";
     import {
-        saveChatRecord,
-        getChatHistory
+        getChatHistory,
+        saveChatRecord
     } from "../../database/chat-history.js";
+    import { getCurUserData } from "../../database/cur-user.js";
 
     const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
-    // 用户数据
-    const userDataStore = useUserDataStore();
+    // 当前登录的用户信息
+    const curLoginUser = ref({});
+    const updateCurLoginUser = async () => {
+        curLoginUser.value = await getCurUserData();
+    };
 
     // WebSocket连接
     const websocketStore = useWebSocketStore();
@@ -223,7 +226,7 @@
         else {
             const message = {
                 id: UUID.generate(),
-                sender: userDataStore.userId,
+                sender: curLoginUser.value.userId,
                 receiver: props.chatInfo.userId,
                 type: "text",
                 content: chatInput.value,
@@ -249,7 +252,7 @@
     // 聊天对象变化
     const handleChatObjectChange = async (event) => {
         const friendId = event.detail;
-        chatHistory.value = await getChatHistory(friendId, userDataStore.userId);
+        chatHistory.value = await getChatHistory(friendId, curLoginUser.value.userId);
 
         // 发送消息后滚动到底部
         scrollToBottom("auto")
@@ -283,17 +286,22 @@
         }
     ]);
 
-    onBeforeMount(() => {
+    onBeforeMount(async () => {
         // 注册消息监听事件
         window.addEventListener("messageReceive", handleMessageReceive);
         // 订阅聊天对象变化事件
         window.addEventListener("chatObjectChange", handleChatObjectChange);
+
+        // 初始化当前登录的用户信息
+        await updateCurLoginUser();
     });
 </script>
 
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .chat-detail {
     display: flex;
     flex-direction: column;
@@ -467,7 +475,7 @@
                 padding: 5px;
                 font-size: 14px;
                 color: white;
-                background-color: #1677FF;
+                background-color: global-variable.$theme-color;
                 border-radius: 5px;
                 box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
                 word-wrap: break-word; /* 强制换行 */

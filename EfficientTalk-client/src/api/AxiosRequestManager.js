@@ -19,7 +19,7 @@ const resourceServicePort = "18080";
 /** 社交服务端口 */
 const socialServicePort = "18080";
 /** 留言板服务端口 */
-const messageBoardServicePort = "18080";
+const chatServicePort = "18080";
 
 // 生成并导出axios实例
 /** 认证服务实例 */
@@ -31,4 +31,4 @@ export const resourceService = new BaseAxiosInstance(serverIP, resourceServicePo
 /** 社交服务实例 */
 export const socialService = new BaseAxiosInstance(serverIP, socialServicePort, 10000);
 /** 留言板服务实例 */
-export const messageBoardService = new BaseAxiosInstance(serverIP, messageBoardServicePort, 10000);
+export const chatService = new BaseAxiosInstance(serverIP, chatServicePort, 10000);

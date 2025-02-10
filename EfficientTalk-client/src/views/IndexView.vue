@@ -23,15 +23,31 @@
     import { RouterView } from "vue-router";
     import AppNavigation from "../components/app-nav/AppNavigation.vue";
     import AppHeader from "../components/app-header/AppHeader.vue";
-    import { useWebSocketStore} from "../store/WebSocketStore.js";
+    import { useWebSocketStore } from "../store/WebSocketStore.js";
     import {
-        onBeforeMount
+        onBeforeMount,
+        ref
     } from "vue";
+    import { getCurUserData } from "../database/cur-user.js";
+    import { useRouter } from "vue-router";
 
+    // 当前登录的用户信息
+    const curLoginUser = ref({});
+    const updateCurLoginUser = async () => {
+        curLoginUser.value = await getCurUserData();
+    };
+
+    const router = useRouter();
     const websocketStore = useWebSocketStore();
-    onBeforeMount(()=>{
-        websocketStore.initSocket();
-    })
+
+    onBeforeMount(async () => {
+        await updateCurLoginUser();
+        if (curLoginUser.value === null) {
+            // TODO 如果当前登录用户信息为空则退出到登录页面
+            await router.push("/auth");
+        }
+        websocketStore.initSocket(curLoginUser.value.userId);
+    });
 </script>
 
 <style scoped

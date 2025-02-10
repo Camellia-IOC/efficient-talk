@@ -1,6 +1,9 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia'
+
+// 全局样式表
 import '../style/global-style.css';
+import '../style/global-variable.scss'
 
 // 路由
 import router from '../../router/index.js';

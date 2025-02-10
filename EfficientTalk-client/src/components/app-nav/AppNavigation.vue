@@ -3,7 +3,7 @@
     <div class="nav-main">
       <div class="user-info-container no-drag">
         <img class="user-avatar"
-             :src="userDataStore.userAvatar"
+             :src="curLoginUser.userAvatar"
              alt="avatar"
         />
       </div>
@@ -49,6 +49,7 @@
 
 <script setup>
     import {
+        onBeforeMount,
         ref
     } from "vue";
     import {
@@ -65,12 +66,15 @@
         BarsOutlined
     } from "@ant-design/icons-vue";
     import { useRouter } from "vue-router";
-    import { useUserDataStore } from "../../store/UserDataStore.js";
+    import { getCurUserData } from "../../database/cur-user.js";
 
     const router = useRouter();
 
-    // 用户数据
-    const userDataStore = useUserDataStore();
+    // 当前登录的用户信息
+    const curLoginUser = ref({});
+    const updateCurLoginUser = async () => {
+        curLoginUser.value = await getCurUserData();
+    };
 
     // 处理退出登录
     const handleLogout = () => {
@@ -121,6 +125,11 @@
         selectedNavIndex.value = index;
         router.push(path);
     };
+
+    onBeforeMount(async () => {
+        // 初始化当前登录的用户信息
+        await updateCurLoginUser();
+    })
 </script>
 
 <style scoped
