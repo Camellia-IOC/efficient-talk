@@ -13,9 +13,12 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+/*主题色*/
+$theme-color: #1677FF;
+
 /*主题背景色*/
 .theme-background-color {
-	background-color: #1677FF;
+	background-color: $theme-color;
 }
 
 /*可拖拽区域*/

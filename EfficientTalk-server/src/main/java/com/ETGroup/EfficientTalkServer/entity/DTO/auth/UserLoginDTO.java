@@ -11,6 +11,6 @@ public class UserLoginDTO {
     @JsonProperty("userName")
     private String userName;
     
-    @JsonProperty("avatar")
-    private String avatar;
+    @JsonProperty("userAvatar")
+    private String userAvatar;
 }
