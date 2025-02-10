@@ -17,7 +17,9 @@
 	</environments>
 	<mappers>
 		<mapper resource="mapper/AuthMapper.xml"/>
-<!--		<mapper resource="mapper/UserMapper.xml"/>-->
+		<mapper resource="mapper/SocialMapper.xml"/>
+		<mapper resource="mapper/ChatMapper.xml"/>
+		<mapper resource="mapper/UserMapper.xml"/>
 <!--		<mapper resource="mapper/ResourceMapper.xml"/>-->
 	</mappers>
 </configuration>

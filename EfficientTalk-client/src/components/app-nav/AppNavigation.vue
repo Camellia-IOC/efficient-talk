@@ -126,9 +126,30 @@
         router.push(path);
     };
 
+    // 处理导航索引变化
+    const handleNavIndexChange = (event) => {
+        switch (event.detail){
+            case "chat":
+                selectedNavIndex.value = 0;
+                break;
+            case "contacts":
+                selectedNavIndex.value = 1;
+                break;
+            case "cloud-disk":
+                selectedNavIndex.value = 2;
+                break;
+            case "app-store":
+                selectedNavIndex.value = 3;
+                break;
+        }
+    }
+
     onBeforeMount(async () => {
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
+
+        // 订阅导航索引变化事件
+        window.addEventListener("navForceChange",handleNavIndexChange)
     })
 </script>
 

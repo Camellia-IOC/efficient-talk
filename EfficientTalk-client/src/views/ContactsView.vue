@@ -18,8 +18,8 @@
     const selectedFriend = ref(null);
 
     // 设置选中的朋友
-    const setSelectedFriend = (chat) => {
-        selectedFriend.value = chat;
+    const setSelectedFriend = (friend) => {
+        selectedFriend.value = friend;
     };
 </script>
 

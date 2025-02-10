@@ -26,10 +26,10 @@
           <div class="user-info">
             <div class="user-name">{{ item.userName }}</div>
             <div class="user-dept"
-                 v-if="item.dept!==null"
+                 v-if="item.deptName!==null && item.deptId!==null"
             >
               <CrownTwoTone/>
-              {{ item.dept }}
+              {{ item.deptName }}
             </div>
           </div>
         </div>
@@ -52,6 +52,13 @@
         CrownTwoTone
     } from "@ant-design/icons-vue";
     import SocialApi from "../../api/modules/SocialApi";
+    import { getCurUserData } from "../../database/cur-user.js";
+
+    // 当前登录的用户信息
+    const curLoginUser = ref({});
+    const updateCurLoginUser = async () => {
+        curLoginUser.value = await getCurUserData();
+    };
 
     // 类型集合
     const typeSets = [{
@@ -72,20 +79,7 @@
     };
 
     // 好友列表
-    const friendList = ref([
-        {
-            userId: "1",
-            userName: "测试1",
-            userAvatar: "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
-            dept: "部门1"
-        },
-        {
-            userId: "2",
-            userName: "测试2",
-            userAvatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            dept: null
-        }
-    ]);
+    const friendList = ref([]);
 
     // 组织列表
     const groupList = ref([
@@ -102,12 +96,25 @@
         }
     ]);
 
-    onBeforeMount(() => {
-        SocialApi.getFriendList({
-            userId: "1"
-        }).then(res => {
-            friendList.value = res.data;
+    // 获取好友列表
+    const getFriendList = async () => {
+        await SocialApi.getFriendList({
+            userId: curLoginUser.value.userId,
+        }).then((res) => {
+            if (res.code === 0) {
+                const data = res.data;
+                if (data != null) {
+                    friendList.value = data.friendList;
+                }
+            }
         });
+    };
+
+    onBeforeMount(async () => {
+        await updateCurLoginUser();
+
+        // 获取好友列表
+        await getFriendList();
     });
 </script>
 

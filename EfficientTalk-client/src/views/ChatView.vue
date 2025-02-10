@@ -1,7 +1,9 @@
 <template>
   <div class="chat-view-container">
     <div class="chat-list-container">
-      <ChatList @set-selected-chat="setSelectedChat"/>
+      <ChatList @set-selected-chat="setSelectedChat"
+                :friend-info="friendInfo"
+      />
     </div>
     <div class="chat-detail-container">
       <ChatDetail :chat-info="selectedChat"/>
@@ -10,17 +12,37 @@
 </template>
 
 <script setup>
-    import { ref } from "vue";
+    import {
+        onBeforeMount,
+        ref
+    } from "vue";
     import ChatList from "../components/module-chat/ChatList.vue";
     import ChatDetail from "../components/module-chat/ChatDetail.vue";
+    import { useRoute } from "vue-router";
+
+    const route = useRoute();
 
     // 选中的聊天
     const selectedChat = ref(null);
+    const friendInfo = ref(null);
 
     // 设置选中的聊天
     const setSelectedChat = (chat) => {
-      selectedChat.value = chat;
+        selectedChat.value = chat;
     };
+
+    onBeforeMount(() => {
+        if (route.query.friendInfo !== undefined && route.query.friendInfo !== null) {
+            friendInfo.value = JSON.parse(route.query.friendInfo);
+            if (friendInfo.value !== null && friendInfo.value !== undefined) {
+                selectedChat.value = {
+                    userId: friendInfo.value.userId,
+                    userName: friendInfo.value.userName,
+                    userAvatar: friendInfo.value.userAvatar
+                };
+            }
+        }
+    });
 </script>
 
 <style scoped

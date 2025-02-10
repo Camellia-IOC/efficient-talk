@@ -22,6 +22,9 @@ public class UserPO {
     @TableField("avatar")
     private String avatar;
     
+    @TableField("deptId")
+    private String deptId;
+    
     @TableField("register_time")
     private LocalDateTime registerTime;
     

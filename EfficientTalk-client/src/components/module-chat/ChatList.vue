@@ -55,6 +55,13 @@
     } from "../../database/chat-list.js";
     import { getCurUserData } from "../../database/cur-user.js";
 
+    const props = defineProps({
+        friendInfo: {
+            type: Object,
+            default: null
+        }
+    });
+
     // 当前登录的用户信息
     const curLoginUser = ref({});
     const updateCurLoginUser = async () => {
@@ -145,7 +152,12 @@
     // 选择聊天
     const handleSelectChat = (index) => {
         curChatId.value = chatList.value[index].userId;
-        emits("setSelectedChat", chatList.value[index]);
+        const chatInfo = {
+            userId: chatList.value[index].userId,
+            userName: chatList.value[index].userName,
+            userAvatar: chatList.value[index].userAvatar
+        };
+        emits("setSelectedChat", chatInfo);
 
         // 广播聊天对象变化事件
         window.dispatchEvent(new CustomEvent("chatObjectChange", {
@@ -190,6 +202,38 @@
 
         // 读取聊天列表
         chatList.value = await getChatList(curLoginUser.value.userId);
+
+        // 如果传入的好友ID不为null,则将聊天对象设置为该好友
+        if (props.friendInfo !== null) {
+            let flag = false;
+            for (let i = 0; i < chatList.value.length; i++) {
+                if (chatList.value[i].userId === props.friendInfo.userId) {
+                    flag = true;
+                    break;
+                }
+            }
+
+            if (!flag) {
+                // 在聊天列表的头部添加该好友
+                chatList.value.unshift({
+                    userId: props.friendInfo.userId,
+                    userName: props.friendInfo.userName,
+                    userAvatar: props.friendInfo.userAvatar,
+                    lastMessage: "",
+                    lastMessageTime: "",
+                    unreadCount: 0
+                });
+                // handleSaveChatList(chatList.value);
+            }
+
+            curChatId.value = props.friendInfo.userId;
+            const chatInfo = {
+                userId: props.friendInfo.userId,
+                userName: props.friendInfo.userName,
+                userAvatar: props.friendInfo.userAvatar
+            };
+            emits("setSelectedChat", chatInfo);
+        }
     });
 </script>
 

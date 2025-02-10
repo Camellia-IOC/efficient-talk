@@ -9,7 +9,7 @@ export default class SocialApi {
      * @param data 请求数据
      */
     static getFriendList = (data) => {
-        return service.post({
+        return service.get({
             url: this.requestPath + "/getFriendList",
             data
         });
