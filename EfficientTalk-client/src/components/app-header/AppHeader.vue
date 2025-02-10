@@ -1,5 +1,5 @@
 <template>
-  <div class="app-header-container theme-background-color">
+  <div class="app-header-container theme-background-color draggable">
     <div class="logo-container">
       <DingdingOutlined style="font-size: 30px"/>
     </div>
@@ -77,11 +77,6 @@
 <style scoped
        lang="scss"
 >
-  // 用于取消局部拖拽，在拖拽区要监听事件的组件都要加上
-  .no-drag {
-    -webkit-app-region: no-drag;
-  }
-
   .app-header-container {
     display: flex;
     justify-content: space-between;
@@ -107,6 +102,7 @@
       width: calc(100% - $logo-container-width);
       height: 100%;
       background-color: white;
+      padding-right: 10px;
 
       .control-btn {
         display: flex;

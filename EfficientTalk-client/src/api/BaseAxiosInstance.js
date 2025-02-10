@@ -58,7 +58,7 @@ class BaseAxiosInstance {
             ...config,
             method: 'get',
             params: config.data
-        })
+        }).then((response) => response.data);
     }
 
     /** post请求 */
@@ -67,7 +67,7 @@ class BaseAxiosInstance {
             ...config,
             method: 'post',
             data: config.data
-        })
+        }).then((response) => response.data);
     }
 
     /** put请求 */
@@ -76,7 +76,7 @@ class BaseAxiosInstance {
             ...config,
             method: 'put',
             data: config.data
-        })
+        }).then((response) => response.data);
     }
 
     /** delete请求 */
@@ -85,7 +85,7 @@ class BaseAxiosInstance {
             ...config,
             method: 'delete',
             params: config.data
-        })
+        }).then((response) => response.data);
     }
 
     /** download请求 */

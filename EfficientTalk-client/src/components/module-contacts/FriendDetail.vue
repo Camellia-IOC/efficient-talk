@@ -1,11 +1,13 @@
 <template>
-  $END$<div></div>
+  <div></div>
 </template>
 
 <script setup>
 
 </script>
 
-<style scoped lang="scss">
+<style scoped
+       lang="scss"
+>
 
 </style>

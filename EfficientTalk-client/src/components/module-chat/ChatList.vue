@@ -3,16 +3,18 @@
     <div v-for="(item,index) in chatList"
          :key="index"
          class="chat-list-item"
+         @click="handleSelectChat(index)"
+         @contextmenu="handleContextMenu"
     >
       <div class="item-avatar">
         <img class="avatar"
-             :src="item.avatar"
+             :src="item.userAvatar"
              alt=""
         />
       </div>
       <div class="item-detail">
         <div class="detail-header">
-          <div class="username">{{ item.name }}</div>
+          <div class="username">{{ item.userName }}</div>
           <div class="time">{{ item.lastMessageTime }}</div>
         </div>
         <div class="detail-content">
@@ -42,108 +44,145 @@
 </template>
 
 <script setup>
-    import { ref } from "vue";
+    import {
+        onBeforeMount,
+        ref
+    } from "vue";
+    import {
+        saveChatList,
+        getChatList
+    } from "../../database/chat-list.js";
+    import { useUserDataStore } from "../../store/UserDataStore.js";
 
+    const userDataStore = useUserDataStore();
+
+    // 当前聊天对象的ID
+    const curChatId = ref("");
+
+    // 保存聊天列表
+    const handleSaveChatList = (chatList) => {
+        const chatListJson = JSON.stringify(chatList);
+        saveChatList(userDataStore.userId, chatListJson);
+    };
+
+    // 接收消息
+    const handleMessageReceive = (event) => {
+        const message = event.detail;
+        const sender = message.sender;
+
+        // 遍历消息列表，修改相应的元素内容
+        for (let i = 0; i < chatList.value.length; i++) {
+            if (chatList.value[i].userId === sender) {
+                switch (message.type) {
+                    case "text":
+                        chatList.value[i].lastMessage = message.content;
+                        break;
+                    case "image":
+                        chatList.value[i].lastMessage = "[图片]";
+                        break;
+                    case "file":
+                        chatList.value[i].lastMessage = "[文件]";
+                        break;
+                    default:
+                        chatList.value[i].lastMessage = message.content;
+                }
+                chatList.value[i].lastMessageTime = message.time;
+
+                // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
+                if (curChatId.value !== sender) {
+                    chatList.value[i].unreadCount++;
+                }
+                break;
+            }
+        }
+
+        // 保存聊天列表
+        handleSaveChatList(chatList.value);
+    };
+
+    // 发送消息
+    const handleMessageSend = (event) => {
+        const message = event.detail;
+        const receiver = message.receiver;
+
+        // 遍历消息列表，修改相应的元素内容
+        for (let i = 0; i < chatList.value.length; i++) {
+            if (chatList.value[i].userId === receiver) {
+                switch (message.type) {
+                    case "text":
+                        chatList.value[i].lastMessage = message.content;
+                        break;
+                    case "image":
+                        chatList.value[i].lastMessage = "[图片]";
+                        break;
+                    case "file":
+                        chatList.value[i].lastMessage = "[文件]";
+                        break;
+                    default:
+                        chatList.value[i].lastMessage = message.content;
+                }
+                chatList.value[i].lastMessageTime = message.time;
+                break;
+            }
+        }
+
+        // 保存聊天列表
+        handleSaveChatList(chatList.value);
+    };
+
+    const emits = defineEmits(["setSelectedChat"]);
+
+    // 右键菜单
+    const handleContextMenu = () => {
+        alert("context menu");
+    };
+
+    // 选择聊天
+    const handleSelectChat = (index) => {
+        curChatId.value = chatList.value[index].userId;
+        emits("setSelectedChat", chatList.value[index]);
+
+        // 广播聊天对象变化事件
+        window.dispatchEvent(new CustomEvent("chatObjectChange", {
+            detail: curChatId.value
+        }));
+
+        // 如果有消息未读则清空未读消息数
+        if (chatList.value[index].unreadCount !== 0) {
+            chatList.value[index].unreadCount = 0;
+            handleSaveChatList(chatList.value);
+        }
+    };
+
+    // 聊天列表
     const chatList = ref([
         {
-            name: "Chat 1",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Hello, how are you?",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 2,
+            userId: "1",
+            userName: "测试1",
+            userAvatar: "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
+            lastMessage: "你好",
+            lastMessageTime: "2023-05-01 12:00:00",
+            unreadCount: 0
         },
         {
-            name: "Chat 2",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "I'm good, thanks!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 100,
-        },
-        {
-            name: "Chat 3",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "What's up?",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 99,
-        },
-        {
-            name: "Chat 4",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "How are you doing?",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 5",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Hey!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 6",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Good morning!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 7",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "What's new?",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 8",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Hello there!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 9",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Hi!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 10",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Good afternoon!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 999,
-        },
-        {
-            name: "Chat 11",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Good evening!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 12",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "How's it going?",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 13",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "What's up?",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
-        {
-            name: "Chat 14",
-            avatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
-            lastMessage: "Good night!",
-            lastMessageTime: "2023-07-01",
-            unreadCount: 0,
-        },
+            userId: "2",
+            userName: "测试2",
+            userAvatar: "https://avatars.githubusercontent.com/u/123456789?v=4",
+            lastMessage: "你好",
+            lastMessageTime: "2023-05-01 12:00:00",
+            unreadCount: 0
+        }
     ]);
+
+    onBeforeMount(async () => {
+        // 订阅消息接收
+        window.addEventListener("messageReceive", handleMessageReceive);
+        // 订阅消息发送
+        window.addEventListener("messageSend", handleMessageSend);
+
+        // 读取聊天列表
+        chatList.value = await getChatList(userDataStore.userId);
+    });
 </script>
 
 <style scoped

@@ -11,15 +11,15 @@ const serverIP = "127.0.0.1";
 
 // 微服务端口
 /** 认证服务端口 */
-const authServicePort = "1314";
+const authServicePort = "18080";
 /** 用户服务端口 */
-const userServicePort = "1314";
+const userServicePort = "18080";
 /** 资源服务端口 */
-const resourceServicePort = "1314";
+const resourceServicePort = "18080";
 /** 社交服务端口 */
-const socialServicePort = "1314";
+const socialServicePort = "18080";
 /** 留言板服务端口 */
-const messageBoardServicePort = "1314";
+const messageBoardServicePort = "18080";
 
 // 生成并导出axios实例
 /** 认证服务实例 */

@@ -2,6 +2,7 @@ import {
     createRouter,
     createWebHashHistory
 } from "vue-router";
+import AuthView from "../views/AuthView.vue";
 import IndexView from "../views/IndexView.vue";
 
 const router = createRouter({
@@ -12,14 +13,14 @@ const router = createRouter({
         {
             // 初始路由重定向
             path: "/",
-            redirect: "/app"
+            redirect: "/auth"
         },
-        // {
-        //     // 登录模块
-        //     path: "/auth",
-        //     name: "auth",
-        //     component: () => import("../views/AuthView.vue"),
-        // },
+        {
+            // 登录模块
+            path: "/auth",
+            name: "auth",
+            component: AuthView
+        },
         {
             // 主界面模块
             path: "/app",
@@ -38,18 +39,18 @@ const router = createRouter({
                     name: "contacts",
                     component: () => import("../views/ContactsView.vue")
                 },
-                // {
-                //     // 播客
-                //     path: "podcasts",
-                //     name: "podcasts",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
-                // {
-                //     // 漫游
-                //     path: "roaming",
-                //     name: "roaming",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
+                {
+                    // 云盘
+                    path: "cloud-disk",
+                    name: "cloud-disk",
+                    component: () => import("../views/EmptyView.vue")
+                },
+                {
+                    // 漫游
+                    path: "app-store",
+                    name: "app-store",
+                    component: () => import("../views/EmptyView.vue")
+                },
                 // {
                 //     // 动态
                 //     path: "news",

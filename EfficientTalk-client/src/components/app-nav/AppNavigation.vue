@@ -1,12 +1,15 @@
 <template>
-  <div class="app-nav-container theme-background-color">
+  <div class="app-nav-container theme-background-color draggable">
     <div class="nav-main">
-      <div class="user-info-container">
-        <div class="user-avatar"></div>
+      <div class="user-info-container no-drag">
+        <img class="user-avatar"
+             :src="userDataStore.userAvatar"
+             alt="avatar"
+        />
       </div>
       <div v-for="(item,index) in navConfig"
            :key="index"
-           class="nav-item"
+           class="nav-item no-drag"
            :class="{ 'nav-item-active': selectedNavIndex === item.index }"
            @click="handleNavChange(item.index, item.path)"
       >
@@ -21,13 +24,33 @@
       </div>
     </div>
     <div class="nav-footer">
-
+      <div class="nav-item no-drag"
+      >
+        <div class="nav-item-icon">
+          <QuestionCircleOutlined/>
+        </div>
+      </div>
+      <div class="nav-item no-drag"
+      >
+        <div class="nav-item-icon">
+          <BarsOutlined/>
+        </div>
+      </div>
+      <div class="nav-item no-drag"
+           @click="handleLogout()"
+      >
+        <div class="nav-item-icon">
+          <PoweroffOutlined/>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-    import { ref } from "vue";
+    import {
+        ref
+    } from "vue";
     import {
         MessageOutlined,
         MessageFilled,
@@ -36,11 +59,27 @@
         CloudFilled,
         CloudOutlined,
         AppstoreOutlined,
-        AppstoreFilled
+        AppstoreFilled,
+        QuestionCircleOutlined,
+        PoweroffOutlined,
+        BarsOutlined
     } from "@ant-design/icons-vue";
     import { useRouter } from "vue-router";
+    import { useUserDataStore } from "../../store/UserDataStore.js";
 
     const router = useRouter();
+
+    // 用户数据
+    const userDataStore = useUserDataStore();
+
+    // 处理退出登录
+    const handleLogout = () => {
+        // TODO 使用electron运行时记得取消相应注释
+        // windowController.hide();
+        // appController.logout();
+        router.push("/auth");
+        // windowController.show();
+    };
 
     // 导航配置
     const navConfig = [
@@ -63,14 +102,14 @@
             index: 2,
             icon: CloudOutlined,
             iconActive: CloudFilled,
-            path: "/"
+            path: "/app/cloud-disk"
         },
         {
             name: "工作台",
             index: 3,
             icon: AppstoreOutlined,
             iconActive: AppstoreFilled,
-            path: "/"
+            path: "/app/app-store"
         }
     ];
 
@@ -80,7 +119,7 @@
     // 处理导航切换
     const handleNavChange = (index, path) => {
         selectedNavIndex.value = index;
-        router.push(path)
+        router.push(path);
     };
 </script>
 
@@ -142,8 +181,31 @@
 
     .nav-footer {
       display: flex;
+      flex-direction: column;
       justify-content: flex-end;
       align-items: center;
+      width: 100%;
+      height: 50%;
+
+      .nav-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        margin: 10px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item-icon {
+          font-size: 20px;
+          color: white;
+        }
+      }
     }
   }
 </style>
