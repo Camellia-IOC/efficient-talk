@@ -7,5 +7,6 @@ import java.util.ArrayList;
 
 @Data
 public class FriendListResponseVO {
+    // 好友列表
     ArrayList<FriendListItemDTO> friendList;
 }

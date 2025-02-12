@@ -3,4 +3,36 @@
 		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.ChatMapper">
+	<!--保存聊天记录-->
+	<insert id="saveChatHistory" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		INSERT INTO chat_history (id, sender, receiver, type, file_id, content, send_time)
+		VALUES (#{id}, #{sender}, #{receiver}, #{type}, #{fileId}, #{content}, #{time})
+	</insert>
+
+	<!--缓存聊天记录-->
+	<insert id="cacheChatHistory" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		INSERT INTO chat_history_cache (id, sender, receiver, type, file_id, content, send_time)
+		VALUES (#{id}, #{sender}, #{receiver}, #{type}, #{fileId}, #{content}, #{time})
+	</insert>
+
+	<!--获取缓存的聊天记录-->
+	<select id="getChatHistoryCache" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		SELECT id        as id,
+			   sender    as sender,
+			   receiver  as receiver,
+			   type      as type,
+			   file_id   as fileId,
+			   content   as content,
+			   send_time as time
+		FROM chat_history_cache
+		WHERE receiver = #{userId}
+		ORDER BY send_time
+	</select>
+
+	<!--删除缓存的聊天记录-->
+	<delete id="deleteChatHistoryCache">
+		DELETE
+		FROM chat_history_cache
+		WHERE receiver = #{userId}
+	</delete>
 </mapper>

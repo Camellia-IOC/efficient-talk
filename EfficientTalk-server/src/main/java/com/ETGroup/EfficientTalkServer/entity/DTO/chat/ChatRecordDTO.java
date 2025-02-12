@@ -1,24 +1,23 @@
-package com.ETGroup.EfficientTalkServer.websocket.message;
+package com.ETGroup.EfficientTalkServer.entity.DTO.chat;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * 用于封装浏览器发送给服务端的消息数据
- */
 @Data
-public class Message {
-    // 消息ID
+public class ChatRecordDTO {
+    // 聊天记录ID
     private String id;
-    // 发送人ID
+    // 发送者ID
     private String sender;
-    // 接收人ID
+    // 接收者ID
     private String receiver;
     // 消息类型
     private String type;
+    // 文件ID
+    private String fileId;
     // 消息内容
     private String content;
-    // 消息发送时间
+    // 发送时间
     private LocalDateTime time;
 }

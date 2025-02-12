@@ -52,6 +52,7 @@
     display: flex;
     width: 100%;
     height: 100%;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 
     $chat-list-container-width: 250px;
 

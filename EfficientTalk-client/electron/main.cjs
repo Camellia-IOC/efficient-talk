@@ -108,7 +108,7 @@ app.whenReady()
                type: "radio"
            }
        ]);
-       const icon = nativeImage.createFromPath("./src/assets/icon.png");
+       const icon = nativeImage.createFromPath("./src/assets/logo.png");
        let tray = new Tray(icon);
        tray.setContextMenu(contextMenu);
        tray.setToolTip("测试应用");

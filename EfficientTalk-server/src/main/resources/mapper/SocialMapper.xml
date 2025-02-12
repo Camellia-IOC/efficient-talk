@@ -5,11 +5,11 @@
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.SocialMapper">
 	<!--获取好友列表-->
 	<select id="getFriendList" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.FriendListItemDTO">
-		SELECT friends.friend_id     as userId,
-			   users.username        as userName,
-			   users.avatar          as userAvatar,
-			   users.dept_id         as deptId,
-			   departments.dept_name as deptName
+		SELECT friends.friend_id     AS userId,
+			   users.username        AS userName,
+			   users.avatar          AS userAvatar,
+			   users.dept_id         AS deptId,
+			   departments.dept_name AS deptName
 		FROM friends
 				 LEFT JOIN users ON friends.friend_id = users.id
 				 LEFT JOIN departments ON users.dept_id = departments.dept_id

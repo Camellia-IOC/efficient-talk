@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { saveChatRecord } from "../database/chat-history.js";
 
 // WebSocket全局配置
 export const useWebSocketStore = defineStore("web-socket-store", () => {
@@ -17,6 +18,9 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
             const messageData = JSON.parse(message.data);
             console.log("收到服务器消息：", messageData);
 
+            // 保存聊天记录
+            saveChatRecord(messageData).then();
+
             // 广播消息
             window.dispatchEvent(new CustomEvent("messageReceive", {
                 detail: messageData
@@ -30,8 +34,14 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
         };
     };
 
+    // 关闭WebSocket连接
+    const closeSocket = () => {
+        socket.value.close();
+    }
+
     return {
         socket,
         initSocket,
+        closeSocket
     };
 });

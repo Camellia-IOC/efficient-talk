@@ -20,6 +20,6 @@
 		<mapper resource="mapper/SocialMapper.xml"/>
 		<mapper resource="mapper/ChatMapper.xml"/>
 		<mapper resource="mapper/UserMapper.xml"/>
-<!--		<mapper resource="mapper/ResourceMapper.xml"/>-->
+		<mapper resource="mapper/CloudDiskMapper.xml"/>
 	</mappers>
 </configuration>

@@ -3,4 +3,27 @@
 		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.UserMapper">
+	<!--获取用户详细信息-->
+	<select id="getUserDetail" resultType="com.ETGroup.EfficientTalkServer.entity.response.user.UserDetailResponseVO">
+		SELECT users.id              AS userId,
+			   users.username        AS userName,
+			   users.avatar          AS userAvatar,
+			   users.employee_id     AS employeeId,
+			   users.dept_id         AS deptId,
+			   departments.dept_name AS deptName,
+			   users.job_id          AS jobId,
+			   jobs.job_name         AS jobName
+		FROM users
+				 LEFT JOIN departments ON departments.dept_id = users.dept_id
+				 LEFT JOIN jobs ON jobs.job_id = users.job_id
+		WHERE users.id = #{userId}
+	</select>
+
+	<!--获取用户基本信息-->
+	<select id="getUserBasicInfo"
+			resultType="com.ETGroup.EfficientTalkServer.entity.response.user.UserBasicInfoResponseVO">
+		SELECT users.username as userName, users.avatar as userAvatar
+		FROM users
+		WHERE users.id = #{userId}
+	</select>
 </mapper>

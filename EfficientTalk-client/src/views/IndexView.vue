@@ -26,6 +26,7 @@
     import { useWebSocketStore } from "../store/WebSocketStore.js";
     import {
         onBeforeMount,
+        onUnmounted,
         ref
     } from "vue";
     import { getCurUserData } from "../database/cur-user.js";
@@ -43,10 +44,15 @@
     onBeforeMount(async () => {
         await updateCurLoginUser();
         if (curLoginUser.value === null) {
-            // TODO 如果当前登录用户信息为空则退出到登录页面
+            // 如果当前登录用户信息为空则退出到登录页面
             await router.push("/auth");
         }
         websocketStore.initSocket(curLoginUser.value.userId);
+    });
+
+    onUnmounted(() => {
+        // 退出时关闭WebSocket连接
+        websocketStore.closeSocket();
     });
 </script>
 

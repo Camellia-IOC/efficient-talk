@@ -54,6 +54,8 @@
     import SocialApi from "../../api/modules/SocialApi";
     import { getCurUserData } from "../../database/cur-user.js";
 
+    const emits = defineEmits(["setSelectedFriend"]);
+
     // 当前登录的用户信息
     const curLoginUser = ref({});
     const updateCurLoginUser = async () => {
@@ -76,6 +78,7 @@
     const curFriendId = ref(null);
     const handleSelectFriend = (friend) => {
         curFriendId.value = friend.userId;
+        emits("setSelectedFriend", curFriendId.value);
     };
 
     // 好友列表

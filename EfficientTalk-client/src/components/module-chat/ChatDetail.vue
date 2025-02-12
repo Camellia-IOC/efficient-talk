@@ -48,7 +48,7 @@
               </div>
             </div>
             <div class="message-time">
-              {{ item.time }}
+              {{ formatMessageTime(item.time, "chat-detail") }}
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@
               </div>
             </div>
             <div class="message-time">
-              {{ item.time }}
+              {{ formatMessageTime(item.time, "chat-detail") }}
             </div>
           </div>
           <div class="message-avatar">
@@ -87,8 +87,40 @@
     <div class="chat-footer">
       <div class="operations-bar">
         <div class="left-bar">
+          <a-popover title="表情包"
+                     trigger="hover"
+                     class="emoji-selector"
+          >
+            <template #content>
+              <div style="width:400px;height: 400px;overflow-y:auto ">
+                <!--<Vue3EmojiPicker style="width: 100%;height: 100%;border-radius: 0"-->
+                <!--                 :native="true"-->
+                <!--                 :disable-skin-tones="true"-->
+                <!--                 :display-recent="true"-->
+                <!--                 :disable-sticky-group-names="true"-->
+                <!--                 :static-texts="{ placeholder: '搜索表情'}"-->
+                <!--                 v-model="selectedEmoji"-->
+                <!--                 @select="handleEmojiSelect"-->
+                <!--                 :group-names="{-->
+                <!--								 'recently-used':'最近使用',-->
+                <!--							   'smileys_people': '表情 & 人',-->
+                <!--								 'animals_nature': '动物 & 自然',-->
+                <!--								 'food_drink': '食物 & 饮品',-->
+                <!--								 'activities': '活动',-->
+                <!--								 'travel_places': '旅行地点',-->
+                <!--								 'objects': '物品',-->
+                <!--								 'symbols': '标志',-->
+                <!--								 'flags': '国旗'-->
+                <!--							 }"-->
+                <!--/>-->
+              </div>
+            </template>
+            <a-button class="operation-btn">
+              <SmileOutlined/>
+            </a-button>
+          </a-popover>
           <a-button class="operation-btn">
-            <SmileOutlined/>
+            <PictureOutlined/>
           </a-button>
           <a-button class="operation-btn">
             <FolderOutlined/>
@@ -138,7 +170,8 @@
     import {
         FolderOutlined,
         HistoryOutlined,
-        SmileOutlined
+        SmileOutlined,
+        PictureOutlined
     } from "@ant-design/icons-vue";
     import dayjs from "dayjs";
     import { UUID } from "uuidjs";
@@ -148,6 +181,7 @@
         saveChatRecord
     } from "../../database/chat-history.js";
     import { getCurUserData } from "../../database/cur-user.js";
+    import { formatMessageTime } from "../../utils/time-utils.js";
 
     const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
@@ -165,6 +199,11 @@
 
     // 输入消息
     const chatInput = ref("");
+    const selectedEmoji = ref();
+    const handleEmojiSelect = (emoji) => {
+        chatInput.value += emoji.i;
+        selectedEmoji.value = "";
+    };
 
     //传入参数
     const props = defineProps({
@@ -201,15 +240,12 @@
     const handleMessageReceive = (message) => {
         const messageData = message.detail;
         console.log("收到服务器消息：", messageData);
-        chatHistory.value.push(messageData);
 
         if (messageData.sender === props.chatInfo.userId) {
-            // 如果发送者是当前聊天的对象，滚动到底部
-            scrollToBottom("smooth")
+            // 如果发送者是当前聊天的对象,注入消息并滚动到底部
+            chatHistory.value.push(messageData);
+            scrollToBottom("smooth");
         }
-
-        // 保存聊天记录
-        handleSaveChatHistory(messageData);
     };
 
     // 发送消息
@@ -229,6 +265,7 @@
                 sender: curLoginUser.value.userId,
                 receiver: props.chatInfo.userId,
                 type: "text",
+                fileId: null,
                 content: chatInput.value,
                 time: dayjs().format("YYYY-MM-DD HH:mm:ss")
             };
@@ -236,7 +273,7 @@
             chatHistory.value.push(message);
 
             // 发送消息后滚动到底部
-            scrollToBottom("smooth")
+            scrollToBottom("smooth");
 
             // 广播消息
             window.dispatchEvent(new CustomEvent("messageSend", {
@@ -255,36 +292,11 @@
         chatHistory.value = await getChatHistory(friendId, curLoginUser.value.userId);
 
         // 发送消息后滚动到底部
-        scrollToBottom("auto")
+        scrollToBottom("auto");
     };
 
     // 聊天记录
-    const chatHistory = ref([
-        {
-            id: "1",
-            sender: "1",
-            receiver: "2",
-            type: "text",
-            content: "你好",
-            time: "2023-05-05 12:00:00"
-        },
-        {
-            id: "2",
-            sender: "2",
-            receiver: "1",
-            type: "text",
-            content: "你好",
-            time: "2023-05-05 12:00:00",
-        },
-        {
-            id: "3",
-            sender: "1",
-            receiver: "2",
-            type: "image",
-            content: "https://picsum.photos/200/300",
-            time: "2023-05-05 12:00:00",
-        }
-    ]);
+    const chatHistory = ref([]);
 
     onBeforeMount(async () => {
         // 注册消息监听事件
@@ -309,7 +321,7 @@
     width: 100%;
     height: 100%;
 
-    $header-height: 50px;
+    $header-height: 60px;
     $footer-height: 210px;
 
     .chat-header {
@@ -365,10 +377,15 @@
         $avatar-container-width: 60px;
         $message-user-name-size: 12px;
         $message-element-gap: 8px;
+        $message-content-max-width: 80%;
+        $message-content-horizontal-padding: 10px;
+        $message-content-vertical-padding: 6px;
 
         .others-message {
           display: flex;
           justify-content: flex-start;
+          width: 100%;
+          height: fit-content;
 
           .message-avatar {
             display: flex;
@@ -402,8 +419,8 @@
                 display: flex;
                 justify-content: flex-start;
                 width: fit-content;
-                max-width: 100%;
-                padding: 5px;
+                max-width: $message-content-max-width;
+                padding: $message-content-vertical-padding $message-content-horizontal-padding;
                 font-size: 14px;
                 color: black;
                 background-color: rgba(0, 0, 0, 0.1);
@@ -424,8 +441,8 @@
               display: flex;
               justify-content: flex-start;
               align-items: center;
-              font-size: 12px;
-              color: gray;
+              font-size: 10px;
+              color: rgba(0, 0, 0, 0.35);
             }
           }
         }
@@ -471,8 +488,8 @@
                 display: flex;
                 justify-content: flex-start;
                 width: fit-content;
-                max-width: 100%;
-                padding: 5px;
+                max-width: $message-content-max-width;
+                padding: $message-content-vertical-padding $message-content-horizontal-padding;
                 font-size: 14px;
                 color: white;
                 background-color: global-variable.$theme-color;
@@ -493,8 +510,8 @@
               display: flex;
               justify-content: flex-end;
               align-items: center;
-              font-size: 12px;
-              color: gray;
+              font-size: 10px;
+              color: rgba(0, 0, 0, 0.35);
             }
           }
         }
