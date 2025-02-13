@@ -3,6 +3,7 @@ package com.ETGroup.EfficientTalkServer.mapper;
 import com.ETGroup.EfficientTalkServer.entity.response.user.UserBasicInfoResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.user.UserDetailResponseVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserMapper {
@@ -13,7 +14,7 @@ public interface UserMapper {
      *
      * @return 用户详细信息
      */
-    UserDetailResponseVO getUserDetail(String userId);
+    UserDetailResponseVO getUserDetail(@Param("curLoginUserId") String curLoginUserId, @Param("userId") String userId);
     
     /**
      * 获取用户基本信息

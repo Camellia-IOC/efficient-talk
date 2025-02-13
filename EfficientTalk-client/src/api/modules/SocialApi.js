@@ -25,4 +25,59 @@ export default class SocialApi {
             data
         });
     };
+
+    /**
+     * 获取好友邀请列表
+     * @param data 请求数据
+     */
+    static getFriendInvitationList = (data) => {
+        return service.get({
+            url: this.requestPath + "/getFriendInvitationList",
+            data
+        });
+    };
+
+    /**
+     * 删除好友
+     * @param data 请求数据
+     */
+    static deleteFriend = (data) => {
+        return service.delete({
+            url: this.requestPath + "/deleteFriend",
+            data
+        });
+    };
+
+    /**
+     * 创建好友邀请
+     * @param data
+     */
+    static createFriendInvite = (data) => {
+        return service.post({
+            url: this.requestPath + "/createFriendInvite",
+            data
+        });
+    };
+
+    /**
+     * 处理好友邀请
+     * @param data
+     */
+    static handleFriendInvite = (data) => {
+        return service.put({
+            url: this.requestPath + "/handleFriendInvite",
+            data
+        });
+    }
+
+    /**
+     * 获取好友分组
+     * @param data
+     */
+    static getUserFriendGroups = (data) => {
+        return service.get({
+            url: this.requestPath + "/getUserFriendGroups",
+            data
+        });
+    }
 }

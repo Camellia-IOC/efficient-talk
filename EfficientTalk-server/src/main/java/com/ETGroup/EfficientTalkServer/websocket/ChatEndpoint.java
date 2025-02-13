@@ -67,7 +67,7 @@ public class ChatEndpoint {
             }
         }
         catch (Exception exception) {
-            log.error(exception.getMessage());
+            log.error(exception.toString());
         }
     }
     
@@ -96,7 +96,7 @@ public class ChatEndpoint {
             }
         }
         catch (Exception exception) {
-            log.error(exception.getMessage());
+            log.error(exception.toString());
         }
     }
     

@@ -5,15 +5,145 @@
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.SocialMapper">
 	<!--获取好友列表-->
 	<select id="getFriendList" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.FriendListItemDTO">
-		SELECT friends.friend_id     AS userId,
-			   users.username        AS userName,
-			   users.avatar          AS userAvatar,
-			   users.dept_id         AS deptId,
-			   departments.dept_name AS deptName
+		SELECT friends.friend_id        as userId,
+			   users.username           as userName,
+			   users.avatar             as userAvatar,
+			   users.dept_id            as deptId,
+			   departments.dept_name    as deptName,
+			   friend_groups.group_id   as groupId,
+			   friend_groups.group_name as groupName
 		FROM friends
 				 LEFT JOIN users ON friends.friend_id = users.id
 				 LEFT JOIN departments ON users.dept_id = departments.dept_id
+				 LEFT JOIN friend_groups ON friends.group_id = friend_groups.group_id
 		WHERE friends.user_id = #{userId}
 		ORDER BY users.username
+	</select>
+
+	<!--创建好友邀请-->
+	<insert id="createFriendInvite" parameterType="com.ETGroup.EfficientTalkServer.entity.PO.FriendInvitationPO">
+		INSERT INTO friend_invitations (id, user_id, friend_id, message, group_id, invite_time, handle_time, state)
+		VALUES (#{id}, #{userId}, #{friendId}, #{message}, #{groupId}, #{inviteTime}, #{inviteTime}, #{state})
+	</insert>
+
+	<!--处理好友邀请-->
+	<update id="handleFriendInvite">
+		UPDATE friend_invitations
+		SET handle_time = #{handleTime},
+			state       = #{state}
+		WHERE id = #{id}
+	</update>
+
+	<!--获取邀请记录中的用户ID-->
+	<!--<select id="getInvitationUsers"-->
+	<!--		resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.GetInvitationUsersDTO">-->
+	<!--	SELECT user_id as userId, friend_id as friendId-->
+	<!--	FROM friend_invitations-->
+	<!--	WHERE id = #{id}-->
+	<!--</select>-->
+
+	<!--添加好友记录-->
+	<!--TODO 修改分组-->
+	<insert id="addFriendRecord" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.social.AddFriendRecordDTO">
+		INSERT INTO friends (record_id, user_id, friend_id, group_id, create_time)
+		VALUES (#{userRecordId}, #{userId}, #{friendId}, #{userGroupId}, #{createTime})
+		<if test="!userId.equals(friendId)">
+			, (#{friendRecordId}, #{friendId}, #{userId}, #{friendGroupId}, #{createTime})
+		</if>
+	</insert>
+
+	<!--删除好友-->
+	<delete id="deleteFriend">
+		DELETE
+		FROM friends
+		WHERE (user_id = #{userId} AND friend_id = #{friendId})
+		   OR (friend_id = #{userId} AND user_id = #{friendId})
+	</delete>
+
+	<!--获取好友申请列表-->
+	<select id="getFriendInvitationList"
+			resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.FriendInvitationListItemDTO">
+		SELECT friend_invitations.id          as invitationId,
+			   friend_invitations.user_id     as senderId,
+			   friend_invitations.friend_id   as receiverId,
+			   users.username                 as friendName,
+			   users.avatar                   as friendAvatar,
+			   friend_invitations.message     as message,
+			   friend_invitations.group_id    as groupId,
+			   friend_invitations.invite_time as inviteTime,
+			   friend_invitations.handle_time as handleTime,
+			   friend_invitations.state       as state
+		FROM friend_invitations
+				 LEFT JOIN users ON users.id = friend_invitations.friend_id
+		WHERE user_id = #{userId}
+		UNION
+		SELECT friend_invitations.id          as invitationId,
+			   friend_invitations.user_id     as receiverId,
+			   friend_invitations.friend_id   as senderId,
+			   users.username                 as friendName,
+			   users.avatar                   as friendAvatar,
+			   friend_invitations.message     as message,
+			   friend_invitations.group_id    as groupId,
+			   friend_invitations.invite_time as inviteTime,
+			   friend_invitations.handle_time as handleTime,
+			   friend_invitations.state       as state
+		FROM friend_invitations
+				 LEFT JOIN users ON users.id = friend_invitations.user_id
+		WHERE friend_id = #{userId}
+		ORDER BY handleTime DESC
+	</select>
+
+	<!--检查是否存在关联记录,返回关联邀请记录ID-->
+	<select id="checkRelativeInvitation" resultType="java.lang.String">
+		SELECT id
+		FROM friend_invitations
+		WHERE user_id = #{friendId}
+		  AND friend_id = #{userId}
+	</select>
+
+	<!--获取邀请记录状态-->
+	<select id="getInvitationState" resultType="java.lang.Integer">
+		SELECT state
+		FROM friend_invitations
+		WHERE id = #{id}
+	</select>
+
+	<!--搜索新好友-->
+	<select id="searchNewFriend" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.NewFriendBasicInfoDTO">
+		SELECT users.id                                                     as userId,
+			   users.username                                               as userName,
+			   users.avatar                                                 as userAvatar,
+			   users.dept_id                                                as deptId,
+			   departments.dept_name                                        as deptName,
+			   users.job_id                                                 as jobId,
+			   jobs.job_name                                                as jobName,
+			   users.sex                                                    as sex,
+			   EXISTS(SELECT 1
+					  FROM friends
+					  WHERE (user_id = #{userId} AND friend_id = users.id)
+						 OR (user_id = users.id AND friend_id = #{userId})) as isFriend
+		FROM users
+				 LEFT JOIN departments ON users.dept_id = departments.dept_id
+				 LEFT JOIN jobs ON users.job_id = jobs.job_id
+		WHERE id = #{friendId}
+		   OR username LIKE CONCAT('%', #{friendName}, '%')
+		LIMIT #{pageSize}
+		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
+		OFFSET #{pageOffset}
+	</select>
+
+	<!--检查是否为好友-->
+	<select id="checkIsFriend" resultType="java.lang.Integer">
+		SELECT 1
+		FROM friends
+		WHERE (user_id = #{userId} AND friend_id = #{friendId})
+		   OR (user_id = #{friendId} AND friend_id = #{userId})
+	</select>
+
+	<!--获取指定用户的好友分组-->
+	<select id="getUserFriendGroups" resultType="com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO">
+		SELECT group_id as groupId, group_name as groupName, user_id as userId
+		FROM friend_groups
+		WHERE user_id = 'SYSTEM' || user_id = #{userId}
 	</select>
 </mapper>

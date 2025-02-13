@@ -21,8 +21,8 @@ public class UserServiceImpl implements UserService {
      * @return 用户详细信息
      */
     @Override
-    public UserDetailResponseVO getUserDetail(String userId) {
-        return userMapper.getUserDetail(userId);
+    public UserDetailResponseVO getUserDetail(String curLoginUserId, String userId) {
+        return userMapper.getUserDetail(curLoginUserId, userId);
     }
     
     /**

@@ -21,14 +21,14 @@ public class UserController {
     
     @Operation(summary = "获取用户详细信息")
     @GetMapping("/getUserDetail")
-    public ResponseData<UserDetailResponseVO> getUserDetail (@RequestParam String userId) {
-        UserDetailResponseVO response = userService.getUserDetail(userId);
+    public ResponseData<UserDetailResponseVO> getUserDetail(@RequestParam String curLoginUserId, @RequestParam String userId) {
+        UserDetailResponseVO response = userService.getUserDetail(curLoginUserId, userId);
         return ResponseData.success(response);
     }
     
     @Operation(summary = "获取用户基本信息")
     @GetMapping("/getUserBasicInfo")
-    public ResponseData<UserBasicInfoResponseVO> getUserBasicInfo (@RequestParam String userId) {
+    public ResponseData<UserBasicInfoResponseVO> getUserBasicInfo(@RequestParam String userId) {
         UserBasicInfoResponseVO response = userService.getUserBasicInfo(userId);
         return ResponseData.success(response);
     }

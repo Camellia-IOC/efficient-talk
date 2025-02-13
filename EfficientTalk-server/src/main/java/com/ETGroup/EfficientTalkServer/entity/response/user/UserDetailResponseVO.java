@@ -20,4 +20,6 @@ public class UserDetailResponseVO {
     private String jobId;
     // 用户职位
     private String jobName;
+    // 是否为好友
+    private Boolean isFriend;
 }

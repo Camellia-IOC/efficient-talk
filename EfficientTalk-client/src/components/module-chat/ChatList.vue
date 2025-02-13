@@ -4,9 +4,7 @@
       <a-input class="content-input"
                placeholder="搜索"
       ></a-input>
-      <a-button class="search-btn"
-                shape="circle"
-      >
+      <a-button class="search-btn">
         <SearchOutlined/>
       </a-button>
     </div>
@@ -315,11 +313,19 @@
       }
 
       .search-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: calc($search-area-height * 0.6);
         height: 60%;
         color: gray;
         border: none;
+        border-radius: 8px;
         background-color: rgba(0, 0, 0, 0.04);
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.08);
+        }
       }
     }
 

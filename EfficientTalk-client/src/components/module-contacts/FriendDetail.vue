@@ -24,10 +24,13 @@
         </div>
       </div>
       <div class="dept-info">
-        <a-descriptions class="dept-info-content" bordered :column="1">
+        <a-descriptions class="dept-info-content"
+                        bordered
+                        :column="1"
+        >
           <a-descriptions-item label="工号">{{ friendInfo.employeeId }}</a-descriptions-item>
-          <a-descriptions-item label="部门">{{ friendInfo.deptName}}</a-descriptions-item>
-          <a-descriptions-item label="职位">{{ friendInfo.jobName}}</a-descriptions-item>
+          <a-descriptions-item label="部门">{{ friendInfo.deptName }}</a-descriptions-item>
+          <a-descriptions-item label="职位">{{ friendInfo.jobName }}</a-descriptions-item>
         </a-descriptions>
       </div>
       <div class="operation-bar">
@@ -37,13 +40,20 @@
         </a-button>
         <a-button type="primary"
                   danger
-                  v-if="friendInfo.userId!==curLoginUser.userId"
+                  v-if="friendInfo.isFriend === true && friendInfo.userId !== curLoginUser.userId"
                   class="operation-btn"
+                  @click="handleDeleteFriend"
         >删除好友
+        </a-button>
+        <a-button @click="handleCreateFriendInvite"
+                  class="operation-btn"
+                  v-else-if="friendInfo.isFriend === false && friendInfo.userId !== curLoginUser.userId"
+        >添加好友
         </a-button>
         <a-button type="primary"
                   @click="handleGoChat"
                   class="operation-btn"
+                  v-if="friendInfo.isFriend === true && friendInfo.userId !== curLoginUser.userId"
         > 发送消息
         </a-button>
       </div>
@@ -59,6 +69,8 @@
     import { useRouter } from "vue-router";
     import UserApi from "../../api/modules/UserApi.js";
     import { getCurUserData } from "../../database/cur-user.js";
+    import SocialApi from "../../api/modules/SocialApi.js";
+    import { message } from "ant-design-vue";
 
     const router = useRouter();
 
@@ -94,6 +106,7 @@
     // 获取好友信息
     const getUserDetail = async (userId) => {
         await UserApi.getUserDetail({
+            curLoginUserId: curLoginUser.value.userId,
             userId: userId
         }).then((res) => {
             if (res.code === 0) {
@@ -107,7 +120,8 @@
                         deptId: data.deptId,
                         deptName: data.deptName,
                         jobId: data.jobId,
-                        jobName: data.jobName
+                        jobName: data.jobName,
+                        isFriend: data.isFriend
                     };
                 }
             }
@@ -122,6 +136,43 @@
         // 获取用户信息
         await getUserDetail(newValue);
     });
+
+    // 删除好友
+    const handleDeleteFriend = async () => {
+        await SocialApi.deleteFriend({
+            userId: curLoginUser.value.userId,
+            friendId: props.friendId
+        }).then((res) => {
+            if (res.code === 0) {
+                message.success("删除成功");
+                friendInfo.value.isFriend = false;
+            }
+            else {
+                message.error("删除失败");
+            }
+        }).catch((err) => {
+            console.error(err);
+            message.error("删除失败");
+        });
+    };
+
+    // 添加好友
+    const handleCreateFriendInvite = async () => {
+        await SocialApi.createFriendInvite({
+            userId: curLoginUser.value.userId,
+            friendId: props.friendId
+        }).then((res) => {
+            if (res.code === 0) {
+                message.success("已发送好友邀请");
+            }
+            else {
+                message.error("发送好友邀请失败");
+            }
+        }).catch((err) => {
+            console.error(err);
+            message.error("发送好友邀请失败");
+        });
+    };
 </script>
 
 <style scoped

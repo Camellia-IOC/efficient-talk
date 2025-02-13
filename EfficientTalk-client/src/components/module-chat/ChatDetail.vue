@@ -147,14 +147,7 @@
       </div>
     </div>
   </div>
-  <div v-else
-       class="chat-detail"
-       style="justify-content: center"
-  >
-    <a-empty :image="simpleImage"
-             :description="'选择用户开始沟通吧'"
-    />
-  </div>
+  <EmptyContainer v-else :description="'选择用户开始沟通吧'"/>
 </template>
 
 <script setup>
@@ -163,10 +156,7 @@
         onBeforeMount,
         ref
     } from "vue";
-    import {
-        Empty,
-        notification
-    } from "ant-design-vue";
+    import { notification } from "ant-design-vue";
     import {
         FolderOutlined,
         HistoryOutlined,
@@ -182,8 +172,7 @@
     } from "../../database/chat-history.js";
     import { getCurUserData } from "../../database/cur-user.js";
     import { formatMessageTime } from "../../utils/time-utils.js";
-
-    const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
+    import EmptyContainer from "../empty-container/EmptyContainer.vue";
 
     // 当前登录的用户信息
     const curLoginUser = ref({});
@@ -423,9 +412,8 @@
                 padding: $message-content-vertical-padding $message-content-horizontal-padding;
                 font-size: 14px;
                 color: black;
-                background-color: rgba(0, 0, 0, 0.1);
+                background-color: rgba(0, 0, 0, 0.06);
                 border-radius: 5px;
-                box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
                 word-wrap: break-word; /* 强制换行 */
                 word-break: break-all; /* 在任意字符处换行 */
                 white-space: normal; /* 默认行为，正常换行 */
@@ -494,7 +482,6 @@
                 color: white;
                 background-color: global-variable.$theme-color;
                 border-radius: 5px;
-                box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
                 word-wrap: break-word; /* 强制换行 */
                 word-break: break-all; /* 在任意字符处换行 */
                 white-space: normal; /* 默认行为，正常换行 */

@@ -11,6 +11,8 @@
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+
+	--theme-color: #1677FF;
 }
 
 /*单行文本截断*/

@@ -13,7 +13,7 @@ public interface UserService {
      *
      * @return 用户详细信息
      */
-    UserDetailResponseVO getUserDetail(String userId);
+    UserDetailResponseVO getUserDetail(String curLoginUserId, String userId);
     
     /**
      * 获取用户基本信息
