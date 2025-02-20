@@ -16,6 +16,12 @@ public class ChatRecordDTO {
     private String type;
     // 文件ID
     private String fileId;
+    // 文件名
+    private String fileName;
+    // 文件类型
+    private String fileType;
+    // 文件大小
+    private String fileSize;
     // 消息内容
     private String content;
     // 发送时间

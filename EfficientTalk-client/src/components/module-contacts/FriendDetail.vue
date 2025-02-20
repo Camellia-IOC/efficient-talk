@@ -13,10 +13,15 @@
     >
       <div class="user-info">
         <div class="user-avatar">
-          <a-image :src="friendInfo.userAvatar"
+          <a-image v-if="friendInfo.userAvatar!==null"
+                   :src="friendInfo.userAvatar"
                    :preview-mask="false"
                    style="width: 100px;height: 100px;cursor: pointer;border-radius: 50%"
           />
+          <a-avatar v-else
+                    style="display:flex;justify-content:center;align-items:center;width: 100px;height: 100px;cursor: pointer;border-radius: 50%;font-size: 24px"
+          >{{ friendInfo.userName.substring(0, 2) }}
+          </a-avatar>
         </div>
         <div class="user-base-info">
           <div class="user-name">{{ friendInfo.userName }}</div>
@@ -47,13 +52,13 @@
         </a-button>
         <a-button @click="handleCreateFriendInvite"
                   class="operation-btn"
-                  v-else-if="friendInfo.isFriend === false && friendInfo.userId !== curLoginUser.userId"
+                  v-else-if="friendInfo.isFriend === false"
         >添加好友
         </a-button>
         <a-button type="primary"
                   @click="handleGoChat"
                   class="operation-btn"
-                  v-if="friendInfo.isFriend === true && friendInfo.userId !== curLoginUser.userId"
+                  v-if="friendInfo.isFriend === true"
         > 发送消息
         </a-button>
       </div>
@@ -104,11 +109,12 @@
     };
 
     // 获取好友信息
-    const getUserDetail = async (userId) => {
-        await UserApi.getUserDetail({
+    const getUserDetail = (userId) => {
+        UserApi.getUserDetail({
             curLoginUserId: curLoginUser.value.userId,
             userId: userId
-        }).then((res) => {
+        }).then((response) => {
+            const res = response.data;
             if (res.code === 0) {
                 const data = res.data;
                 if (data != null) {
@@ -134,15 +140,16 @@
         await updateCurLoginUser();
 
         // 获取用户信息
-        await getUserDetail(newValue);
+        getUserDetail(newValue);
     });
 
     // 删除好友
-    const handleDeleteFriend = async () => {
-        await SocialApi.deleteFriend({
+    const handleDeleteFriend = () => {
+        SocialApi.deleteFriend({
             userId: curLoginUser.value.userId,
             friendId: props.friendId
-        }).then((res) => {
+        }).then((response) => {
+            const res = response.data;
             if (res.code === 0) {
                 message.success("删除成功");
                 friendInfo.value.isFriend = false;
@@ -157,11 +164,12 @@
     };
 
     // 添加好友
-    const handleCreateFriendInvite = async () => {
-        await SocialApi.createFriendInvite({
+    const handleCreateFriendInvite = () => {
+        SocialApi.createFriendInvite({
             userId: curLoginUser.value.userId,
             friendId: props.friendId
-        }).then((res) => {
+        }).then((response) => {
+            const res = response.data;
             if (res.code === 0) {
                 message.success("已发送好友邀请");
             }

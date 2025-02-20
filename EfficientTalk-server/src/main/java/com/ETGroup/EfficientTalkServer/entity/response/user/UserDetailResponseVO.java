@@ -12,6 +12,10 @@ public class UserDetailResponseVO {
     private String userAvatar;
     // 工号
     private Integer employeeId;
+    // 用户所属组织ID
+    private String orgId;
+    // 用户所属组织
+    private String orgName;
     // 用户所属部门ID
     private String deptId;
     // 用户所属部门

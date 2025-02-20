@@ -45,11 +45,11 @@
 
     // 对话框控制
     const dialogOpenFlag = ref(false);
-    const dialogOpen = async () => {
+    const dialogOpen = () => {
         // 获取好友通知列表
-        await getFriendInvitationList();
+        getFriendInvitationList();
         // 获取好友分组列表
-        await getUserFriendGroups();
+        getUserFriendGroups();
         dialogOpenFlag.value = true;
     };
     const dialogClose = () => {
@@ -58,10 +58,11 @@
 
     // 好友通知列表
     const invitationList = ref([]);
-    const getFriendInvitationList = async () => {
-        await SocialApi.getFriendInvitationList({
+    const getFriendInvitationList = () => {
+        SocialApi.getFriendInvitationList({
             userId: props.curLoginUserId,
-        }).then((res) => {
+        }).then((response) => {
+            const res = response.data
             if (res.code === 0) {
                 const data = res.data;
                 if (data != null) {
@@ -77,10 +78,11 @@
 
     // 用户的好友分组
     const userFriendGroups = ref([]);
-    const getUserFriendGroups = async () => {
-        await SocialApi.getUserFriendGroups({
+    const getUserFriendGroups = () => {
+        SocialApi.getUserFriendGroups({
             userId: props.curLoginUserId
-        }).then((res) => {
+        }).then((response) => {
+            const res = response.data
             if (res.code === 0) {
                 const data = res.data;
                 if (data != null) {
@@ -94,15 +96,16 @@
     };
 
     // 处理好友邀请
-    const handleInvitation = async (invitationId, friendId, userGroupId, friendGroupId, accept) => {
-        await SocialApi.handleFriendInvite({
+    const handleInvitation = (invitationId, friendId, userGroupId, friendGroupId, accept) => {
+        SocialApi.handleFriendInvite({
             invitationId: invitationId,
             userId: props.curLoginUserId,
             friendId: friendId,
             userGroupId: userGroupId,
             friendGroupId: friendGroupId,
             accept: accept
-        }).then((res) => {
+        }).then((response) => {
+            const res = response.data
             if (res.code === 0) {
                 const result = accept ? 1 : 2;
                 for (let i = 0; i < invitationList.value.length; i++) {

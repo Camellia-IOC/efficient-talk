@@ -5,19 +5,22 @@
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.UserMapper">
 	<!--获取用户详细信息-->
 	<select id="getUserDetail" resultType="com.ETGroup.EfficientTalkServer.entity.response.user.UserDetailResponseVO">
-		SELECT users.id                                                     as userId,
-			   users.username                                               as userName,
-			   users.avatar                                                 as userAvatar,
-			   users.employee_id                                            as employeeId,
-			   users.dept_id                                                as deptId,
-			   departments.dept_name                                        as deptName,
-			   users.job_id                                                 as jobId,
-			   jobs.job_name                                                as jobName,
+		SELECT users.id                                                             as userId,
+			   users.username                                                       as userName,
+			   users.avatar                                                         as userAvatar,
+			   users.employee_id                                                    as employeeId,
+			   organizations.org_id                                                 as orgId,
+			   organizations.org_name                                               as orgName,
+			   users.dept_id                                                        as deptId,
+			   departments.dept_name                                                as deptName,
+			   users.job_id                                                         as jobId,
+			   jobs.job_name                                                        as jobName,
 			   EXISTS(SELECT 1
 					  FROM friends
 					  WHERE (user_id = #{curLoginUserId} AND friend_id = users.id)
 						 OR (user_id = users.id AND friend_id = #{curLoginUserId})) as isFriend
 		FROM users
+				 LEFT JOIN organizations ON organizations.org_id = users.org_id
 				 LEFT JOIN departments ON departments.dept_id = users.dept_id
 				 LEFT JOIN jobs ON jobs.job_id = users.job_id
 		WHERE users.id = #{userId}

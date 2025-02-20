@@ -68,18 +68,17 @@ public class SocialServiceImpl implements SocialService {
     /**
      * 搜索新好友
      *
-     * @param friendId   好友ID
-     * @param friendName 好友名称
-     * @param userId     用户ID
-     * @param pageSize   页面大小
-     * @param pageIndex  页面索引
+     * @param searchKey 搜索关键字
+     * @param userId    用户ID
+     * @param pageSize  页面大小
+     * @param pageIndex 页面索引
      *
      * @return 新好友列表
      */
     @Override
-    public NewFriendsResponseVO searchNewFriend(String friendId, String friendName, String userId, Integer pageSize, Integer pageIndex) {
+    public NewFriendsResponseVO searchNewFriend(String searchKey, String userId, Integer pageSize, Integer pageIndex) {
         NewFriendsResponseVO response = new NewFriendsResponseVO();
-        response.setResultList(socialMapper.searchNewFriend(friendId, friendName, userId, pageSize, pageIndex));
+        response.setResultList(socialMapper.searchNewFriend(searchKey, userId, pageSize, pageIndex));
         return response;
     }
     
@@ -109,6 +108,8 @@ public class SocialServiceImpl implements SocialService {
         // 检查好友申请记录是否已存在
         String relativeInvitationId = socialMapper.checkRelativeInvitation(param.getUserId(), param.getFriendId());
         if (relativeInvitationId != null) {
+            // TODO 逻辑是否需要修改
+            
             return true;
         }
         

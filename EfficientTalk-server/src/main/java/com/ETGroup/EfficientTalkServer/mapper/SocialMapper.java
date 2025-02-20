@@ -43,8 +43,7 @@ public interface SocialMapper {
     Integer getInvitationState(@Param("id") String id);
     
     // 搜索新好友
-    ArrayList<NewFriendBasicInfoDTO> searchNewFriend(@Param("friendId") String friendId,
-                                                     @Param("friendName") String friendName,
+    ArrayList<NewFriendBasicInfoDTO> searchNewFriend(@Param("searchKey") String searchKey,
                                                      @Param("userId") String userId,
                                                      @Param("pageSize") Integer pageSize,
                                                      @Param("pageIndex") Integer pageIndex);

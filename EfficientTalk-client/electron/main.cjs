@@ -2,25 +2,26 @@
 const {
     app,
     BrowserWindow,
-    session
+    session,
+    dialog,
+    Notification
 } = require("electron");
 
 // 托盘
 const {
     Tray,
-    Menu,
-    nativeImage
+    Menu
 } = require("electron");
 
 // 异步通信
 const {ipcMain} = require("electron");
 
-// const {useWebSocketStore} = require("../src/store/WebSocketStore.js");
-// const websocketStore = useWebSocketStore();
-
+// Node模块
 const path = require("node:path");
+const fs = require("node:fs");
 
-const sessionId = "1";
+// 会话ID
+const sessionId = new Date().getTime().toString();
 
 // 项目地址
 const projectUrl = "http://localhost:5173/";
@@ -45,6 +46,7 @@ const createWindow = () => {
             preload: path.join(__dirname, "preload.cjs"),
             session: session.fromPartition(`persist:${sessionId}`)
         },
+        icon: path.join(__dirname, "./resources/logo.ico"),
         // 禁用大小调节
         resizable: false,
         // 是否使用自带标题栏
@@ -108,7 +110,7 @@ app.whenReady()
                type: "radio"
            }
        ]);
-       const icon = nativeImage.createFromPath("./src/assets/logo.png");
+       const icon = path.join(__dirname, "./resources/logo.ico");
        let tray = new Tray(icon);
        tray.setContextMenu(contextMenu);
        tray.setToolTip("测试应用");
@@ -126,7 +128,7 @@ app.on("window-all-closed", () => {
     }
 });
 
-// 窗口相关操作
+// 窗口相关操作 start ####################################################################################################
 // 隐藏窗口
 ipcMain.handle("window-hide", () => {
     mainWindow.hide();
@@ -156,6 +158,7 @@ ipcMain.handle("window-maximize", () => {
 ipcMain.handle("window-recover", () => {
     mainWindow.restore();
 });
+// 窗口相关操作 end ######################################################################################################
 
 // 子窗口相关操作
 // 打开子窗口
@@ -170,7 +173,8 @@ ipcMain.handle("child-window-close", (e, windowName) => {
     // childWidowManager[windowName].hide();
 });
 
-// 业务功能
+// 业务功能 start ########################################################################################################
+// 登录
 ipcMain.handle("app-login", (e, param) => {
     mainWindow.close();
     mainWindow = new BrowserWindow({
@@ -179,6 +183,8 @@ ipcMain.handle("app-login", (e, param) => {
         minWidth: 1060,
         minHeight: 760,
         webPreferences: {
+            webSecurity: false,
+            nodeIntegration: true,
             preload: path.join(__dirname, "preload.cjs"),
             session: session.fromPartition(`persist:${sessionId}`)
         },
@@ -189,10 +195,11 @@ ipcMain.handle("app-login", (e, param) => {
     // 程序启动后开启开发者工具
     mainWindow.webContents.openDevTools();
 
-    mainWindow.loadURL(projectUrl + "#/app/chat")
+    mainWindow.loadURL(projectUrl + "#/app")
               .then();
 });
 
+// 登出
 ipcMain.handle("app-logout", (e, param) => {
     mainWindow.close();
     mainWindow = new BrowserWindow({
@@ -215,3 +222,48 @@ ipcMain.handle("app-logout", (e, param) => {
     mainWindow.loadURL(projectUrl + "#/auth")
               .then();
 });
+
+// 处理文件选择(单选)
+ipcMain.handle("select-file", async (event, params) => {
+    const result = await dialog.showOpenDialog({
+        properties: ["openFile", "multiSelections"],
+        filters: params.filters,
+        title: params.title,
+    });
+
+    if (result.canceled) {
+        return [];
+    }
+
+    return result.filePaths;
+});
+
+// 处理文件选择(多选)
+ipcMain.handle("select-files", async (event, params) => {
+    const result = await dialog.showOpenDialog({
+        properties: ["openFile", "multiSelections"],
+        filters: params.filters,
+        title: params.title,
+    });
+
+    if (result.canceled) {
+        return [];
+    }
+
+    return result.filePaths;
+});
+
+// 判断文件是否存在
+ipcMain.handle("file-check-is-exist", (event, path) => {
+    return fs.existsSync(path);
+});
+
+// 显示通知
+ipcMain.handle("show-notification", (event, params) => {
+    new Notification({
+        title: params.title,
+        body: params.body,
+        icon: params.icon,
+    }).show();
+});
+// 业务功能 end ##########################################################################################################

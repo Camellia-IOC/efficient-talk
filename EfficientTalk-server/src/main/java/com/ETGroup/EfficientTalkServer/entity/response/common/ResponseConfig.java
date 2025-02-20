@@ -24,8 +24,8 @@ public enum ResponseConfig {
     RESOURCE_DELETE_FAILED(401, "资源删除失败，请重新尝试"),
     RESOURCE_DOWNLOAD_FAILED(402, "资源下载失败，请重新尝试"),
     
-    // 留言板模块：5xx
-    MESSAGE_BOARD_POST_FAILED(500, "留言失败，请重新尝试"),
+    // 聊天模块：5xx
+    SAVE_CHAT_LIST_FAILED(500, "保存对话列表失败"),
     MESSAGE_BOARD_TOGGLE_LIKE_STATUS_FAILED(501, "点赞/取消点赞失败，请重新尝试"),
     MESSAGE_BOARD_DELETE_FAILED(502, "删除留言失败，请重新尝试");
     

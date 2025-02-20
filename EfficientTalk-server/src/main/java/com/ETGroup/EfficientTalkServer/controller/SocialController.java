@@ -45,12 +45,11 @@ public class SocialController {
     
     @Operation(summary = "搜索新好友")
     @GetMapping("/searchNewFriend")
-    public ResponseData<NewFriendsResponseVO> searchNewFriend(@RequestParam String friendId,
-                                                              @RequestParam String friendName,
+    public ResponseData<NewFriendsResponseVO> searchNewFriend(@RequestParam String searchKey,
                                                               @RequestParam String userId,
                                                               @RequestParam Integer pageSize,
                                                               @RequestParam Integer pageIndex) {
-        NewFriendsResponseVO response = socialService.searchNewFriend(friendId, friendName, userId, pageSize, pageIndex);
+        NewFriendsResponseVO response = socialService.searchNewFriend(searchKey, userId, pageSize, pageIndex);
         return ResponseData.success(response);
     }
     

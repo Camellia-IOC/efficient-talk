@@ -36,15 +36,31 @@
               {{ chatInfo.userName }}
             </div>
             <div class="message-content-container">
-              <div class="message-content">
-                <div v-if="item.type === 'text'"
-                     v-html="item.content"
-                ></div>
-                <img v-else-if="item.type === 'image'"
-                     :src="item.content"
-                     alt="image"
-                     class="image-message"
-                >
+              <div class="text-message"
+                   v-if="item.type === 'text'"
+              >
+                <div>{{ item.content }}</div>
+              </div>
+              <div class="image-message"
+                   v-else-if="item.type === 'image'"
+              >
+                <a-image :src="item.content"
+                         alt="image"
+                />
+              </div>
+              <div class="file-message"
+                   v-else-if="item.type === 'file'"
+              >
+                <div class="file-detail">
+                  <img :src="getFileIcon(item.fileType)"
+                       alt="image"
+                       class="file-icon"
+                  >
+                  <label class="file-name">{{ item.fileName + "." + item.fileType }}</label>
+                </div>
+                <div class="file-info">
+                  <label class="file-size">{{ translateFileSize(item.fileSize) }}</label>
+                </div>
               </div>
             </div>
             <div class="message-time">
@@ -60,15 +76,31 @@
               {{ curLoginUser.userName }}
             </div>
             <div class="message-content-container">
-              <div class="message-content">
-                <div v-if="item.type === 'text'"
-                     v-html="item.content"
-                ></div>
-                <img v-else-if="item.type === 'image'"
-                     :src="item.content"
-                     alt="image"
-                     class="image-message"
-                >
+              <div class="text-message"
+                   v-if="item.type === 'text'"
+              >
+                <div>{{ item.content }}</div>
+              </div>
+              <div class="image-message"
+                   v-else-if="item.type === 'image'"
+              >
+                <a-image :src="item.content"
+                         alt="image"
+                />
+              </div>
+              <div class="file-message"
+                   v-else-if="item.type === 'file'"
+              >
+                <div class="file-detail">
+                  <img :src="getFileIcon(item.fileType)"
+                       alt="image"
+                       class="file-icon"
+                  >
+                  <label class="file-name">{{ item.fileName + "." + item.fileType }}</label>
+                </div>
+                <div class="file-info">
+                  <label class="file-size">{{ translateFileSize(item.fileSize) }}</label>
+                </div>
               </div>
             </div>
             <div class="message-time">
@@ -119,10 +151,14 @@
               <SmileOutlined/>
             </a-button>
           </a-popover>
-          <a-button class="operation-btn">
+          <a-button class="operation-btn"
+                    @click="handlePictureSelectorDialogOpen"
+          >
             <PictureOutlined/>
           </a-button>
-          <a-button class="operation-btn">
+          <a-button class="operation-btn"
+                    @click="handleFileSelectorDialogOpen"
+          >
             <FolderOutlined/>
           </a-button>
         </div>
@@ -147,7 +183,25 @@
       </div>
     </div>
   </div>
-  <EmptyContainer v-else :description="'选择用户开始沟通吧'"/>
+  <EmptyContainer v-else
+                  :description="'选择用户开始沟通吧'"
+  />
+
+  <!--图片上传-->
+  <FileSelectorDialog ref="pictureSelectorDialog"
+                      :dialog-title="'选择图片'"
+                      :multi="false"
+                      :type="'image'"
+                      @send-selected-file="handleSendFileMessage"
+  />
+
+  <!--文件上传-->
+  <FileSelectorDialog ref="fileSelectorDialog"
+                      :dialog-title="'选择文件'"
+                      :multi="true"
+                      :type="'file'"
+                      @send-selected-file="handleSendFileMessage"
+  />
 </template>
 
 <script setup>
@@ -173,6 +227,21 @@
     import { getCurUserData } from "../../database/cur-user.js";
     import { formatMessageTime } from "../../utils/time-utils.js";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
+    import FileSelectorDialog from "../dialog/file-selector/FileSelectorDialog.vue";
+    import ChatApi from "../../api/modules/ChatApi.js";
+    import { translateFileSize } from "../../utils/unit-utils.js";
+
+    // 图片上传对话框控制
+    const pictureSelectorDialog = ref();
+    const handlePictureSelectorDialogOpen = () => {
+        pictureSelectorDialog.value.dialogOpen();
+    };
+
+    // 文件上传对话框控制
+    const fileSelectorDialog = ref();
+    const handleFileSelectorDialogOpen = () => {
+        fileSelectorDialog.value.dialogOpen();
+    };
 
     // 当前登录的用户信息
     const curLoginUser = ref({});
@@ -207,6 +276,18 @@
             }
         }
     });
+
+    // 获取文件图标
+    const getFileIcon = (fileType) => {
+        // TODO 有bug,不能正确判断
+        console.error(fileController.checkIsExist("./public/file-icon/" + fileType + ".png"));
+        if (fileController.checkIsExist("./public/file-icon/" + fileType + ".png")) {
+            return "/public/file-icon/" + fileType + ".png";
+        }
+        else {
+            return "/public/file-icon/other.png";
+        }
+    };
 
     // 对话框滚动到底部
     const scrollToBottom = (animation) => {
@@ -275,17 +356,105 @@
         chatInput.value = "";
     };
 
-    // 聊天对象变化
-    const handleChatObjectChange = async (event) => {
-        const friendId = event.detail;
-        chatHistory.value = await getChatHistory(friendId, curLoginUser.value.userId);
+    // 上传聊天文件
+    const uploadChatFile = async (file) => {
+        const formData = new FormData();
+        formData.append("fileId", file.fileId);
+        formData.append("fileName", file.fileName);
+        formData.append("fileType", file.fileType);
+        formData.append("fileSize", file.fileSize);
+        formData.append("file", file.origin);
+        formData.append("sender", curLoginUser.value.userId);
+        formData.append("receiver", props.chatInfo.userId);
 
-        // 发送消息后滚动到底部
-        scrollToBottom("auto");
+        const response = await ChatApi.uploadChatFile(formData);
+        const res = response.data;
+        if (res.code === 0) {
+            return res.data.filePath;
+        }
+        return null;
+    };
+
+    // 发送文件消息
+    const handleSendFileMessage = async (messageList) => {
+        for (let i = 0; i < messageList.length; i++) {
+            const messageItem = messageList[i];
+            // 保存文件
+            const filePath = await uploadChatFile(messageItem);
+
+            // 发送消息
+            const message = {
+                id: UUID.generate(),
+                sender: curLoginUser.value.userId,
+                receiver: props.chatInfo.userId,
+                type: messageItem.type,
+                fileId: messageItem.fileId,
+                content: filePath,
+                time: dayjs().format("YYYY-MM-DD HH:mm:ss")
+            };
+            websocketStore.socket.send(JSON.stringify(message));
+
+            // 添加文件信息至本地消息记录
+            message.fileName = messageItem.fileName;
+            message.fileType = messageItem.fileType;
+            message.fileSize = messageItem.fileSize;
+            chatHistory.value.push(message);
+
+            // 发送消息后滚动到底部
+            scrollToBottom("smooth");
+
+            // 广播消息
+            window.dispatchEvent(new CustomEvent("messageSend", {
+                detail: message
+            }));
+
+            // 保存聊天记录
+            handleSaveChatHistory(message);
+        }
     };
 
     // 聊天记录
     const chatHistory = ref([]);
+
+    /**
+     * 获取云端聊天记录
+     * @param friendId 好友ID
+     * @returns {Promise<any>}
+     */
+    const getCloudChatHistory = async (friendId) => {
+        // TODO 添加分页获取聊天记录
+        const response = await ChatApi.getChatHistory({
+            userId: curLoginUser.value.userId,
+            friendId: friendId,
+            pageSize: 0,
+            pageIndex: 0
+        });
+
+        const res = response.data;
+        if (res.code === 0) {
+            if (res.data != null) {
+                return new Promise((resolve) => {
+                    resolve(res.data.chatHistory);
+                });
+            }
+        }
+        return new Promise((resolve) => {
+            resolve([]);
+        });
+    };
+
+    // 聊天对象变化
+    const handleChatObjectChange = async (event) => {
+        // TODO 存在随着使用次数的增加，请求次数会越来越多的bug
+        const friendId = event.detail;
+        chatHistory.value = await getCloudChatHistory(friendId);
+        if (chatHistory.value.length === 0) {
+            chatHistory.value = await getChatHistory(friendId, curLoginUser.value.userId);
+        }
+
+        // 发送消息后滚动到底部
+        scrollToBottom("auto");
+    };
 
     onBeforeMount(async () => {
         // 注册消息监听事件
@@ -404,7 +573,7 @@
               justify-content: flex-start;
               width: 100%;
 
-              .message-content {
+              .text-message {
                 display: flex;
                 justify-content: flex-start;
                 width: fit-content;
@@ -412,15 +581,66 @@
                 padding: $message-content-vertical-padding $message-content-horizontal-padding;
                 font-size: 14px;
                 color: black;
-                background-color: rgba(0, 0, 0, 0.06);
+                background-color: #F0F2F5;
                 border-radius: 5px;
                 word-wrap: break-word; /* 强制换行 */
                 word-break: break-all; /* 在任意字符处换行 */
                 white-space: normal; /* 默认行为，正常换行 */
                 overflow-wrap: break-word; /* 在单词内部换行 */
+              }
 
-                .image-message {
-                  max-width: 100%;
+              .image-message {
+                max-width: 40%;
+              }
+
+              .file-message {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                width: 40%;
+                height: 90px;
+                padding: 10px;
+                background-color: #F5F7FA;
+                border-radius: 10px;
+                cursor: pointer;
+
+                &:hover {
+                  background-color: #EBEDF0;
+                }
+
+                .file-detail {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+                  cursor: pointer;
+
+                  .file-icon {
+                    width: 50px;
+                    height: 45px;
+                    border-radius: 5px;
+                    margin-right: 15px;
+                    cursor: pointer;
+                  }
+
+                  .file-name {
+                    font-size: 14px;
+                    cursor: pointer;
+                  }
+                }
+
+                .file-info {
+                  display: flex;
+                  justify-content: flex-end;
+                  align-items: center;
+                  width: 100%;
+                  cursor: pointer;
+
+                  .file-size {
+                    font-size: 12px;
+                    color: gray;
+                    cursor: pointer;
+                  }
                 }
               }
             }
@@ -472,7 +692,7 @@
               justify-content: flex-end;
               width: 100%;
 
-              .message-content {
+              .text-message {
                 display: flex;
                 justify-content: flex-start;
                 width: fit-content;
@@ -486,9 +706,60 @@
                 word-break: break-all; /* 在任意字符处换行 */
                 white-space: normal; /* 默认行为，正常换行 */
                 overflow-wrap: break-word; /* 在单词内部换行 */
+              }
 
-                .image-message {
-                  max-width: 100%;
+              .image-message {
+                max-width: 40%;
+              }
+
+              .file-message {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                width: 40%;
+                height: 90px;
+                padding: 10px;
+                background-color: #F5F7FA;
+                border-radius: 10px;
+                cursor: pointer;
+
+                &:hover {
+                  background-color: #EBEDF0;
+                }
+
+                .file-detail {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+                  cursor: pointer;
+
+                  .file-icon {
+                    width: 50px;
+                    height: 45px;
+                    border-radius: 5px;
+                    margin-right: 15px;
+                    cursor: pointer;
+                  }
+
+                  .file-name {
+                    font-size: 14px;
+                    cursor: pointer;
+                  }
+                }
+
+                .file-info {
+                  display: flex;
+                  justify-content: flex-end;
+                  align-items: center;
+                  width: 100%;
+                  cursor: pointer;
+
+                  .file-size {
+                    font-size: 12px;
+                    color: gray;
+                    cursor: pointer;
+                  }
                 }
               }
             }

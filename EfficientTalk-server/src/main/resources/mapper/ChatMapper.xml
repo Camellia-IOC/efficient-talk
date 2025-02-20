@@ -17,15 +17,19 @@
 
 	<!--获取缓存的聊天记录-->
 	<select id="getChatHistoryCache" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
-		SELECT id        as id,
-			   sender    as sender,
-			   receiver  as receiver,
-			   type      as type,
-			   file_id   as fileId,
-			   content   as content,
-			   send_time as time
+		SELECT chat_history_cache.id                         as id,
+			   chat_history_cache.sender  as sender,
+			   chat_history_cache.receiver                   as receiver,
+			   chat_history_cache.type                       as type,
+			   chat_history_cache.file_id as fileId,
+			   chat_files.file_name       as fileName,
+			   chat_files.file_type       as fileType,
+			   chat_files.file_size       as fileSize,
+			   chat_history_cache.content                    as content,
+			   chat_history_cache.send_time                  as time
 		FROM chat_history_cache
-		WHERE receiver = #{userId}
+				 LEFT JOIN chat_files ON chat_history_cache.file_id = chat_files.file_id
+		WHERE chat_history_cache.receiver = #{userId}
 		ORDER BY send_time
 	</select>
 
@@ -35,4 +39,47 @@
 		FROM chat_history_cache
 		WHERE receiver = #{userId}
 	</delete>
+
+	<!--获取聊天记录-->
+	<select id="getChatHistory" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		SELECT chat_history.id        as id,
+			   chat_history.sender    as sender,
+			   chat_history.receiver  as receiver,
+			   chat_history.type      as type,
+			   chat_history.file_id   as fileId,
+			   chat_files.file_name   as fileName,
+			   chat_files.file_type   as fileType,
+			   chat_files.file_size   as fileSize,
+			   chat_history.content   as content,
+			   chat_history.send_time as time
+		FROM chat_history
+				 LEFT JOIN chat_files ON chat_history.file_id = chat_files.file_id
+		WHERE (chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
+		   OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId})
+		ORDER BY send_time
+	</select>
+
+	<!--保存对话列表-->
+	<insert id="saveChatList"
+			parameterType="com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam">
+		INSERT INTO chat_list (user_id, chat_list)
+		VALUES (#{userId}, #{ChatListJson})
+		ON DUPLICATE KEY
+			UPDATE user_id   = #{userId},
+				   chat_list = #{ChatListJson}
+	</insert>
+
+	<!--获取对话列表-->
+	<select id="getChatList" resultType="com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO">
+		SELECT user_id   as userId,
+			   chat_list as chatList
+		FROM chat_list
+		WHERE user_id = #{userId}
+	</select>
+
+	<!--保存聊天文件-->
+	<insert id="uploadChatFile" parameterType="com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO">
+		INSERT INTO chat_files (file_id, file_name, file_path, file_type, file_size, sender, receiver, create_time)
+		VALUES (#{fileId}, #{fileName}, #{filePath}, #{fileType}, #{fileSize}, #{sender}, #{receiver}, #{createTime})
+	</insert>
 </mapper>

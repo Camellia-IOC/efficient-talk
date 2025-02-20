@@ -97,8 +97,8 @@
 	<select id="checkRelativeInvitation" resultType="java.lang.String">
 		SELECT id
 		FROM friend_invitations
-		WHERE user_id = #{friendId}
-		  AND friend_id = #{userId}
+		WHERE user_id = #{userId}
+		  AND friend_id = #{friendId}
 	</select>
 
 	<!--获取邀请记录状态-->
@@ -125,8 +125,8 @@
 		FROM users
 				 LEFT JOIN departments ON users.dept_id = departments.dept_id
 				 LEFT JOIN jobs ON users.job_id = jobs.job_id
-		WHERE id = #{friendId}
-		   OR username LIKE CONCAT('%', #{friendName}, '%')
+		WHERE id = #{searchKey}
+		   OR username LIKE CONCAT('%', #{searchKey}, '%')
 		LIMIT #{pageSize}
 		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
 		OFFSET #{pageOffset}

@@ -5,9 +5,13 @@
       <!--头像-->
       <div class="user-avatar">
         <img class="avatar"
+             v-if="item.friendAvatar!==null"
              :src="item.friendAvatar"
              alt="avatar"
         />
+        <a-avatar class="avatar"
+                  v-else
+        >{{ item.friendName.substring(0, 2)}}</a-avatar>
       </div>
       <!--信息-->
       <div class="info-detail">
@@ -161,6 +165,9 @@
         height: 100%;
 
         .avatar {
+          display: flex;
+          justify-content: center;
+          align-items: center;
           $avatar-size: 50px;
           width: $avatar-size;
           height: $avatar-size;

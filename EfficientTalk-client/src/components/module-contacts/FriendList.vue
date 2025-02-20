@@ -4,7 +4,9 @@
       <a-input class="content-input"
                placeholder="搜索"
       ></a-input>
-      <a-button class="search-btn">
+      <a-button class="search-btn"
+                @click="handleAddNewFriendDialogOpen"
+      >
         <PlusOutlined/>
       </a-button>
     </div>
@@ -51,10 +53,12 @@
                    @click="handleSelectFriend(friend)"
               >
                 <div class="user-avatar">
-                  <img :src="friend.userAvatar"
+                  <img v-if="friend.userAvatar!==null"
+                       :src="friend.userAvatar"
                        alt="avatar"
                        class="avatar"
                   >
+                  <a-avatar v-else class="avatar">{{ friend.userName.substring(0, 2)}}</a-avatar>
                 </div>
                 <div class="user-info">
                   <div class="user-name">{{ friend.userName }}</div>
@@ -86,6 +90,11 @@
   <FriendInvitationDialog ref="friendInvitationDialog"
                           :cur-login-user-id="curLoginUser.userId"
   />
+
+  <!--添加好友对话框-->
+  <AddNewFriendDialog ref="addNewFriendDialog"
+                      :cur-login-user-id="curLoginUser.userId"
+  />
 </template>
 
 <script setup>
@@ -102,6 +111,7 @@
     import { getCurUserData } from "../../database/cur-user.js";
     import FriendInvitationDialog from "../dialog/friend-invitations/FriendInvitationDialog.vue";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
+    import AddNewFriendDialog from "../dialog/add-friend/AddNewFriendDialog.vue";
 
     const emits = defineEmits(["setSelectedFriend"]);
 
@@ -109,6 +119,12 @@
     const friendInvitationDialog = ref();
     const handleInvitationDialogOpen = () => {
         friendInvitationDialog.value.dialogOpen();
+    };
+
+    // 添加好友对话框控制
+    const addNewFriendDialog = ref();
+    const handleAddNewFriendDialogOpen = () => {
+        addNewFriendDialog.value.dialogOpen();
     };
 
     // 当前登录的用户信息
@@ -146,10 +162,11 @@
     const groupList = ref([]);
 
     // 获取好友列表
-    const getFriendList = async () => {
-        await SocialApi.getFriendList({
+    const getFriendList = () => {
+        SocialApi.getFriendList({
             userId: curLoginUser.value.userId,
-        }).then((res) => {
+        }).then((response) => {
+            const res = response.data;
             if (res.code === 0) {
                 const data = res.data;
                 if (data != null) {
@@ -160,8 +177,8 @@
     };
 
     // 更新好友列表
-    const handleUpdateFriendList = async () => {
-        await getFriendList();
+    const handleUpdateFriendList = () => {
+        getFriendList();
     };
 
     onBeforeMount(async () => {
@@ -322,6 +339,9 @@
                   align-items: center;
 
                   .avatar {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                     width: 50px;
                     height: 50px;
                     border-radius: 50%;

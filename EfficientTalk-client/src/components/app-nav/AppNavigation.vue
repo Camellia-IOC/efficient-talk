@@ -3,9 +3,13 @@
     <div class="nav-main">
       <div class="user-info-container no-drag">
         <img class="user-avatar"
+             v-if="curLoginUser.userAvatar!==null"
              :src="curLoginUser.userAvatar"
              alt="avatar"
         />
+        <a-avatar class="user-avatar"
+                   v-else
+        >{{ curLoginUser.userName.substring(0, 2)}}</a-avatar>
       </div>
       <div v-for="(item,index) in navConfig"
            :key="index"
@@ -79,10 +83,9 @@
     // 处理退出登录
     const handleLogout = () => {
         // TODO 使用electron运行时记得取消相应注释
-        // windowController.hide();
-        // appController.logout();
-        router.push("/auth");
-        // windowController.show();
+        windowController.hide();
+        appController.logout();
+        windowController.show();
     };
 
     // 导航配置
@@ -128,7 +131,7 @@
 
     // 处理导航索引变化
     const handleNavIndexChange = (event) => {
-        switch (event.detail){
+        switch (event.detail) {
             case "chat":
                 selectedNavIndex.value = 0;
                 break;
@@ -142,15 +145,15 @@
                 selectedNavIndex.value = 3;
                 break;
         }
-    }
+    };
 
     onBeforeMount(async () => {
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
 
         // 订阅导航索引变化事件
-        window.addEventListener("navForceChange",handleNavIndexChange)
-    })
+        window.addEventListener("navForceChange", handleNavIndexChange);
+    });
 </script>
 
 <style scoped
@@ -176,9 +179,13 @@
         align-items: center;
 
         .user-avatar {
+          display: flex;
+          justify-content: center;
+          align-items: center;
           width: 40px;
           height: 40px;
           background-color: white;
+          color: black;
           border-radius: 50%;
           margin: 10px;
         }

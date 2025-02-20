@@ -10,7 +10,7 @@
     <div class="container-body">
       <div class="user-avatar">
         <img class="avatar"
-             src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png"
+             src="../assets/logo.png"
              alt="avatar"
         >
       </div>
@@ -43,13 +43,10 @@
 
 <script setup>
     import { ref } from "vue";
-    import { useRouter } from "vue-router";
     import { CloseOutlined } from "@ant-design/icons-vue";
     import AuthApi from "../api/modules/AuthApi.js";
-    import { db } from "../database/db.js";
     import { saveCurUserData } from "../database/cur-user.js";
-
-    const router = useRouter();
+    import { message } from "ant-design-vue";
 
     const accountInput = ref("");
     const passwordInput = ref("");
@@ -60,26 +57,34 @@
     };
 
     // 处理登录操作
-    const handleLogin = () => {
-        AuthApi.userLogin({
-            userId: accountInput.value,
-            password: passwordInput.value
-        }).then(async (res) => {
+    const handleLogin = async () => {
+        try {
+            // 请求数据
+            const response = await AuthApi.userLogin({
+                userId: accountInput.value,
+                password: passwordInput.value
+            });
+
+            const res = response.data;
             if (res.code === 0) {
                 if (res.data.permission === true) {
                     const data = res.data.userData;
-                    // TODO 使用electron运行时记得取消相应注释
-                    // windowController.hide();
-                    // appController.login();
-
                     // 保存当前登录用户信息到数据库中
                     await saveCurUserData(data.userId, data.userName, data.userAvatar);
 
-                    await router.push("/app/chat");
-                    // windowController.show();
+                    // TODO 使用electron运行时记得取消相应注释
+                    windowController.hide();
+                    appController.login();
+                    windowController.show();
                 }
             }
-        });
+            else {
+                message.error("账号或密码错误");
+            }
+        } catch (err) {
+            console.error(err);
+            message.error("请求失败，请稍后重试");
+        }
     };
 </script>
 
@@ -122,6 +127,7 @@
         .avatar {
           width: 90px;
           height: 90px;
+          border-radius: 50%;
         }
       }
 

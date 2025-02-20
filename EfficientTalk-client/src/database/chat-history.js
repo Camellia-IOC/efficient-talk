@@ -10,6 +10,10 @@ export const saveChatRecord = async (record) => {
         sender: record.sender,
         receiver: record.receiver,
         type: record.type,
+        file_id: record.fileId,
+        file_name: record.fileName,
+        file_type: record.fileType,
+        file_size: record.fileSize,
         content: record.content,
         time: record.time
     }).then(() => {

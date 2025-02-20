@@ -21,15 +21,14 @@ public interface SocialService {
     /**
      * 搜索新好友
      *
-     * @param friendId 好友ID
-     * @param friendName 好友名称
-     * @param userId   用户ID
-     * @param pageSize 页面大小
+     * @param searchKey 搜索关键字
+     * @param userId    用户ID
+     * @param pageSize  页面大小
      * @param pageIndex 页面索引
      *
      * @return 新好友列表
      */
-    NewFriendsResponseVO searchNewFriend(String friendId, String friendName, String userId, Integer pageSize, Integer pageIndex);
+    NewFriendsResponseVO searchNewFriend(String searchKey, String userId, Integer pageSize, Integer pageIndex);
     
     /**
      * 获取好友申请列表

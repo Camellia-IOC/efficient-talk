@@ -26,6 +26,9 @@ const router = createRouter({
             path: "/app",
             name: "app",
             component: IndexView,
+            redirect: {
+                name: "chat"
+            },
             children: [
                 {
                     // 消息
@@ -43,62 +46,34 @@ const router = createRouter({
                     // 云盘
                     path: "cloud-disk",
                     name: "cloud-disk",
-                    component: () => import("../views/EmptyView.vue")
+                    component: () => import("../views/CloudDiskView.vue"),
+                    children: [
+                        {
+                            // 云盘-我的文件
+                            path: "my-files",
+                            name: "my-files",
+                            component: () => import("../views/EmptyView.vue")
+                        },
+                        {
+                            // 云盘-组织文件
+                            path: "org-files",
+                            name: "org-files",
+                            component: () => import("../views/EmptyView.vue")
+                        },
+                        {
+                            // 云盘-聊天文件
+                            path: "chat-files",
+                            name: "chat-files",
+                            component: () => import("../views/EmptyView.vue")
+                        }
+                    ]
                 },
                 {
-                    // 漫游
+                    // 应用中心
                     path: "app-store",
                     name: "app-store",
                     component: () => import("../views/EmptyView.vue")
-                },
-                // {
-                //     // 动态
-                //     path: "news",
-                //     name: "news",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
-                // {
-                //     // 我喜欢的音乐
-                //     path: "my-favors",
-                //     name: "my-favors",
-                //     component: () => import("../views/MyFavorsView.vue")
-                // },
-                // {
-                //     // 最近播放
-                //     path: "recent-history",
-                //     name: "recent-history",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
-                // {
-                //     // 我的播客
-                //     path: "my-podcasts",
-                //     name: "my-podcasts",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
-                // {
-                //     // 我的收藏
-                //     path: "my-collections",
-                //     name: "my-collections",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
-                // {
-                //     // 下载管理
-                //     path: "download-manager",
-                //     name: "download-manager",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
-                // {
-                //     // 本地音乐
-                //     path: "local-music",
-                //     name: "local-music",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
-                // {
-                //     // 我的音乐云盘
-                //     path: "my-cloud-disk",
-                //     name: "my-cloud-disk",
-                //     component: () => import("../views/EmptyView.vue")
-                // },
+                }
             ]
         },
         // {

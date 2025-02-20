@@ -30,7 +30,8 @@
         ref
     } from "vue";
     import { getCurUserData } from "../database/cur-user.js";
-    import { useRouter } from "vue-router";
+
+    const websocketStore = useWebSocketStore();
 
     // 当前登录的用户信息
     const curLoginUser = ref({});
@@ -38,15 +39,17 @@
         curLoginUser.value = await getCurUserData();
     };
 
-    const router = useRouter();
-    const websocketStore = useWebSocketStore();
-
     onBeforeMount(async () => {
         await updateCurLoginUser();
         if (curLoginUser.value === null) {
             // 如果当前登录用户信息为空则退出到登录页面
-            await router.push("/auth");
+            // TODO 使用electron运行时记得取消相应注释
+            windowController.hide();
+            appController.logout();
+            windowController.show();
         }
+
+        // 打开WebSocket连接
         websocketStore.initSocket(curLoginUser.value.userId);
     });
 

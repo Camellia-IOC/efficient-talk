@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -34,42 +33,33 @@ public class ChatEndpoint {
     private static final Map<String, Session> sessionStorage = new ConcurrentHashMap<>();
     
     @OnOpen
-    public void onOpen(@PathParam("userId") String userId, Session session) throws IOException {
+    public void onOpen(@PathParam("userId") String userId, Session session) {
         log.info("连接打开:{}", userId);
-        
-        // 获取ChatService实例
-        this.chatService = beanFactory.getBean(ChatService.class);
-        
-        // 检查是否有缓存的消息，如果有则取出发送
-        ArrayList<ChatRecordDTO> chatHistory = chatService.getChatHistoryCache(userId);
-        if (chatHistory != null) {
-            for (ChatRecordDTO chatRecord : chatHistory) {
-                session.getBasicRemote()
-                       .sendText(JSON.toJSONString(chatRecord));
-            }
-        }
         
         // 保存当前用户的会话
         sessionStorage.put(userId, session);
+        
+        // 获取ChatService实例
+        this.chatService = beanFactory.getBean(ChatService.class);
     }
     
-    private void broadcastAllUsers(String message) {
-        try {
-            Set<Map.Entry<String, Session>> entries = sessionStorage.entrySet();
-            
-            for (Map.Entry<String, Session> entry : entries) {
-                // 获取到所有用户对应的 session 对象
-                Session session = entry.getValue();
-                
-                // 使用 getBasicRemote() 方法发送同步消息
-                session.getBasicRemote()
-                       .sendText(message);
-            }
-        }
-        catch (Exception exception) {
-            log.error(exception.toString());
-        }
-    }
+    //    private void broadcastAllUsers(String message) {
+    //        try {
+    //            Set<Map.Entry<String, Session>> entries = sessionStorage.entrySet();
+    //
+    //            for (Map.Entry<String, Session> entry : entries) {
+    //                // 获取到所有用户对应的 session 对象
+    //                Session session = entry.getValue();
+    //
+    //                // 使用 getBasicRemote() 方法发送同步消息
+    //                session.getBasicRemote()
+    //                       .sendText(message);
+    //            }
+    //        }
+    //        catch (Exception exception) {
+    //            log.error(exception.toString());
+    //        }
+    //    }
     
     @OnMessage
     public void onMessage(String message) {

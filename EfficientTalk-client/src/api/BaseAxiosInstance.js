@@ -1,5 +1,5 @@
-import axios from 'axios'
-import {message} from "ant-design-vue";
+import axios from "axios";
+import { message } from "ant-design-vue";
 
 // 基础axios实例
 class BaseAxiosInstance {
@@ -17,86 +17,95 @@ class BaseAxiosInstance {
         this.instance = axios.create({
             baseURL: `http://${serverIP}:${servicePort}`,
             timeout: timeout
-        })
+        });
 
         // 配置请求拦截器
         this.instance.interceptors.request.use(
             (config) => {
                 // 请求预处理
-                config.headers = config.headers || {}
-                return config
+                config.headers = config.headers || {};
+                return config;
             },
             (error) => {
                 // 错误处理
-                return Promise.reject(error)
+                return Promise.reject(error);
             }
-        )
+        );
 
         // 配置响应拦截器
         this.instance.interceptors.response.use(
             (response) => {
                 // 响应数据预处理
-                return response
+                return response;
             },
             (error) => {
                 // TODO: 发布时要删除以下代码
                 // 错误处理
                 if (error.response) {
-                    message.error(
-                        error.response.data.status + ' ' + error.response.data.error,
-                        1000
-                    ).then()
+                    message.error(error.response.data.status + " " + error.response.data.error).then();
                 }
-                return Promise.reject(error)
+                return Promise.reject(error);
             }
-        )
+        );
     }
 
     /** get请求 */
     get = (config) => {
         return this.instance({
             ...config,
-            method: 'get',
+            method: "get",
             params: config.data
-        }).then((response) => response.data);
-    }
+        });
+    };
 
     /** post请求 */
     post = (config) => {
         return this.instance({
             ...config,
-            method: 'post',
+            method: "post",
             data: config.data
-        }).then((response) => response.data);
-    }
+        });
+    };
 
     /** put请求 */
     put = (config) => {
         return this.instance({
             ...config,
-            method: 'put',
+            method: "put",
             data: config.data
-        }).then((response) => response.data);
-    }
+        });
+    };
 
     /** delete请求 */
     delete = (config) => {
         return this.instance({
             ...config,
-            method: 'delete',
+            method: "delete",
             params: config.data
-        }).then((response) => response.data);
-    }
+        });
+    };
+
+    /** upload请求 */
+    upload = (config) => {
+        return this.instance({
+            ...config,
+            method: "post",
+            data: config.data,
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+    };
 
     /** download请求 */
     download = (config) => {
         return this.instance({
             ...config,
-            method: 'get',
-            responseType: 'blob',
+            method: "get",
+            responseType: "blob",
             params: config.data
-        })
-    }
+        });
+    };
 }
 
-export default BaseAxiosInstance
+export default BaseAxiosInstance;

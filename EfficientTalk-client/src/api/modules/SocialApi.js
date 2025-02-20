@@ -80,4 +80,15 @@ export default class SocialApi {
             data
         });
     }
+
+    /**
+     * 搜索新朋友
+     * @param data
+     */
+    static searchNewFriend = (data) => {
+        return service.get({
+            url: this.requestPath + "/searchNewFriend",
+            data
+        });
+    }
 }
