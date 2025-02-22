@@ -91,6 +91,7 @@
       <div class="operation-bar">
         <a-button type="primary"
                   @click="handleSend"
+                  class="operation-btn"
         >发送
         </a-button>
       </div>
@@ -213,6 +214,8 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .file-selector-container {
     display: flex;
     flex-direction: column;
@@ -375,6 +378,10 @@
       align-items: center;
       width: 100%;
       height: 10%;
+
+      .operation-btn{
+        background-color: global-variable.$theme-color;
+      }
     }
   }
 </style>

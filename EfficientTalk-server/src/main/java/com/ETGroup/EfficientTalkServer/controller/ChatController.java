@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Tag(name = "通讯相关接口", description = "通讯相关接口")
 @Slf4j
@@ -43,10 +44,13 @@ public class ChatController {
     
     @Operation(summary = "获取聊天记录")
     @GetMapping("/getChatHistory")
-    public ResponseData<ChatHistoryResponseVO> getChatHistory(@RequestParam String userId, @RequestParam String friendId,
-                                                              @RequestParam Integer pageSize, @RequestParam Integer pageIndex) {
+    public ResponseData<ChatHistoryResponseVO> getChatHistory(@RequestParam String userId,
+                                                              @RequestParam String friendId,
+                                                              @RequestParam(required = false) Integer pageIndex,
+                                                              @RequestParam Integer pageSize,
+                                                              @RequestParam(required = false) LocalDateTime lastTime) {
         ChatHistoryResponseVO response = new ChatHistoryResponseVO();
-        response.setChatHistory(chatService.getChatHistory(userId, friendId, pageSize, pageIndex));
+        response.setChatHistory(chatService.getChatHistory(userId, friendId, pageIndex, pageSize, lastTime));
         return ResponseData.success(response);
     }
     

@@ -91,4 +91,15 @@ export default class SocialApi {
             data
         });
     }
+
+    /**
+     * 获取组织信息
+     * @param data
+     */
+    static getOrganizationInfo = (data) => {
+        return service.get({
+            url: this.requestPath + "/getOrganizationInfo",
+            data
+        });
+    }
 }

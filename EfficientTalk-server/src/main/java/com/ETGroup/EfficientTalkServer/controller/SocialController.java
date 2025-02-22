@@ -1,5 +1,6 @@
 package com.ETGroup.EfficientTalkServer.controller;
 
+import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
@@ -90,6 +91,14 @@ public class SocialController {
     @GetMapping("/getOrganizationTree")
     public ResponseData<OrgTreeResponseVO> getOrganizationTree(@RequestParam String orgId, @RequestParam(required = false) String parentId) {
         OrgTreeResponseVO response = socialService.getOrganizationTree(orgId, parentId);
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取组织信息")
+    @GetMapping("/getOrganizationInfo")
+    public ResponseData<OrganizationInfoResponseVO> getOrganizationInfo(@RequestParam String orgId) {
+        OrganizationInfoResponseVO response = new OrganizationInfoResponseVO();
+        response.setOrgInfo(socialMapper.getOrganizationInfo(orgId));
         return ResponseData.success(response);
     }
 }

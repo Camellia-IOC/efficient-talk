@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Service
@@ -63,12 +64,13 @@ public interface ChatService {
      *
      * @param userId    用户ID
      * @param friendId  好友ID
-     * @param pageSize  每页大小
      * @param pageIndex 页码
+     * @param pageSize  每页大小
+     * @param lastTime  最早一条记录的时间
      *
      * @return 聊天记录
      */
-    ArrayList<ChatRecordDTO> getChatHistory(String userId, String friendId, Integer pageSize, Integer pageIndex);
+    ArrayList<ChatRecordDTO> getChatHistory(String userId, String friendId, Integer pageIndex, Integer pageSize, LocalDateTime lastTime);
     
     /**
      * 保存聊天文件
@@ -83,8 +85,14 @@ public interface ChatService {
      *
      * @return 文件路径
      */
-    String uploadChatFile(String fileId, String fileName, String fileType, Long fileSize, String sender, String receiver, MultipartFile file) throws IOException;
-
+    String uploadChatFile(String fileId,
+                          String fileName,
+                          String fileType,
+                          Long fileSize,
+                          String sender,
+                          String receiver,
+                          MultipartFile file) throws IOException;
+    
     /**
      * 获取聊天文件列表
      *

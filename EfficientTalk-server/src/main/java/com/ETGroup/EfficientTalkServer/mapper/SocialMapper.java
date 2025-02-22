@@ -3,6 +3,7 @@ package com.ETGroup.EfficientTalkServer.mapper;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.*;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendInvitationPO;
+import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import org.apache.ibatis.annotations.MapKey;
@@ -56,4 +57,7 @@ public interface SocialMapper {
     
     // 获取组织树中的用户节点
     ArrayList<OrgTreeUserNodeDTO> getOrgTreeUserNodeList(@Param("orgId") String orgId,@Param("parentId") String parentId);
+    
+    // 获取组织信息
+    OrganizationPO getOrganizationInfo(@Param("orgId") String orgId);
 }

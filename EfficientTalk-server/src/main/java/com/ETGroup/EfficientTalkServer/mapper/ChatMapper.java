@@ -8,6 +8,7 @@ import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestPa
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Mapper
@@ -27,8 +28,9 @@ public interface ChatMapper {
     // 获取聊天记录
     ArrayList<ChatRecordDTO> getChatHistory(@Param("userId") String userId,
                                             @Param("friendId") String friendId,
+                                            @Param("pageIndex") Integer pageIndex,
                                             @Param("pageSize") Integer pageSize,
-                                            @Param("pageIndex") Integer pageIndex);
+                                            @Param("lastTime") LocalDateTime lastTime);
     
     // 保存对话列表
     Integer saveChatList(SaveChatListRequestParam param);

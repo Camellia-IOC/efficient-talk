@@ -3,6 +3,7 @@ package com.ETGroup.EfficientTalkServer.service.social;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.*;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendInvitationPO;
+import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.social.FriendInvitationListResponseVO;
@@ -206,5 +207,17 @@ public class SocialServiceImpl implements SocialService {
         response.setDeptList(socialMapper.getOrgTreeDeptNodeList(orgId, parentId));
         response.setUserList(socialMapper.getOrgTreeUserNodeList(orgId, parentId));
         return response;
+    }
+    
+    /**
+     * 获取组织信息
+     *
+     * @param orgId 组织ID
+     *
+     * @return 组织信息
+     */
+    @Override
+    public OrganizationPO getOrganizationInfo(String orgId) {
+        return socialMapper.getOrganizationInfo(orgId);
     }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="app-nav-container theme-background-color draggable">
+  <div class="app-nav-container draggable">
     <div class="nav-main">
       <div class="user-info-container no-drag">
         <img class="user-avatar"
@@ -159,12 +159,15 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .app-nav-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     height: 100%;
+    background-color: global-variable.$theme-color;
 
     .nav-main {
       display: flex;

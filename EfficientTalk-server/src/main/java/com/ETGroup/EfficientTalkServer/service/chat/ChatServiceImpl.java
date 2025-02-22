@@ -94,14 +94,15 @@ public class ChatServiceImpl implements ChatService {
      *
      * @param userId    用户ID
      * @param friendId  好友ID
-     * @param pageSize  每页大小
      * @param pageIndex 页码
+     * @param pageSize  每页大小
+     * @param lastTime  最早一条记录的时间
      *
      * @return 聊天记录
      */
     @Override
-    public ArrayList<ChatRecordDTO> getChatHistory(String userId, String friendId, Integer pageSize, Integer pageIndex) {
-        return chatMapper.getChatHistory(userId, friendId, pageSize, pageIndex);
+    public ArrayList<ChatRecordDTO> getChatHistory(String userId, String friendId, Integer pageIndex, Integer pageSize, LocalDateTime lastTime) {
+        return chatMapper.getChatHistory(userId, friendId, pageIndex, pageSize, lastTime);
     }
     
     /**

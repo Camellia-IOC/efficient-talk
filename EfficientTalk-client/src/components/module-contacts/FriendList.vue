@@ -156,10 +156,10 @@
               <div class="user-info">
                 <div class="user-name">{{ item.userName }}</div>
                 <div class="user-dept"
-                     v-if="item.deptName!==null && item.deptId!==null"
+                     v-if="item.jobName!==null && item.jobId!==null"
                 >
                   <CrownTwoTone/>
-                  {{ item.deptName }}
+                  {{ item.jobName }}
                 </div>
               </div>
             </div>
@@ -615,6 +615,7 @@
                 justify-content: flex-start;
                 align-items: center;
                 height: 100%;
+                cursor: pointer;
 
                 .org-icon {
                   color: global-variable.$theme-color;
@@ -624,6 +625,7 @@
 
                 .org-name {
                   font-size: 14px;
+                  cursor: pointer;
                 }
               }
 

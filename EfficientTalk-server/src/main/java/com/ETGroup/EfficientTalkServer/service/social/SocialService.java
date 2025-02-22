@@ -1,5 +1,6 @@
 package com.ETGroup.EfficientTalkServer.service.social;
 
+import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.social.FriendInvitationListResponseVO;
@@ -77,4 +78,13 @@ public interface SocialService {
      * @return 好友分组列表
      */
     OrgTreeResponseVO getOrganizationTree(String orgId, String parentId);
+    
+    /**
+     * 获取组织信息
+     *
+     * @param orgId 组织ID
+     *
+     * @return 组织信息
+     */
+    OrganizationPO getOrganizationInfo(String orgId);
 }

@@ -9,4 +9,6 @@ public class OrgTreeUserNodeDTO {
     private String userAvatar;
     private String deptId;
     private String deptName;
+    private String jobId;
+    private String jobName;
 }

@@ -91,6 +91,8 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .auth-view-container {
     display: flex;
     flex-direction: column;
@@ -162,6 +164,7 @@
 
         .operation-btn {
           width: 100%;
+          background-color: global-variable.$theme-color;
         }
       }
     }

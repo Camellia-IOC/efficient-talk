@@ -18,6 +18,17 @@
     <div ref="chatHistoryElement"
          class="chat-history"
     >
+      <div v-if="historyPageConfig.lastCount === historyPageConfig.pageSize"
+           class="load-btn-container"
+      >
+        <a-button type="link"
+                  class="load-btn"
+                  @click="handleLoadMoreHistory"
+        >
+          <CloudSyncOutlined/>
+          <label>加载更多</label>
+        </a-button>
+      </div>
       <div class="message-item"
            v-for="(item,index) in chatHistory"
            :key="index"
@@ -215,7 +226,8 @@
         FolderOutlined,
         HistoryOutlined,
         SmileOutlined,
-        PictureOutlined
+        PictureOutlined,
+        CloudSyncOutlined
     } from "@ant-design/icons-vue";
     import dayjs from "dayjs";
     import { UUID } from "uuidjs";
@@ -256,6 +268,17 @@
     // 消息记录对话框元素
     const chatHistoryElement = ref(null);
 
+    // 聊天记录分页配置
+    const historyPageConfig = ref({
+        // 每页大小
+        pageSize: 20,
+        // 最后一次获取的聊天记录数
+        lastCount: 0,
+        resetPage: () => {
+            historyPageConfig.value.lastCount = 0;
+        }
+    });
+
     // 输入消息
     const chatInput = ref("");
     const selectedEmoji = ref();
@@ -279,8 +302,8 @@
     });
 
     // 对话框滚动到底部
-    const scrollToBottom = (animation) => {
-        nextTick(() => {
+    const scrollToBottom = async (animation) => {
+        await nextTick(() => {
             if (chatHistoryElement.value) {
                 chatHistoryElement.value.scrollTo({
                     top: chatHistoryElement.value.scrollHeight,
@@ -390,7 +413,7 @@
             chatHistory.value.push(message);
 
             // 发送消息后滚动到底部
-            scrollToBottom("smooth");
+            await scrollToBottom("smooth");
 
             // 广播消息
             window.dispatchEvent(new CustomEvent("messageSend", {
@@ -408,15 +431,15 @@
     /**
      * 获取云端聊天记录
      * @param friendId 好友ID
+     * @param lastTime 最早一条记录的时间
      * @returns {Promise<any>}
      */
-    const getCloudChatHistory = async (friendId) => {
-        // TODO 添加分页获取聊天记录
+    const getCloudChatHistory = async (friendId, lastTime) => {
         const response = await ChatApi.getChatHistory({
             userId: curLoginUser.value.userId,
             friendId: friendId,
-            pageSize: 0,
-            pageIndex: 0
+            pageSize: historyPageConfig.value.pageSize,
+            lastTime: lastTime
         });
 
         const res = response.data;
@@ -432,17 +455,43 @@
         });
     };
 
+    // 加载更多聊天记录
+    const handleLoadMoreHistory = async () => {
+        const oldContainerSize = chatHistoryElement.value.scrollHeight;
+        const friendId = props.chatInfo.userId;
+        const historyPage = await getCloudChatHistory(friendId, chatHistory.value[0].time);
+        historyPageConfig.value.lastCount = historyPage.length;
+        chatHistory.value = historyPage.reverse().concat(chatHistory.value);
+
+        // 保持浏览位置在原处
+        await nextTick(() => {
+            const newContainerSize = chatHistoryElement.value.scrollHeight;
+            if (chatHistoryElement.value) {
+                chatHistoryElement.value.scrollTo({
+                    top: (newContainerSize - oldContainerSize),
+                    behavior: "auto",
+                });
+            }
+        });
+    };
+
     // 聊天对象变化
+    // TODO 存在随着使用次数的增加，请求次数会越来越多的bug
     const handleChatObjectChange = async (event) => {
-        // TODO 存在随着使用次数的增加，请求次数会越来越多的bug
+        // 重置分页
+        historyPageConfig.value.resetPage();
+
+        chatHistory.value = [];
         const friendId = event.detail;
-        chatHistory.value = await getCloudChatHistory(friendId);
+        const historyPage = await getCloudChatHistory(friendId, null);
+        historyPageConfig.value.lastCount = historyPage.length;
+        chatHistory.value = chatHistory.value.concat(historyPage.reverse());
         if (chatHistory.value.length === 0) {
             chatHistory.value = await getChatHistory(friendId, curLoginUser.value.userId);
         }
 
         // 发送消息后滚动到底部
-        scrollToBottom("auto");
+        await scrollToBottom("auto");
     };
 
     onBeforeMount(async () => {
@@ -512,6 +561,30 @@
       height: calc(100% - #{$header-height + $footer-height});
       overflow-y: auto;
       padding-bottom: 20px;
+
+      .load-btn-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+
+        .load-btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: gray;
+          gap: 5px;
+          cursor: pointer;
+
+          &:hover {
+            color: global-variable.$theme-color;
+          }
+
+          label {
+            cursor: pointer;
+          }
+        }
+      }
 
       $message-item-gap: 15px;
 
@@ -826,6 +899,7 @@
           position: absolute;
           right: 15px;
           bottom: 15px;
+          background-color: global-variable.$theme-color;
         }
       }
     }

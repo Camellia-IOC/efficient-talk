@@ -167,6 +167,7 @@
 				AND departments.parent_id IS NULL
 			</if>
 		</where>
+		ORDER BY departments.sort_order
 	</select>
 
 	<!--获取组织树中的用户节点-->
@@ -176,9 +177,12 @@
 			   users.username        as userName,
 			   users.avatar          as userAvatar,
 			   users.dept_id         as deptId,
+			   users.job_id          as jobId,
+			   jobs.job_name         as jobName,
 			   departments.dept_name as deptName
 		FROM users
 				 LEFT JOIN departments ON departments.dept_id = users.dept_id
+				 LEFT JOIN jobs ON jobs.job_id = users.job_id
 		<where>
 			users.org_id = #{orgId}
 			<if test="parentId != null and parentId != ''">
@@ -188,5 +192,14 @@
 				AND users.dept_id IS NULL
 			</if>
 		</where>
+	</select>
+
+	<!--获取组织信息-->
+	<select id="getOrganizationInfo" resultType="com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO">
+		SELECT organizations.org_id   as orgId,
+			   organizations.org_name as orgName,
+			   organizations.org_logo as orgLogo
+		FROM organizations
+		WHERE organizations.org_id = #{orgId}
 	</select>
 </mapper>

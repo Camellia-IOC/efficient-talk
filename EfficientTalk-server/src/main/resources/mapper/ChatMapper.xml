@@ -54,9 +54,15 @@
 			   chat_history.send_time as time
 		FROM chat_history
 				 LEFT JOIN chat_files ON chat_history.file_id = chat_files.file_id
-		WHERE (chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
-		   OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId})
-		ORDER BY send_time
+		<where>
+			((chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
+				OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId}))
+			<if test="lastTime != null">
+				AND send_time &lt; #{lastTime}
+			</if>
+		</where>
+		ORDER BY send_time DESC
+		LIMIT #{pageSize}
 	</select>
 
 	<!--保存对话列表-->

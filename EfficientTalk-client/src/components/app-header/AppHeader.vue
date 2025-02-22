@@ -1,5 +1,5 @@
 <template>
-  <div class="app-header-container theme-background-color draggable">
+  <div class="app-header-container draggable">
     <div class="logo-container">
       <Logo :color="'#FFFFFF'" :size="35"/>
     </div>
@@ -77,6 +77,8 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .app-header-container {
     display: flex;
     justify-content: space-between;
@@ -93,6 +95,7 @@
       width: $logo-container-width;
       height: 100%;
       color: white;
+      background-color: global-variable.$theme-color;
     }
 
     .window-controller {
