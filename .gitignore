@@ -3,6 +3,7 @@ arget/
 !**/src/main/**/target/
 !**/src/test/**/target/
 /EfficientTalk-server/target/   
+/EfficientTalk-server/resources
 
 ### STS ###
 .apt_generated
