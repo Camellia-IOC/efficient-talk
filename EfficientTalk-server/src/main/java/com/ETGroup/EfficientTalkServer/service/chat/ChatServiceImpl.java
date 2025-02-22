@@ -1,15 +1,15 @@
 package com.ETGroup.EfficientTalkServer.service.chat;
 
+import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.response.chat.UploadChatFileResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -145,5 +145,24 @@ public class ChatServiceImpl implements ChatService {
             return filePath;
         }
         return null;
+    }
+    
+    /**
+     * 获取聊天文件列表
+     *
+     * @param userId    用户ID
+     * @param pageIndex 页码
+     * @param pageSize  每页大小
+     *
+     * @return 聊天文件列表
+     */
+    @Override
+    public ChatFileListResponseVO getChatFileList(String userId, Integer pageIndex, Integer pageSize) {
+        ChatFileListResponseVO response = new ChatFileListResponseVO();
+        Integer total = chatMapper.getChatFileTotal(userId);
+        ArrayList<ChatFileListItemDTO> chatFileList = chatMapper.getChatFileList(userId, pageIndex, pageSize);
+        response.setTotal(total);
+        response.setChatFileList(chatFileList);
+        return response;
     }
 }

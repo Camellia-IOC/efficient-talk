@@ -1,10 +1,10 @@
 package com.ETGroup.EfficientTalkServer.service.chat;
 
+import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatHistoryResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
+import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,4 +84,15 @@ public interface ChatService {
      * @return 文件路径
      */
     String uploadChatFile(String fileId, String fileName, String fileType, Long fileSize, String sender, String receiver, MultipartFile file) throws IOException;
+
+    /**
+     * 获取聊天文件列表
+     *
+     * @param userId    用户ID
+     * @param pageIndex 页码
+     * @param pageSize  每页大小
+     *
+     * @return 聊天文件列表
+     */
+    ChatFileListResponseVO getChatFileList(String userId, Integer pageIndex, Integer pageSize);
 }

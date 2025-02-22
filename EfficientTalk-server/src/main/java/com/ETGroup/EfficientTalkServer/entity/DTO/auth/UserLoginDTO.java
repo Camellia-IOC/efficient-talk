@@ -13,4 +13,10 @@ public class UserLoginDTO {
     
     @JsonProperty("userAvatar")
     private String userAvatar;
+    
+    private String orgId;
+    
+    private String deptId;
+    
+    private String jobId;
 }

@@ -50,4 +50,10 @@ public interface SocialMapper {
     
     // 检查是否为好友
     Integer checkIsFriend(@Param("userId") String userId, @Param("friendId") String friendId);
+    
+    // 获取组织树中的部门节点
+    ArrayList<OrgTreeDeptNodeDTO> getOrgTreeDeptNodeList(@Param("orgId") String orgId,@Param("parentId") String parentId);
+    
+    // 获取组织树中的用户节点
+    ArrayList<OrgTreeUserNodeDTO> getOrgTreeUserNodeList(@Param("orgId") String orgId,@Param("parentId") String parentId);
 }

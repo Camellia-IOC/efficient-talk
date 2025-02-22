@@ -28,14 +28,15 @@ public class AuthServiceImpl extends ServiceImpl<AuthMapper, UserPO> implements 
      */
     @Override
     public LoginResponseVO userLogin(LoginRequestParam param) {
-        UserPO userData = authMapper.getPasswordById(param.getUserId());
+        String password = authMapper.getPasswordById(param.getUserId());
         LoginResponseVO loginResponseVO = new LoginResponseVO();
         
-        if (userData == null) {
+        if (password == null) {
             loginResponseVO.setPermission(false);
         }
         else {
-            loginResponseVO.setPermission(Objects.equals(param.getPassword(), userData.getPassword()));
+            loginResponseVO.setPermission(param.getPassword()
+                                               .equals(password));
             if (loginResponseVO.getPermission()) {
                 loginResponseVO.setUserData(authMapper.getUserLoginDTO(param.getUserId()));
             }

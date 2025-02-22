@@ -4,16 +4,14 @@ import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteR
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
-import com.ETGroup.EfficientTalkServer.entity.response.social.FriendInvitationListResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.social.FriendListResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.social.NewFriendsResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.social.UserFriendGroupsResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.social.*;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
 import com.ETGroup.EfficientTalkServer.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +24,7 @@ public class SocialController {
     @Resource
     private SocialService socialService;
     
-    @Autowired
+    @Resource
     private SocialMapper socialMapper;
     
     @Operation(summary = "获取好友列表")
@@ -85,6 +83,13 @@ public class SocialController {
     public ResponseData<UserFriendGroupsResponseVO> getUserFriendGroups(@RequestParam String userId) {
         UserFriendGroupsResponseVO response = new UserFriendGroupsResponseVO();
         response.setFriendGroups(socialMapper.getUserFriendGroups(userId));
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取组织层级")
+    @GetMapping("/getOrganizationTree")
+    public ResponseData<OrgTreeResponseVO> getOrganizationTree(@RequestParam String orgId, @RequestParam(required = false) String parentId) {
+        OrgTreeResponseVO response = socialService.getOrganizationTree(orgId, parentId);
         return ResponseData.success(response);
     }
 }

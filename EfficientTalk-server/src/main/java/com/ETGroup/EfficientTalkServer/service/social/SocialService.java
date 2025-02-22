@@ -5,6 +5,7 @@ import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteR
 import com.ETGroup.EfficientTalkServer.entity.response.social.FriendInvitationListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.social.FriendListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.social.NewFriendsResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.social.OrgTreeResponseVO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -66,4 +67,14 @@ public interface SocialService {
      * @return 删除结果
      */
     Boolean deleteFriend(String userId, String friendId);
+    
+    /**
+     * 获取组织树
+     *
+     * @param orgId 组织ID
+     * @param parentId 父节点ID
+     *
+     * @return 好友分组列表
+     */
+    OrgTreeResponseVO getOrganizationTree(String orgId, String parentId);
 }

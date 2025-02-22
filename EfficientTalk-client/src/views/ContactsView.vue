@@ -26,18 +26,20 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .friend-view-container {
     display: flex;
     width: 100%;
     height: 100%;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
 
     $friend-list-container-width: 250px;
 
     .friend-list-container {
       width: $friend-list-container-width;
       height: 100%;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      border-right: global-variable.$border-line-width solid global-variable.$border-line-color;
     }
 
     .friend-detail-container {

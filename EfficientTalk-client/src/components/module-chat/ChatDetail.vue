@@ -190,7 +190,7 @@
   <!--图片上传-->
   <FileSelectorDialog ref="pictureSelectorDialog"
                       :dialog-title="'选择图片'"
-                      :multi="false"
+                      :multi="true"
                       :type="'image'"
                       @send-selected-file="handleSendFileMessage"
   />
@@ -230,6 +230,7 @@
     import FileSelectorDialog from "../dialog/file-selector/FileSelectorDialog.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
     import { translateFileSize } from "../../utils/unit-utils.js";
+    import { getFileIcon } from "../../utils/file-utils.js";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -276,18 +277,6 @@
             }
         }
     });
-
-    // 获取文件图标
-    const getFileIcon = (fileType) => {
-        // TODO 有bug,不能正确判断
-        console.error(fileController.checkIsExist("./public/file-icon/" + fileType + ".png"));
-        if (fileController.checkIsExist("./public/file-icon/" + fileType + ".png")) {
-            return "/public/file-icon/" + fileType + ".png";
-        }
-        else {
-            return "/public/file-icon/other.png";
-        }
-    };
 
     // 对话框滚动到底部
     const scrollToBottom = (animation) => {
@@ -488,7 +477,7 @@
       width: 100%;
       height: $header-height;
       padding: 20px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: global-variable.$border-line-width solid global-variable.$border-line-color;
 
       .user-info {
         display: flex;
@@ -792,7 +781,7 @@
         width: 100%;
         height: $operations-bar-height;
         padding: 0 20px;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
 
         .left-bar {
           display: flex;

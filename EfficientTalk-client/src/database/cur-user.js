@@ -2,33 +2,28 @@ import { db } from "./db.js";
 
 /**
  * 保存当前登录的用户信息
- * @param userId 用户id
- * @param userName 用户名
- * @param userAvatar 用户头像
- * @param orgId 组织id
- * @param deptId 部门id
- * @param jobId 职位id
+ * @param userData 用户数据
  */
-export const saveCurUserData = async (userId, userName, userAvatar, orgId, deptId, jobId) => {
+export const saveCurUserData = async (userData) => {
     // 保存登录记录
     await db.users.put({
-        id: userId,
-        username: userName,
-        avatar: userAvatar,
-        org_id: orgId,
-        dept_id: deptId,
-        job_id: jobId
+        id: userData.userId,
+        username: userData.userName,
+        avatar: userData.userAvatar,
+        org_id: userData.orgId,
+        dept_id: userData.deptId,
+        job_id: userData.jobId
     });
 
     // 记录当前登录的用户
     await db.curUser.put({
         key: "CUR_USER",
-        user_id: userId,
-        username: userName,
-        avatar: userAvatar,
-        org_id: orgId,
-        dept_id: deptId,
-        job_id: jobId
+        user_id: userData.userId,
+        username: userData.userName,
+        avatar: userData.userAvatar,
+        org_id: userData.orgId,
+        dept_id: userData.deptId,
+        job_id: userData.jobId
     });
 };
 

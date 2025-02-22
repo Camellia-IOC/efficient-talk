@@ -2,6 +2,7 @@ package com.ETGroup.EfficientTalkServer.controller;
 
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatHistoryResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.UploadChatFileResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
@@ -65,14 +66,24 @@ public class ChatController {
                                                @RequestParam Long fileSize,
                                                @RequestParam String sender,
                                                @RequestParam String receiver,
-                                               @RequestParam MultipartFile file){
+                                               @RequestParam MultipartFile file) {
         try {
             String filePath = chatService.uploadChatFile(fileId, fileName, fileType, fileSize, sender, receiver, file);
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
             response.setFilePath(filePath);
             return ResponseData.success(response);
-        }catch (IOException e){
+        }
+        catch (IOException e) {
             return ResponseData.error(ResponseConfig.RESOURCE_UPLOAD_FAILED);
         }
+    }
+    
+    @Operation(summary = "分页获取聊天文件列表")
+    @GetMapping("/getChatFileList")
+    public ResponseData<ChatFileListResponseVO> getChatFileList(@RequestParam String userId,
+                                                                @RequestParam Integer pageIndex,
+                                                                @RequestParam Integer pageSize) {
+        ChatFileListResponseVO response = chatService.getChatFileList(userId, pageIndex, pageSize);
+        return ResponseData.success(response);
     }
 }

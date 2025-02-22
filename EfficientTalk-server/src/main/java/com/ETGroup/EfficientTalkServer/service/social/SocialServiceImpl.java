@@ -8,6 +8,7 @@ import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteR
 import com.ETGroup.EfficientTalkServer.entity.response.social.FriendInvitationListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.social.FriendListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.social.NewFriendsResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.social.OrgTreeResponseVO;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
 import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
@@ -189,5 +190,21 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public Boolean deleteFriend(String userId, String friendId) {
         return socialMapper.deleteFriend(userId, friendId) == 2;
+    }
+    
+    /**
+     * 获取组织树
+     *
+     * @param orgId    组织ID
+     * @param parentId 父节点ID
+     *
+     * @return 好友分组列表
+     */
+    @Override
+    public OrgTreeResponseVO getOrganizationTree(String orgId, String parentId) {
+        OrgTreeResponseVO response = new OrgTreeResponseVO();
+        response.setDeptList(socialMapper.getOrgTreeDeptNodeList(orgId, parentId));
+        response.setUserList(socialMapper.getOrgTreeUserNodeList(orgId, parentId));
+        return response;
     }
 }

@@ -17,16 +17,16 @@
 
 	<!--获取缓存的聊天记录-->
 	<select id="getChatHistoryCache" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
-		SELECT chat_history_cache.id                         as id,
-			   chat_history_cache.sender  as sender,
-			   chat_history_cache.receiver                   as receiver,
-			   chat_history_cache.type                       as type,
-			   chat_history_cache.file_id as fileId,
-			   chat_files.file_name       as fileName,
-			   chat_files.file_type       as fileType,
-			   chat_files.file_size       as fileSize,
-			   chat_history_cache.content                    as content,
-			   chat_history_cache.send_time                  as time
+		SELECT chat_history_cache.id        as id,
+			   chat_history_cache.sender    as sender,
+			   chat_history_cache.receiver  as receiver,
+			   chat_history_cache.type      as type,
+			   chat_history_cache.file_id   as fileId,
+			   chat_files.file_name         as fileName,
+			   chat_files.file_type         as fileType,
+			   chat_files.file_size         as fileSize,
+			   chat_history_cache.content   as content,
+			   chat_history_cache.send_time as time
 		FROM chat_history_cache
 				 LEFT JOIN chat_files ON chat_history_cache.file_id = chat_files.file_id
 		WHERE chat_history_cache.receiver = #{userId}
@@ -82,4 +82,30 @@
 		INSERT INTO chat_files (file_id, file_name, file_path, file_type, file_size, sender, receiver, create_time)
 		VALUES (#{fileId}, #{fileName}, #{filePath}, #{fileType}, #{fileSize}, #{sender}, #{receiver}, #{createTime})
 	</insert>
+
+	<!--获取聊天文件列表-->
+	<select id="getChatFileList" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO">
+		SELECT chat_files.file_id     as fileId,
+			   chat_files.file_name   as fileName,
+			   chat_files.file_type   as fileType,
+			   chat_files.file_size   as fileSize,
+			   chat_files.sender      as sender,
+			   users.username         as senderName,
+			   chat_files.create_time as createTime
+		FROM chat_files
+				 LEFT JOIN users ON chat_files.sender = users.id
+		WHERE chat_files.sender = #{userId}
+		   OR chat_files.receiver = #{userId}
+		LIMIT #{pageSize}
+		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
+		OFFSET #{pageOffset}
+	</select>
+
+	<!--获取聊天文件总数-->
+	<select id="getChatFileTotal" resultType="java.lang.Integer">
+		SELECT COUNT(*) as total
+		FROM chat_files
+		WHERE chat_files.sender = #{userId}
+		   OR chat_files.receiver = #{userId}
+	</select>
 </mapper>

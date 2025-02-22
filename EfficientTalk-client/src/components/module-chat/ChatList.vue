@@ -569,7 +569,7 @@
         }
 
         &:hover {
-          background-color: rgba(0, 0, 0, 0.05);
+          background-color: global-variable.$hover-background-color;
           cursor: pointer;
         }
       }

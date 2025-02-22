@@ -1,5 +1,5 @@
 <template>
-  <div class="friend-list">
+  <div class="friend-list-container">
     <div class="search-area">
       <a-input class="content-input"
                placeholder="搜索"
@@ -26,8 +26,9 @@
       />
     </div>
     <div class="list-container">
-      <div v-if="activeType === 'FRIEND'"
-           class="type-friend-list"
+      <a-spin v-if="activeType === 'FRIEND'"
+              :wrapper-class-name="'type-friend-list'"
+              :spinning="isFriendListLoading"
       >
         <div class="empty-list"
              v-if="friendList.total === 0"
@@ -58,7 +59,10 @@
                        alt="avatar"
                        class="avatar"
                   >
-                  <a-avatar v-else class="avatar">{{ friend.userName.substring(0, 2)}}</a-avatar>
+                  <a-avatar v-else
+                            class="avatar"
+                  >{{ friend.userName.substring(0, 2) }}
+                  </a-avatar>
                 </div>
                 <div class="user-info">
                   <div class="user-name">{{ friend.userName }}</div>
@@ -73,15 +77,94 @@
             </div>
           </a-collapse-panel>
         </a-collapse>
-      </div>
-      <div v-else-if="activeType === 'GROUP'"
-           class="type-group-list"
+      </a-spin>
+      <div v-else-if="activeType === 'ORG'"
+           class="type-org-list"
       >
         <div class="empty-list"
-             v-if="groupList.length === 0"
+             v-if="curLoginUser.orgId === null"
         >
           <EmptyContainer :description="'你还没有加入组织噢'"/>
         </div>
+        <a-spin v-else
+                :wrapper-class-name="'org-list'"
+                :spinning="isOrgTreeLoading"
+        >
+          <div class="org-info-bar"
+               v-if="openedNodeStack.length!==0"
+          >
+            <label class="org-info single-line-ellipsis">{{ curOrgNodeInfo.deptName }}</label>
+            <a-button shape="round"
+                      @click="preOrgTreeLevel"
+                      size="small"
+                      class="back-btn"
+            >
+              <LeftOutlined/>
+            </a-button>
+          </div>
+          <div class="org-list-container"
+               v-if="orgTree.deptList.length===0&&orgTree.userList.length===0"
+          >
+            <EmptyContainer :description="'空组织'"/>
+          </div>
+          <div class="org-list-container"
+               v-else
+          >
+            <div class="group-label"
+                 v-if="orgTree.deptList.length!==0&&openedNodeStack.length!==0"
+            >
+              <ApartmentOutlined/>
+              <label>下级部门</label>
+            </div>
+            <div class="org-dept-list-item"
+                 v-for="(item,index) in orgTree.deptList"
+                 :key="index"
+                 @click="nextOrgTreeLevel(item)"
+            >
+              <div class="org-info">
+                <div class="org-icon">
+                  <TeamOutlined/>
+                </div>
+                <label class="org-name">{{ item.deptName }}</label>
+              </div>
+              <div class="more-icon">
+                <RightOutlined/>
+              </div>
+            </div>
+            <div class="group-label"
+                 v-if="orgTree.userList.length!==0&&openedNodeStack.length!==0"
+            >
+              <UserOutlined/>
+              <label>部门成员</label>
+            </div>
+            <div class="org-user-list-item"
+                 v-for="(item,index) in orgTree.userList"
+                 :key="index"
+                 @click="handleSelectFriend(item)"
+            >
+              <div class="user-avatar">
+                <img v-if="item.userAvatar!==null"
+                     :src="item.userAvatar"
+                     alt="avatar"
+                     class="avatar"
+                >
+                <a-avatar v-else
+                          class="avatar"
+                >{{ item.userName.substring(0, 2) }}
+                </a-avatar>
+              </div>
+              <div class="user-info">
+                <div class="user-name">{{ item.userName }}</div>
+                <div class="user-dept"
+                     v-if="item.deptName!==null && item.deptId!==null"
+                >
+                  <CrownTwoTone/>
+                  {{ item.deptName }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </a-spin>
       </div>
     </div>
   </div>
@@ -105,13 +188,18 @@
     import {
         CrownTwoTone,
         RightOutlined,
-        PlusOutlined
+        PlusOutlined,
+        TeamOutlined,
+        LeftOutlined,
+        UserOutlined,
+        ApartmentOutlined
     } from "@ant-design/icons-vue";
     import SocialApi from "../../api/modules/SocialApi";
     import { getCurUserData } from "../../database/cur-user.js";
     import FriendInvitationDialog from "../dialog/friend-invitations/FriendInvitationDialog.vue";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import AddNewFriendDialog from "../dialog/add-friend/AddNewFriendDialog.vue";
+    import { message } from "ant-design-vue";
 
     const emits = defineEmits(["setSelectedFriend"]);
 
@@ -133,6 +221,10 @@
         curLoginUser.value = await getCurUserData();
     };
 
+    // 加载标识符
+    const isFriendListLoading = ref(true);
+    const isOrgTreeLoading = ref(true);
+
     // 当前展开的好友分组
     const activeFriendGroupKey = ref([]);
 
@@ -142,7 +234,7 @@
         value: "FRIEND"
     }, {
         label: "组织",
-        value: "GROUP"
+        value: "ORG"
     }];
 
     // 当前选择的类型
@@ -159,11 +251,13 @@
     const friendList = ref({});
 
     // 组织列表
-    const groupList = ref([]);
+    const openedNodeStack = ref([]);
+    const curOrgNodeInfo = ref(null);
+    const orgTree = ref([]);
 
     // 获取好友列表
-    const getFriendList = () => {
-        SocialApi.getFriendList({
+    const getFriendList = async () => {
+        await SocialApi.getFriendList({
             userId: curLoginUser.value.userId,
         }).then((response) => {
             const res = response.data;
@@ -174,11 +268,52 @@
                 }
             }
         });
+        isFriendListLoading.value = false;
     };
 
     // 更新好友列表
-    const handleUpdateFriendList = () => {
-        getFriendList();
+    const handleUpdateFriendList = async () => {
+        await getFriendList();
+    };
+
+    // 获取组织树
+    const getOrgTree = async (parentId) => {
+        const response = await SocialApi.getOrganizationTree({
+            orgId: curLoginUser.value.orgId,
+            parentId: parentId
+        });
+
+        const res = response.data;
+        if (res.code === 0) {
+            if (res.data != null) {
+                orgTree.value = res.data;
+            }
+        }
+        else {
+            message.error("获取组织数据失败");
+            orgTree.value = [];
+        }
+        isOrgTreeLoading.value = false;
+    };
+
+    // 处理组织树层级切换
+    const nextOrgTreeLevel = async (item) => {
+        isOrgTreeLoading.value = true;
+        curOrgNodeInfo.value = item;
+        openedNodeStack.value.push(curOrgNodeInfo.value);
+        await getOrgTree(curOrgNodeInfo.value.deptId);
+    };
+    const preOrgTreeLevel = async () => {
+        isOrgTreeLoading.value = true;
+        curOrgNodeInfo.value = openedNodeStack.value.pop();
+        if (openedNodeStack.value.length === 0) {
+            curOrgNodeInfo.value = null;
+            await getOrgTree(null);
+        }
+        else {
+            await getOrgTree(curOrgNodeInfo.value.parentId);
+            curOrgNodeInfo.value = openedNodeStack.value[openedNodeStack.value.length - 1];
+        }
     };
 
     onBeforeMount(async () => {
@@ -189,6 +324,11 @@
 
         // 获取好友列表
         await getFriendList();
+
+        if (curLoginUser.value.orgId != null) {
+            // 获取组织树
+            await getOrgTree(null);
+        }
     });
 </script>
 
@@ -197,7 +337,7 @@
 >
   @use "/src/assets/style/global-variable.scss";
 
-  .friend-list {
+  .friend-list-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -261,7 +401,7 @@
 
       &:hover {
         cursor: pointer;
-        background-color: rgba(0, 0, 0, 0.05);
+        background-color: global-variable.$hover-background-color;
       }
     }
 
@@ -273,7 +413,7 @@
       align-items: center;
       width: 90%;
       height: $type-select-bar-height;
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
     }
 
     .list-container {
@@ -326,11 +466,12 @@
                 align-items: center;
                 width: 100%;
                 height: 80px;
+                min-height: 80px;
                 padding: 5px 15px;
                 cursor: pointer;
 
                 &:hover {
-                  background-color: rgba(0, 0, 0, 0.05);
+                  background-color: global-variable.$hover-background-color;
                 }
 
                 .user-avatar {
@@ -376,7 +517,7 @@
         }
       }
 
-      .type-group-list {
+      .type-org-list {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -392,6 +533,163 @@
           font-size: 14px;
           color: gray;
         }
+
+        .org-list {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+
+          $org-info-bar-height: 50px;
+
+          .org-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            height: $org-info-bar-height;
+            margin: 10px 5%;
+            padding: 0 10px;
+            background-color: global-variable.$theme-color;
+            border-radius: 10px;
+
+            .org-info {
+              display: flex;
+              align-items: center;
+              width: calc(100% - 30px);
+              font-size: 16px;
+              gap: 10px;
+              color: white;
+            }
+
+            .back-btn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 24px;
+              border: none;
+              color: global-variable.$theme-color;
+            }
+          }
+
+          .org-list-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: calc(100% - $org-info-bar-height - 20px);
+            overflow-y: auto;
+
+            .group-label {
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              width: 90%;
+              margin: 10px 5% 5px 5%;
+              color: gray;
+              font-size: 12px;
+              border-bottom: 1px solid global-variable.$border-line-color;
+
+              label {
+                margin-left: 5px;
+              }
+            }
+
+            .org-dept-list-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              width: 100%;
+              height: 40px;
+              min-height: 40px;
+              padding: 5px 18px;
+              cursor: pointer;
+
+              &:hover {
+                background-color: global-variable.$hover-background-color;
+              }
+
+              .org-info {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                height: 100%;
+
+                .org-icon {
+                  color: global-variable.$theme-color;
+                  font-size: 20px;
+                  margin-right: 10px;
+                }
+
+                .org-name {
+                  font-size: 14px;
+                }
+              }
+
+              .more-icon {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                height: 100%;
+                font-size: 10px;
+                color: gray;
+              }
+            }
+
+            .org-user-list-item {
+              display: flex;
+              align-items: center;
+              width: 100%;
+              height: 80px;
+              min-height: 80px;
+              padding: 5px 15px;
+              cursor: pointer;
+
+              &:hover {
+                background-color: global-variable.$hover-background-color;
+              }
+
+              .user-avatar {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                .avatar {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  width: 50px;
+                  height: 50px;
+                  border-radius: 50%;
+                }
+              }
+
+              .user-info {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                width: 100%;
+                height: 65%;
+                padding-left: 15px;
+                gap: 5px;
+
+                .user-name {
+                  font-size: 14px;
+                }
+
+                .user-dept {
+                  display: flex;
+                  align-items: center;
+                  font-size: 12px;
+                  color: gray;
+                  gap: 5px;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -404,5 +702,10 @@
   // 去除折叠面板内的边距
   :deep(.ant-collapse-content-box) {
     padding: 0 !important;
+  }
+
+  :deep(.ant-spin-container) {
+    height: 100%;
+    width: 100%;
   }
 </style>

@@ -70,7 +70,7 @@
                 if (res.data.permission === true) {
                     const data = res.data.userData;
                     // 保存当前登录用户信息到数据库中
-                    await saveCurUserData(data.userId, data.userName, data.userAvatar);
+                    await saveCurUserData(data);
 
                     // TODO 使用electron运行时记得取消相应注释
                     windowController.hide();

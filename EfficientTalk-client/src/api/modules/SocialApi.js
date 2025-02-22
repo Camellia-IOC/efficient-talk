@@ -16,17 +16,6 @@ export default class SocialApi {
     };
 
     /**
-     * 获取组织架构树
-     * @param data 请求数据
-     */
-    static getOrgTree = (data) => {
-        return service.post({
-            url: this.requestPath + "/getOrgTree",
-            data
-        });
-    };
-
-    /**
      * 获取好友邀请列表
      * @param data 请求数据
      */
@@ -88,6 +77,17 @@ export default class SocialApi {
     static searchNewFriend = (data) => {
         return service.get({
             url: this.requestPath + "/searchNewFriend",
+            data
+        });
+    }
+
+    /**
+     * 获取组织架构树
+     * @param data
+     */
+    static getOrganizationTree = (data) => {
+        return service.get({
+            url: this.requestPath + "/getOrganizationTree",
             data
         });
     }

@@ -34,14 +34,24 @@
                :key="index"
                class="file-item"
           >
-            <div class="file-info">
-              <img :src="getFileIcon(file.fileType)"
-                   alt="icon"
-                   class="file-icon"
-              >
-              <div class="file-name">{{ file.fileName + "." + file.fileType }}</div>
+            <div class="file-info-container">
+              <div class="file-info">
+                <img :src="getFileIcon(file.fileType)"
+                     alt="icon"
+                     class="file-icon"
+                >
+                <div class="file-name">{{ file.fileName + "." + file.fileType }}</div>
+              </div>
+              <div class="file-size">{{ translateFileSize(file.fileSize) }}</div>
             </div>
-            <div class="file-size">{{ translateFileSize(file.fileSize) }}</div>
+            <div class="operation-bar">
+              <a-button type="primary"
+                        danger
+                        @click="deleteFileFromList(index)"
+              >
+                <DeleteOutlined/>
+              </a-button>
+            </div>
           </div>
           <EmptyContainer description="暂无已选择图片"
                           v-if="fileList.length === 0"
@@ -54,14 +64,24 @@
                :key="index"
                class="file-item"
           >
-            <div class="file-info">
-              <img :src="getFileIcon(file.fileType)"
-                   alt="icon"
-                   class="file-icon"
-              >
-              <div class="file-name">{{ file.fileName + "." + file.fileType }}</div>
+            <div class="file-info-container">
+              <div class="file-info">
+                <img :src="getFileIcon(file.fileType)"
+                     alt="icon"
+                     class="file-icon"
+                >
+                <div class="file-name">{{ file.fileName + "." + file.fileType }}</div>
+              </div>
+              <div class="file-size">{{ translateFileSize(file.fileSize) }}</div>
             </div>
-            <div class="file-size">{{ translateFileSize(file.fileSize) }}</div>
+            <div class="operation-bar">
+              <a-button type="primary"
+                        danger
+                        @click="deleteFileFromList(index)"
+              >
+                <DeleteOutlined/>
+              </a-button>
+            </div>
           </div>
           <EmptyContainer description="暂无已选择文件"
                           v-if="fileList.length === 0"
@@ -82,10 +102,14 @@
     import {
         ref
     } from "vue";
-    import { InboxOutlined } from "@ant-design/icons-vue";
+    import {
+        InboxOutlined,
+        DeleteOutlined
+    } from "@ant-design/icons-vue";
     import EmptyContainer from "../../empty-container/EmptyContainer.vue";
     import { UUID } from "uuidjs";
     import { translateFileSize } from "../../../utils/unit-utils.js";
+    import { getFileIcon } from "../../../utils/file-utils.js";
 
     const emit = defineEmits(["sendSelectedFile"]);
 
@@ -129,21 +153,15 @@
         }
     };
 
-    // 获取文件图标
-    const getFileIcon = (fileType) => {
-        // TODO 有bug,不能正确判断
-        console.error(fileController.checkIsExist("./public/file-icon/" + fileType + ".png"));
-        if (fileController.checkIsExist("./public/file-icon/" + fileType + ".png")) {
-            return "/public/file-icon/" + fileType + ".png";
-        }
-        else {
-            return "/public/file-icon/other.png";
-        }
-    };
-
     // 文件列表
     const fileList = ref([]);
     const fileMessageList = ref([]);
+
+    // 删除文件列表中的文件
+    const deleteFileFromList = (index) => {
+        fileList.value.splice(index, 1);
+        fileMessageList.value.splice(index, 1);
+    };
 
     // 选择文件回调
     const handleFileSelect = (file) => {
@@ -179,6 +197,7 @@
         console.log(e);
     }
 
+    // 发送文件
     const handleSend = () => {
         console.error(fileList.value);
         emit("sendSelectedFile", fileMessageList.value);
@@ -236,31 +255,49 @@
           background-color: #F5F7FA;
           border-radius: 15px;
 
-          .file-info {
+          .file-info-container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
+            width: 85%;
+            height: 100%;
 
-            .file-icon {
-              width: 60px;
-              height: 60px;
-              padding: 5px;
-              background-color: white;
-              border-radius: 10px;
+            .file-info {
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              width: 90%;
+              gap: 15px;
+
+              .file-icon {
+                width: 60px;
+                height: 60px;
+                padding: 5px;
+                background-color: white;
+                border-radius: 10px;
+              }
+
+              .file-name {
+                font-size: 16px;
+                font-weight: bold;
+              }
             }
 
-            .file-name{
-              font-size: 16px;
-              font-weight: bold;
+            .file-size {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 10%;
+              color: gray;
             }
           }
 
-          .file-size {
+          .operation-bar {
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
-            color: gray;
+            width: 15%;
+            height: 100%;
           }
         }
       }
@@ -284,31 +321,49 @@
           background-color: #F5F7FA;
           border-radius: 15px;
 
-          .file-info {
+          .file-info-container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
+            width: 85%;
+            height: 100%;
 
-            .file-icon {
-              width: 60px;
-              height: 60px;
-              padding: 5px;
-              background-color: white;
-              border-radius: 10px;
+            .file-info {
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              width: 90%;
+              gap: 15px;
+
+              .file-icon {
+                width: 60px;
+                height: 60px;
+                padding: 5px;
+                background-color: white;
+                border-radius: 10px;
+              }
+
+              .file-name {
+                font-size: 16px;
+                font-weight: bold;
+              }
             }
 
-            .file-name{
-              font-size: 16px;
-              font-weight: bold;
+            .file-size {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 10%;
+              color: gray;
             }
           }
 
-          .file-size {
+          .operation-bar {
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
-            color: gray;
+            width: 15%;
+            height: 100%;
           }
         }
       }

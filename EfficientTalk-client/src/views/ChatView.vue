@@ -48,18 +48,20 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .chat-view-container {
     display: flex;
     width: 100%;
     height: 100%;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
 
     $chat-list-container-width: 250px;
 
     .chat-list-container {
       width: $chat-list-container-width;
       height: 100%;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      border-right: global-variable.$border-line-width solid global-variable.$border-line-color;
     }
 
     .chat-detail-container {

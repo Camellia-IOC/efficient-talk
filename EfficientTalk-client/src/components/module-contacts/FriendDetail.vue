@@ -3,10 +3,7 @@
     <div class="default-content"
          v-if="friendId === null"
     >
-      <img style="width: 200px;height: 200px"
-           src="../../assets/logo.png"
-           alt="logo"
-      >
+      <Logo :color="themeColor" :size="256"/>
     </div>
     <div class="user-detail-container"
          v-else
@@ -76,6 +73,8 @@
     import { getCurUserData } from "../../database/cur-user.js";
     import SocialApi from "../../api/modules/SocialApi.js";
     import { message } from "ant-design-vue";
+    import Logo from "../logo/Logo.vue";
+    import { themeColor } from "../../config/config.js";
 
     const router = useRouter();
 
@@ -186,6 +185,8 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .friend-detail {
     display: flex;
     justify-content: center;

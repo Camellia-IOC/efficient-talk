@@ -64,7 +64,7 @@ const router = createRouter({
                             // 云盘-聊天文件
                             path: "chat-files",
                             name: "chat-files",
-                            component: () => import("../views/EmptyView.vue")
+                            component: () => import("../views/cloud-disk/ChatCloudDiskView.vue")
                         }
                     ]
                 },

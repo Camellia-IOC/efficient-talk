@@ -56,3 +56,13 @@ export const formatMessageTime = (time, position) => {
     // 其他情况（往年消息）
     return messageTime.format("YYYY-MM-DD");
 };
+
+/**
+ * 格式化日期
+ * @param time 时间戳或日期字符串
+ * @returns {string} 格式化后的日期字符串
+ */
+export const formatDate = (time) => {
+    const formatTime = dayjs(time);
+    return formatTime.format("YYYY-MM-DD HH:mm:ss");
+}

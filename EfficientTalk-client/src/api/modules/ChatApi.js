@@ -58,4 +58,15 @@ export default class ChatApi {
             data
         });
     };
+
+    /**
+     * 获取聊天文件列表
+     * @param data
+     */
+    static getChatFileList = (data) => {
+        return service.get({
+            url: this.requestPath + "/getChatFileList",
+            data
+        });
+    };
 }

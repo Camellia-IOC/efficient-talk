@@ -23,8 +23,9 @@ const fs = require("node:fs");
 // 会话ID
 const sessionId = new Date().getTime().toString();
 
-// 项目地址
+// 应用配置
 const projectUrl = "http://localhost:5173/";
+const iconPath = "./resources/logo.ico";
 
 // 主窗口对象
 let mainWindow = null;
@@ -46,7 +47,7 @@ const createWindow = () => {
             preload: path.join(__dirname, "preload.cjs"),
             session: session.fromPartition(`persist:${sessionId}`)
         },
-        icon: path.join(__dirname, "./resources/logo.ico"),
+        icon: path.join(__dirname, iconPath),
         // 禁用大小调节
         resizable: false,
         // 是否使用自带标题栏
@@ -188,6 +189,7 @@ ipcMain.handle("app-login", (e, param) => {
             preload: path.join(__dirname, "preload.cjs"),
             session: session.fromPartition(`persist:${sessionId}`)
         },
+        icon: path.join(__dirname, iconPath),
         // 是否使用自带标题栏
         frame: false,
     });
@@ -211,6 +213,7 @@ ipcMain.handle("app-logout", (e, param) => {
             preload: path.join(__dirname, "preload.cjs"),
             session: session.fromPartition(`persist:${sessionId}`)
         },
+        icon: path.join(__dirname, iconPath),
         // 是否使用自带标题栏
         frame: false,
         resizable: false,

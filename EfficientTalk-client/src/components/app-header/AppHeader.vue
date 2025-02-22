@@ -1,7 +1,7 @@
 <template>
   <div class="app-header-container theme-background-color draggable">
     <div class="logo-container">
-      <DingdingOutlined style="font-size: 30px"/>
+      <Logo :color="'#FFFFFF'" :size="35"/>
     </div>
     <div class="window-controller">
       <a-button class="control-btn no-drag"
@@ -30,10 +30,10 @@
         MinusOutlined,
         CompressOutlined,
         ExpandOutlined,
-        CloseOutlined,
-        DingdingOutlined,
+        CloseOutlined
     } from "@ant-design/icons-vue";
     import { Modal } from "ant-design-vue";
+    import Logo from "../logo/Logo.vue";
 
     // 窗口最大化状态
     const isMaximized = ref(false);

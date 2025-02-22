@@ -1,5 +1,6 @@
 package com.ETGroup.EfficientTalkServer.mapper;
 
+import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
@@ -37,4 +38,12 @@ public interface ChatMapper {
     
     // 保存聊天文件
     Integer uploadChatFile(ChatFilePO chatFile);
+    
+    // 获取聊天文件列表
+    ArrayList<ChatFileListItemDTO> getChatFileList(@Param("userId") String userId,
+                                                   @Param("pageIndex") Integer pageIndex,
+                                                   @Param("pageSize") Integer pageSize);
+    
+    // 获取聊天文件总数
+    Integer getChatFileTotal(@Param("userId") String userId);
 }
