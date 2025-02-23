@@ -10,7 +10,7 @@
     <div class="container-body">
       <div class="user-avatar">
         <img class="avatar"
-             src="../assets/logo.png"
+             src="../assets/resources/logo.png"
              alt="avatar"
         >
       </div>

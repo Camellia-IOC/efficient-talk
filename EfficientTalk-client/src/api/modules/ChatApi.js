@@ -60,6 +60,17 @@ export default class ChatApi {
     };
 
     /**
+     * 上传聊天图片
+     * @param data
+     */
+    static uploadChatImage = (data) => {
+        return service.upload({
+            url: this.requestPath + "/uploadChatImage",
+            data
+        });
+    };
+
+    /**
      * 获取聊天文件列表
      * @param data
      */

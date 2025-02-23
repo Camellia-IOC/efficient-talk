@@ -3,6 +3,7 @@ package com.ETGroup.EfficientTalkServer.mapper;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO;
+import com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
 import org.apache.ibatis.annotations.Mapper;
@@ -40,6 +41,9 @@ public interface ChatMapper {
     
     // 保存聊天文件
     Integer uploadChatFile(ChatFilePO chatFile);
+    
+    // 保存聊天图片
+    Integer uploadChatImage(ChatImagePO chatImage);
     
     // 获取聊天文件列表
     ArrayList<ChatFileListItemDTO> getChatFileList(@Param("userId") String userId,

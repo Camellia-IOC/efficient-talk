@@ -89,6 +89,12 @@
 		VALUES (#{fileId}, #{fileName}, #{filePath}, #{fileType}, #{fileSize}, #{sender}, #{receiver}, #{createTime})
 	</insert>
 
+	<!--保存聊天图片-->
+	<insert id="uploadChatImage" parameterType="com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO">
+		INSERT INTO chat_images (image_id, image_name, image_path, image_type, image_size, sender, receiver, create_time)
+		VALUES (#{imageId}, #{imageName}, #{imagePath}, #{imageType}, #{imageSize}, #{sender}, #{receiver}, #{createTime})
+	</insert>
+
 	<!--获取聊天文件列表-->
 	<select id="getChatFileList" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO">
 		SELECT chat_files.file_id     as fileId,

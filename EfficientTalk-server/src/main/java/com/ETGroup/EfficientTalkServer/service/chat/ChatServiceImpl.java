@@ -3,6 +3,7 @@ package com.ETGroup.EfficientTalkServer.service.chat;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO;
+import com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
@@ -126,7 +127,7 @@ public class ChatServiceImpl implements ChatService {
                                  String sender,
                                  String receiver,
                                  MultipartFile file) throws IOException {
-        String savePath = System.getProperty("user.dir") + "/resources/";
+        String savePath = System.getProperty("user.dir") + "/resources/chat_files";
         File saveFile = new File(savePath + file.getOriginalFilename());
         file.transferTo(saveFile);
         String filePath = savePath + file.getOriginalFilename();
@@ -143,6 +144,49 @@ public class ChatServiceImpl implements ChatService {
         chatFile.setCreateTime(createTime.toString());
         
         if (chatMapper.uploadChatFile(chatFile) == 1) {
+            return filePath;
+        }
+        return null;
+    }
+    
+    /**
+     * 保存聊天图片
+     *
+     * @param imageId   图片ID
+     * @param imageName 图片名
+     * @param imageType 图片类型
+     * @param imageSize 图片大小
+     * @param sender   发送人
+     * @param receiver 接收人
+     * @param image     图片
+     *
+     * @return 图片路径
+     */
+    @Override
+    public String uploadChatImage(String imageId,
+                                  String imageName,
+                                  String imageType,
+                                  Long imageSize,
+                                  String sender,
+                                  String receiver,
+                                  MultipartFile image) throws IOException {
+        String savePath = System.getProperty("user.dir") + "/resources/chat_images/";
+        File saveFile = new File(savePath + image.getOriginalFilename());
+        image.transferTo(saveFile);
+        String filePath = savePath + image.getOriginalFilename();
+        LocalDateTime createTime = LocalDateTime.now();
+        
+        ChatImagePO chatImage = new ChatImagePO();
+        chatImage.setImageId(imageId);
+        chatImage.setImageName(imageName);
+        chatImage.setImagePath(filePath);
+        chatImage.setImageType(imageType);
+        chatImage.setImageSize(imageSize);
+        chatImage.setSender(sender);
+        chatImage.setReceiver(receiver);
+        chatImage.setCreateTime(createTime.toString());
+        
+        if (chatMapper.uploadChatImage(chatImage) == 1) {
             return filePath;
         }
         return null;

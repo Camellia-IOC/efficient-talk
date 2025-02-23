@@ -1,6 +1,5 @@
 package com.ETGroup.EfficientTalkServer.service.chat;
 
-import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
@@ -92,6 +91,27 @@ public interface ChatService {
                           String sender,
                           String receiver,
                           MultipartFile file) throws IOException;
+    
+    /**
+     * 保存聊天图片
+     *
+     * @param imageId   图片ID
+     * @param imageName 图片名
+     * @param imageType 图片类型
+     * @param imageSize 图片大小
+     * @param sender   发送人
+     * @param receiver 接收人
+     * @param image     图片
+     *
+     * @return 图片路径
+     */
+    String uploadChatImage(String imageId,
+                          String imageName,
+                          String imageType,
+                          Long imageSize,
+                          String sender,
+                          String receiver,
+                          MultipartFile image) throws IOException;
     
     /**
      * 获取聊天文件列表

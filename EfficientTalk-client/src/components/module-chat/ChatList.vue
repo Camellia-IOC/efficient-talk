@@ -68,6 +68,7 @@
 <script setup>
     import {
         onBeforeMount,
+        onBeforeUnmount,
         ref
     } from "vue";
     import {
@@ -232,7 +233,8 @@
 
         // 广播聊天对象变化事件
         window.dispatchEvent(new CustomEvent("chatObjectChange", {
-            detail: curChatId.value
+            detail: curChatId.value,
+            bubbles: false
         }));
 
         // 如果有消息未读则清空未读消息数
@@ -414,10 +416,17 @@
             emits("setSelectedChat", chatInfo);
             // 广播聊天对象变化事件
             window.dispatchEvent(new CustomEvent("chatObjectChange", {
-                detail: curChatId.value
+                detail: curChatId.value,
+                bubbles: false
             }));
         }
     });
+
+    onBeforeUnmount(()=>{
+        // 移除监听器防止事件多次触发
+        window.removeEventListener("messageReceive", handleMessageReceive);
+        window.removeEventListener("messageSend", handleMessageSend);
+    })
 </script>
 
 <style scoped

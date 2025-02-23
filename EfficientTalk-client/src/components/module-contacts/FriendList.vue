@@ -183,6 +183,7 @@
 <script setup>
     import {
         onBeforeMount,
+        onBeforeUnmount,
         ref
     } from "vue";
     import {
@@ -330,6 +331,11 @@
             await getOrgTree(null);
         }
     });
+
+    onBeforeUnmount(()=>{
+        // 移除监听器防止事件多次触发
+        window.removeEventListener("updateFriendList", handleUpdateFriendList);
+    })
 </script>
 
 <style scoped

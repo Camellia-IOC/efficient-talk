@@ -82,6 +82,26 @@ public class ChatController {
         }
     }
     
+    @Operation(summary = "保存聊天图片")
+    @PostMapping("/uploadChatImage")
+    public ResponseData<Object> uploadChatImage(@RequestParam String imageId,
+                                               @RequestParam String imageName,
+                                               @RequestParam String imageType,
+                                               @RequestParam Long imageSize,
+                                               @RequestParam String sender,
+                                               @RequestParam String receiver,
+                                               @RequestParam MultipartFile image) {
+        try {
+            String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image);
+            UploadChatFileResponseVO response = new UploadChatFileResponseVO();
+            response.setFilePath(filePath);
+            return ResponseData.success(response);
+        }
+        catch (IOException e) {
+            return ResponseData.error(ResponseConfig.RESOURCE_UPLOAD_FAILED);
+        }
+    }
+    
     @Operation(summary = "分页获取聊天文件列表")
     @GetMapping("/getChatFileList")
     public ResponseData<ChatFileListResponseVO> getChatFileList(@RequestParam String userId,

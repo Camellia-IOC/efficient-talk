@@ -188,7 +188,6 @@
             fileSize: file.size,
             origin: file
         });
-        console.error(fileMessageList.value);
 
         // 用于避免直接上传
         return false;

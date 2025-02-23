@@ -54,6 +54,7 @@
 <script setup>
     import {
         onBeforeMount,
+        onBeforeUnmount,
         ref
     } from "vue";
     import {
@@ -153,6 +154,11 @@
 
         // 订阅导航索引变化事件
         window.addEventListener("navForceChange", handleNavIndexChange);
+    });
+
+    onBeforeUnmount(() => {
+        // 取消订阅导航索引变化事件
+        window.removeEventListener("navForceChange", handleNavIndexChange);
     });
 </script>
 
