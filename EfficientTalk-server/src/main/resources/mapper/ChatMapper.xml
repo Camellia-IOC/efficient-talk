@@ -152,11 +152,20 @@
 		<where>
 			((chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
 				OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId}))
+			<if test="type == 'all' and (searchKey != null and searchKey != '')">
+				AND chat_history.content LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
 			<if test="type == 'image/video'">
 				AND (chat_history.type = 'image' OR chat_history.type = 'video')
+				<if test="searchKey != null and searchKey != ''">
+					AND chat_images.image_name LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
 			</if>
 			<if test="type == 'file'">
 				AND chat_history.type = 'file'
+				<if test="searchKey != null and searchKey != ''">
+					AND chat_files.file_name LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
 			</if>
 			<if test="lastTime != null">
 				AND send_time &lt; #{lastTime}

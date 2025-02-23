@@ -14,9 +14,13 @@
                     tab="全部"
         >
           <div class="tab-content">
+            <EmptyContainer v-if="chatHistoryAllList.length === 0"
+                            :description="'暂无相关聊天记录'"
+            />
             <div class="chat-history-record-item"
                  v-for="(item,index) in chatHistoryAllList"
                  :key="index"
+                 v-else
             >
               <div class="message-item">
                 <div class="message-avatar">
@@ -71,6 +75,7 @@
             </div>
             <a-button @click="getChatHistory"
                       type="link"
+                      v-if="chatHistoryAllList.length !== 0 && allLastCount === pageSize"
             >加载更多
             </a-button>
           </div>
@@ -79,7 +84,12 @@
                     tab="图片/视频"
         >
           <div class="tab-content">
-            <div class="image-grid-container">
+            <EmptyContainer v-if="chatHistoryImageList.length === 0"
+                            :description="'暂无相关聊天记录'"
+            />
+            <div class="image-grid-container"
+                 v-else
+            >
               <a-image v-for="(item,index) in chatHistoryImageList"
                        :key="index"
                        :src="item.content"
@@ -91,6 +101,7 @@
             </div>
             <a-button @click="getChatHistory"
                       type="link"
+                      v-if="chatHistoryImageList.length !== 0 && imageLastCount === pageSize"
             >加载更多
             </a-button>
           </div>
@@ -99,9 +110,13 @@
                     tab="文件"
         >
           <div class="tab-content">
+            <EmptyContainer v-if="chatHistoryFileList.length === 0"
+                            :description="'暂无相关聊天记录'"
+            />
             <div class="chat-history-file-item"
                  v-for="(item,index) in chatHistoryFileList"
                  :key="index"
+                 v-else
             >
               <div class="file-info">
                 <div class="file-icon">
@@ -132,6 +147,7 @@
             </div>
             <a-button @click="getChatHistory"
                       type="link"
+                      v-if="chatHistoryFileList.length !== 0 && fileLastCount === pageSize"
             >加载更多
             </a-button>
           </div>
@@ -144,7 +160,8 @@
 <script setup>
     import {
         onBeforeMount,
-        ref
+        ref,
+        watch
     } from "vue";
     import { useRoute } from "vue-router";
     import ChatApi from "../../api/modules/ChatApi.js";
@@ -158,6 +175,8 @@
     import {
         DownloadOutlined
     } from "@ant-design/icons-vue";
+    import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
+    import { message } from "ant-design-vue";
 
     const route = useRoute();
 
@@ -180,6 +199,9 @@
     const chatHistoryAllList = ref([]);
     const chatHistoryImageList = ref([]);
     const chatHistoryFileList = ref([]);
+    const allLastCount = ref(0);
+    const imageLastCount = ref(0);
+    const fileLastCount = ref(0);
 
     const getUserAvatar = (userId) => {
         if (userId === user.value.userId) {
@@ -243,13 +265,25 @@
         if (res.code === 0) {
             if (res.data != null) {
                 if (activeKey.value === "all") {
+                    allLastCount.value = res.data.chatHistory.length;
                     chatHistoryAllList.value = chatHistoryAllList.value.concat(res.data.chatHistory);
+                    if(res.data.chatHistory.length === 0 && chatHistoryAllList.value.length !== 0){
+                        message.warning("没有更多消息了")
+                    }
                 }
                 else if (activeKey.value === "image/video") {
+                    imageLastCount.value = res.data.chatHistory.length;
                     chatHistoryImageList.value = chatHistoryImageList.value.concat(res.data.chatHistory);
+                    if(res.data.chatHistory.length === 0 && chatHistoryImageList.value.length !== 0){
+                        message.warning("没有更多消息了")
+                    }
                 }
                 else if (activeKey.value === "file") {
+                    fileLastCount.value = res.data.chatHistory.length;
                     chatHistoryFileList.value = chatHistoryFileList.value.concat(res.data.chatHistory);
+                    if(res.data.chatHistory.length === 0 && chatHistoryFileList.value.length !== 0){
+                        message.warning("没有更多消息了")
+                    }
                 }
             }
         }
@@ -283,6 +317,20 @@
             }
         }
     };
+
+    watch(() => searchKey.value, () => {
+        if (activeKey.value === "all") {
+            chatHistoryAllList.value = [];
+        }
+        else if (activeKey.value === "image/video") {
+            chatHistoryImageList.value = [];
+        }
+        else if (activeKey.value === "file") {
+            chatHistoryFileList.value = [];
+        }
+
+        getChatHistory();
+    });
 
     onBeforeMount(() => {
         updateUserInfo(route.query.data);
@@ -341,7 +389,7 @@
             width: 99%;
             height: fit-content;
             padding: 10px 0;
-            margin-right: 1%; 
+            margin-right: 1%;
             border-bottom: global-variable.$border-line-width solid global-variable.$border-line-color;
 
             $avatar-container-width: 60px;
@@ -562,7 +610,7 @@
               width: 20%;
               height: 100%;
 
-              .operation-btn{
+              .operation-btn {
                 display: flex;
                 justify-content: center;
                 align-items: center;
