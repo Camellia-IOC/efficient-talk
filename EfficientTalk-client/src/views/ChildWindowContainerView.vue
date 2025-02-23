@@ -40,7 +40,7 @@
         await router.push({
             name: childWindowUrl.value,
             query: {
-                config: JSON.stringify(childWindowConfig.value)
+                data: JSON.stringify(childWindowConfig.value.data)
             }
         });
     });

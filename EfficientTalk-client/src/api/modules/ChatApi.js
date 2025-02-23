@@ -80,4 +80,15 @@ export default class ChatApi {
             data
         });
     };
+
+    /**
+     * 分类获取聊天记录
+     * @param data 请求数据
+     */
+    static getChatHistoryByType = (data) => {
+        return service.get({
+            url: this.requestPath + "/getChatHistoryByType",
+            data
+        });
+    };
 }

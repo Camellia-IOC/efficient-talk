@@ -85,12 +85,12 @@ public class ChatController {
     @Operation(summary = "保存聊天图片")
     @PostMapping("/uploadChatImage")
     public ResponseData<Object> uploadChatImage(@RequestParam String imageId,
-                                               @RequestParam String imageName,
-                                               @RequestParam String imageType,
-                                               @RequestParam Long imageSize,
-                                               @RequestParam String sender,
-                                               @RequestParam String receiver,
-                                               @RequestParam MultipartFile image) {
+                                                @RequestParam String imageName,
+                                                @RequestParam String imageType,
+                                                @RequestParam Long imageSize,
+                                                @RequestParam String sender,
+                                                @RequestParam String receiver,
+                                                @RequestParam MultipartFile image) {
         try {
             String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image);
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
@@ -108,6 +108,21 @@ public class ChatController {
                                                                 @RequestParam Integer pageIndex,
                                                                 @RequestParam Integer pageSize) {
         ChatFileListResponseVO response = chatService.getChatFileList(userId, pageIndex, pageSize);
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "分类获取聊天记录")
+    @GetMapping("/getChatHistoryByType")
+    public ResponseData<ChatHistoryResponseVO> getChatHistoryByType(@RequestParam String userId,
+                                                                    @RequestParam String friendId,
+                                                                    @RequestParam(required = false) Integer pageIndex,
+                                                                    @RequestParam Integer pageSize,
+                                                                    @RequestParam String type,
+                                                                    @RequestParam(required = false) String searchKey,
+                                                                    @RequestParam(required = false) LocalDateTime lastTime
+    ) {
+        ChatHistoryResponseVO response = new ChatHistoryResponseVO();
+        response.setChatHistory(chatService.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime));
         return ResponseData.success(response);
     }
 }

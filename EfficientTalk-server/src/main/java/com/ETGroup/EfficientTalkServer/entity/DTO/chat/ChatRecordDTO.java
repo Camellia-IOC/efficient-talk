@@ -14,6 +14,12 @@ public class ChatRecordDTO {
     private String receiver;
     // 消息类型
     private String type;
+    // 图片名
+    private String imageName;
+    // 图片类型
+    private String imageType;
+    // 图片大小
+    private String imageSize;
     // 文件ID
     private String fileId;
     // 文件名

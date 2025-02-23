@@ -52,4 +52,13 @@ public interface ChatMapper {
     
     // 获取聊天文件总数
     Integer getChatFileTotal(@Param("userId") String userId);
+    
+    // 分类获取聊天记录
+    ArrayList<ChatRecordDTO> getChatHistoryByType(@Param("userId") String userId,
+                                                  @Param("friendId") String friendId,
+                                                  @Param("pageIndex") Integer pageIndex,
+                                                  @Param("pageSize") Integer pageSize,
+                                                  @Param("type") String type,
+                                                  @Param("searchKey") String searchKey,
+                                                  @Param("lastTime") LocalDateTime lastTime);
 }

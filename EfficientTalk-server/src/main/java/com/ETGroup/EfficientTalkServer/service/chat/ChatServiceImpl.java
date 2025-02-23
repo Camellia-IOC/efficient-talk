@@ -156,8 +156,8 @@ public class ChatServiceImpl implements ChatService {
      * @param imageName 图片名
      * @param imageType 图片类型
      * @param imageSize 图片大小
-     * @param sender   发送人
-     * @param receiver 接收人
+     * @param sender    发送人
+     * @param receiver  接收人
      * @param image     图片
      *
      * @return 图片路径
@@ -209,5 +209,29 @@ public class ChatServiceImpl implements ChatService {
         response.setTotal(total);
         response.setChatFileList(chatFileList);
         return response;
+    }
+    
+    /**
+     * 分类获取聊天记录
+     *
+     * @param userId    用户ID
+     * @param friendId  好友ID
+     * @param pageIndex 页码
+     * @param pageSize  每页大小
+     * @param type      消息类型
+     * @param searchKey 搜索关键词
+     * @param lastTime  最早一条记录的时间
+     *
+     * @return 聊天记录
+     */
+    @Override
+    public ArrayList<ChatRecordDTO> getChatHistoryByType(String userId,
+                                                         String friendId,
+                                                         Integer pageIndex,
+                                                         Integer pageSize,
+                                                         String type,
+                                                         String searchKey,
+                                                         LocalDateTime lastTime) {
+        return chatMapper.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime);
     }
 }

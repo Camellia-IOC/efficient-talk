@@ -91,8 +91,10 @@
 
 	<!--保存聊天图片-->
 	<insert id="uploadChatImage" parameterType="com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO">
-		INSERT INTO chat_images (image_id, image_name, image_path, image_type, image_size, sender, receiver, create_time)
-		VALUES (#{imageId}, #{imageName}, #{imagePath}, #{imageType}, #{imageSize}, #{sender}, #{receiver}, #{createTime})
+		INSERT INTO chat_images (image_id, image_name, image_path, image_type, image_size, sender, receiver,
+								 create_time)
+		VALUES (#{imageId}, #{imageName}, #{imagePath}, #{imageType}, #{imageSize}, #{sender}, #{receiver},
+				#{createTime})
 	</insert>
 
 	<!--获取聊天文件列表-->
@@ -119,5 +121,48 @@
 		FROM chat_files
 		WHERE chat_files.sender = #{userId}
 		   OR chat_files.receiver = #{userId}
+	</select>
+
+	<!--分类获取聊天记录-->
+	<select id="getChatHistoryByType" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		SELECT chat_history.id       as id,
+			   chat_history.sender   as sender,
+			   chat_history.receiver as receiver,
+			   chat_history.type     as type,
+			   chat_history.file_id  as fileId,
+		<if test="type == 'image/video' or type == 'all'">
+			chat_images.image_name as imageName,
+			chat_images.image_type as imageType,
+			chat_images.image_size as imageSize,
+		</if>
+		<if test="type == 'file' or type == 'all'">
+			chat_files.file_name as fileName,
+			chat_files.file_type as fileType,
+			chat_files.file_size as fileSize,
+		</if>
+		chat_history.content   as content,
+		chat_history.send_time as time
+		FROM chat_history
+		<if test="type == 'image/video' or type == 'all'">
+			LEFT JOIN chat_images ON chat_history.file_id = chat_images.image_id
+		</if>
+		<if test="type == 'file' or type == 'all'">
+			LEFT JOIN chat_files ON chat_history.file_id = chat_files.file_id
+		</if>
+		<where>
+			((chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
+				OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId}))
+			<if test="type == 'image/video'">
+				AND (chat_history.type = 'image' OR chat_history.type = 'video')
+			</if>
+			<if test="type == 'file'">
+				AND chat_history.type = 'file'
+			</if>
+			<if test="lastTime != null">
+				AND send_time &lt; #{lastTime}
+			</if>
+		</where>
+		ORDER BY send_time DESC
+		LIMIT #{pageSize}
 	</select>
 </mapper>
