@@ -223,26 +223,28 @@
 
     // 选择聊天
     const handleSelectChat = async (item) => {
-        curChatId.value = item.userId;
-        const chatInfo = {
-            userId: item.userId,
-            userName: item.userName,
-            userAvatar: item.userAvatar
-        };
-        emits("setSelectedChat", chatInfo);
+        if(curChatId.value !== item.userId) {
+            curChatId.value = item.userId;
+            const chatInfo = {
+                userId: item.userId,
+                userName: item.userName,
+                userAvatar: item.userAvatar
+            };
+            emits("setSelectedChat", chatInfo);
 
-        // 广播聊天对象变化事件
-        window.dispatchEvent(new CustomEvent("chatObjectChange", {
-            detail: curChatId.value,
-            bubbles: false
-        }));
+            // 广播聊天对象变化事件
+            window.dispatchEvent(new CustomEvent("chatObjectChange", {
+                detail: curChatId.value,
+                bubbles: false
+            }));
 
-        // 如果有消息未读则清空未读消息数
-        if (item.unreadCount !== 0) {
-            item.unreadCount = 0;
+            // 如果有消息未读则清空未读消息数
+            if (item.unreadCount !== 0) {
+                item.unreadCount = 0;
 
-            // 保存聊天列表至本地和云端
-            await handleSaveChatList(chatList.value);
+                // 保存聊天列表至本地和云端
+                await handleSaveChatList(chatList.value);
+            }
         }
     };
 

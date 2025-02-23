@@ -178,7 +178,9 @@
           </a-button>
         </div>
         <div class="right-bar">
-          <a-button class="operation-btn">
+          <a-button class="operation-btn"
+                    @click="handleOpenChatHistoryWindow"
+          >
             <HistoryOutlined/>
           </a-button>
         </div>
@@ -224,7 +226,6 @@
         nextTick,
         onBeforeMount,
         onBeforeUnmount,
-        onUpdated,
         ref
     } from "vue";
     import { notification } from "ant-design-vue";
@@ -505,6 +506,24 @@
                     top: (newContainerSize - oldContainerSize),
                     behavior: "auto",
                 });
+            }
+        });
+    };
+
+    // 打开聊天记录浏览窗口
+    const handleOpenChatHistoryWindow = () => {
+        childWindowController.open({
+            windowName: "chatHistoryWindow",
+            width: 800,
+            height: 600,
+            isChild: false,
+            url: "/child-window?windowName=chatHistoryWindow&url=child-window-chat-history",
+            config: {
+                title: "聊天记录",
+                data: {
+                    userId: curLoginUser.value.userId,
+                    friendId: props.chatInfo.userId,
+                }
             }
         });
     };

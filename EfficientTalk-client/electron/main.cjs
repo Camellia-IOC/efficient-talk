@@ -32,8 +32,10 @@ let mainWindow = null;
 
 // 子窗口管理器
 let childWidowManager = {
-    userAuthWindow: null,
-    aiAssistantWindow: null
+    // AI聊天窗口
+    aiAssistantWindow: null,
+    // 历史记录窗口
+    chatHistoryWindow: null,
 };
 
 // 创建主窗口
@@ -63,19 +65,22 @@ const createWindow = () => {
 
 // 新建子窗口
 const openChildWindow = (params) => {
-    if (childWidowManager[params.name] === null) {
+    if (childWidowManager[params.windowName] === null || childWidowManager[params.windowName] === undefined) {
         let childWindow = new BrowserWindow({
             width: params.width,
             height: params.height,
-            minWidth: params.width,
-            minHeight: params.height,
-            maxWidth: params.width,
-            maxHeight: params.height,
-            parent: mainWindow,
+            parent: params.isChild ? mainWindow : null,
             webPreferences: {
-                preload: path.join(__dirname, "preload.cjs")
+                webSecurity: false,
+                nodeIntegration: true,
+                preload: path.join(__dirname, "preload.cjs"),
+                session: session.fromPartition(`persist:${sessionId}`)
             },
-            frame: false
+            icon: path.join(__dirname, iconPath),
+            // 禁用大小调节
+            resizable: false,
+            // 是否使用自带标题栏
+            frame: false,
         });
 
         childWindow.loadURL(projectUrl + "#" + params.url)
@@ -84,7 +89,11 @@ const openChildWindow = (params) => {
         // 程序启动后开启开发者工具
         childWindow.webContents.openDevTools();
 
-        childWidowManager[params.name] = childWindow;
+        // 保存子窗口对象
+        childWidowManager[params.windowName] = {
+            windowObject: childWindow,
+            config: params.config
+        };
     }
 };
 
@@ -114,7 +123,7 @@ app.whenReady()
        const icon = path.join(__dirname, "./resources/logo.ico");
        let tray = new Tray(icon);
        tray.setContextMenu(contextMenu);
-       tray.setToolTip("测试应用");
+       tray.setToolTip("易飞讯");
        tray.setTitle("This is my title");
 
        // 创建窗口
@@ -124,7 +133,6 @@ app.whenReady()
 // 关闭应用程序
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
-        // websocketStore.socket.close();
         app.quit();
     }
 });
@@ -161,7 +169,7 @@ ipcMain.handle("window-recover", () => {
 });
 // 窗口相关操作 end ######################################################################################################
 
-// 子窗口相关操作
+// 子窗口相关操作 start ###################################################################################################
 // 打开子窗口
 ipcMain.handle("child-window-open", (e, param) => {
     openChildWindow(param);
@@ -169,10 +177,30 @@ ipcMain.handle("child-window-open", (e, param) => {
 
 // 关闭子窗口
 ipcMain.handle("child-window-close", (e, windowName) => {
-    childWidowManager[windowName].close();
+    childWidowManager[windowName].windowObject.close();
     childWidowManager[windowName] = null;
-    // childWidowManager[windowName].hide();
 });
+
+// 最小化子窗口
+ipcMain.handle("child-window-minimize", (e, windowName) => {
+    childWidowManager[windowName].windowObject.minimize();
+});
+
+// 最大化子窗口
+ipcMain.handle("child-window-maximize", (e, windowName) => {
+    childWidowManager[windowName].windowObject.maximize();
+});
+
+// 恢复子窗口大小
+ipcMain.handle("child-window-recover", (e, windowName) => {
+    childWidowManager[windowName].windowObject.restore();
+});
+
+// 获取子窗口数据
+ipcMain.handle("child-window-get-config", (e, windowName) => {
+    return childWidowManager[windowName].config;
+});
+// 子窗口相关操作 end ###################################################################################################
 
 // 业务功能 start ########################################################################################################
 // 登录
@@ -224,6 +252,8 @@ ipcMain.handle("app-logout", (e, param) => {
 
     mainWindow.loadURL(projectUrl + "#/auth")
               .then();
+
+    // TODO 主窗口关闭或退出登录时关闭所有子窗口
 });
 
 // 处理文件选择(单选)

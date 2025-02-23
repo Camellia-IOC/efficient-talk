@@ -17,7 +17,11 @@ contextBridge.exposeInMainWorld("windowController", {
 // 子窗口控制器
 contextBridge.exposeInMainWorld("childWindowController", {
     open: (params) => ipcRenderer.invoke("child-window-open", params),
-    close: (windowName) => ipcRenderer.invoke("child-window-close", windowName)
+    close: (windowName) => ipcRenderer.invoke("child-window-close", windowName),
+    minimize: (windowName) => ipcRenderer.invoke("child-window-minimize", windowName),
+    maximize: (windowName) => ipcRenderer.invoke("child-window-maximize", windowName),
+    recover: (windowName) => ipcRenderer.invoke("child-window-recover", windowName),
+    getWindowConfig: (windowName) => ipcRenderer.invoke("child-window-get-config", windowName)
 });
 
 // 应用控制器

@@ -76,6 +76,20 @@ const router = createRouter({
                 }
             ]
         },
+        {
+            // 子窗口模块
+            path: "/child-window",
+            name: "/child-window",
+            component: () => import("../views/ChildWindowContainerView.vue"),
+            children: [
+                {
+                    // 聊天记录
+                    path: "child-window-chat-history",
+                    name: "child-window-chat-history",
+                    component: () => import("../views/child-window/ChatHistoryExplorerView.vue")
+                }
+            ]
+        }
         // {
         //     // 用户个人信息页
         //     path: "/user-home",
