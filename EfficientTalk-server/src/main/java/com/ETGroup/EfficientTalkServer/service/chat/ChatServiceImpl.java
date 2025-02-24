@@ -75,7 +75,8 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public Boolean saveChatList(SaveChatListRequestParam param) {
-        return chatMapper.saveChatList(param) == 1;
+        Integer result = chatMapper.saveChatList(param);
+        return result == 1 || result == 2;
     }
     
     /**

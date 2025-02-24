@@ -2,14 +2,53 @@
   <div class="app-nav-container draggable">
     <div class="nav-main">
       <div class="user-info-container no-drag">
-        <img class="user-avatar"
-             v-if="curLoginUser.userAvatar!==null"
-             :src="curLoginUser.userAvatar"
-             alt="avatar"
-        />
-        <a-avatar class="user-avatar"
-                   v-else
-        >{{ curLoginUser.userName.substring(0, 2)}}</a-avatar>
+        <a-popover placement="rightTop"
+                   trigger="click"
+        >
+          <template #content>
+            <!--TODO 封装名片组件-->
+            <div style="width: 300px;height: 300px">
+
+            </div>
+          </template>
+          <img class="user-avatar"
+               v-if="curLoginUser.userAvatar!==null"
+               :src="curLoginUser.userAvatar"
+               alt="avatar"
+          />
+          <a-avatar class="user-avatar"
+                    v-else
+          >{{ curLoginUser.userName.substring(0, 2) }}
+          </a-avatar>
+        </a-popover>
+      </div>
+      <div class="online-switcher-container no-drag"
+           @click="handleOpenOnlineStateSwitcherDialog"
+      >
+        <div class="state"
+             v-if="websocketStore.onlineState==='ONLINE'"
+        >
+          <div class="state-icon">
+            <SmileFilled class="online"/>
+          </div>
+          <label class="state-label">在线</label>
+        </div>
+        <div class="state outline"
+             v-else-if="websocketStore.onlineState==='OUTLINE'"
+        >
+          <div class="state-icon">
+            <FrownFilled class="outline"/>
+          </div>
+          <label class="state-label">离线</label>
+        </div>
+        <div class="state leave"
+             v-else-if="websocketStore.onlineState==='LEAVE'"
+        >
+          <div class="state-icon">
+            <ClockCircleFilled class="leave"/>
+          </div>
+          <label class="state-label">离开</label>
+        </div>
       </div>
       <div v-for="(item,index) in navConfig"
            :key="index"
@@ -49,6 +88,9 @@
       </div>
     </div>
   </div>
+
+  <!--用户状态切换器-->
+  <OnlineStateSwitcherDialog ref="onlineStateSwitcherDialogRef"/>
 </template>
 
 <script setup>
@@ -68,12 +110,23 @@
         AppstoreFilled,
         QuestionCircleOutlined,
         PoweroffOutlined,
-        BarsOutlined
+        BarsOutlined,
+        FrownFilled,
+        ClockCircleFilled
     } from "@ant-design/icons-vue";
     import { useRouter } from "vue-router";
     import { getCurUserData } from "../../database/cur-user.js";
+    import { useWebSocketStore } from "../../store/WebSocketStore.js";
+    import OnlineStateSwitcherDialog from "../dialog/online-state-switcher/OnlineStateSwitcherDialog.vue";
 
     const router = useRouter();
+    const websocketStore = useWebSocketStore();
+
+    // 用户状态切换对话框
+    const onlineStateSwitcherDialogRef = ref();
+    const handleOpenOnlineStateSwitcherDialog = () => {
+        onlineStateSwitcherDialogRef.value.dialogOpen();
+    };
 
     // 当前登录的用户信息
     const curLoginUser = ref({});
@@ -197,6 +250,56 @@
           color: black;
           border-radius: 50%;
           margin: 10px;
+          cursor: pointer;
+        }
+      }
+
+      .online-switcher-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        cursor: pointer;
+
+        .state {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 3px;
+          padding: 5px 6px;
+          border-radius: 10px;
+          background-color: white;
+
+          .state-icon {
+            font-size: 12px;
+
+            .online {
+              color: greenyellow;
+            }
+
+            .outline {
+              color: red;
+            }
+
+            .leave {
+              color: orange;
+            }
+          }
+
+          .state-label {
+            font-size: 12px;
+            color: gray;
+            cursor: pointer;
+          }
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+
+            .state-label {
+              color: white;
+            }
+          }
         }
       }
 

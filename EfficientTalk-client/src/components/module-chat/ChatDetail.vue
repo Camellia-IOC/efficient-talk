@@ -228,7 +228,10 @@
         onBeforeUnmount,
         ref
     } from "vue";
-    import { notification } from "ant-design-vue";
+    import {
+        message,
+        notification
+    } from "ant-design-vue";
     import {
         FolderOutlined,
         HistoryOutlined,
@@ -348,6 +351,9 @@
                 top: 36
             });
         }
+        else if (websocketStore.onlineState === "OUTLINE") {
+            message.error("当前为离线状态，发送失败");
+        }
         else {
             const message = {
                 id: UUID.generate(),
@@ -415,48 +421,53 @@
 
     // 发送文件消息
     const handleSendFileMessage = async (messageList) => {
-        for (let i = 0; i < messageList.length; i++) {
-            const messageItem = messageList[i];
+        if (websocketStore.onlineState !== "OUTLINE") {
+            for (let i = 0; i < messageList.length; i++) {
+                const messageItem = messageList[i];
 
-            // 保存文件
-            let filePath = null;
-            if (messageItem.type === "image") {
-                // 上传图片
-                filePath = await uploadChatImage(messageItem);
+                // 保存文件
+                let filePath = null;
+                if (messageItem.type === "image") {
+                    // 上传图片
+                    filePath = await uploadChatImage(messageItem);
+                }
+                else if (messageItem.type === "file") {
+                    // 上传文件
+                    filePath = await uploadChatFile(messageItem);
+                }
+
+                // 发送消息
+                const message = {
+                    id: UUID.generate(),
+                    sender: curLoginUser.value.userId,
+                    receiver: props.chatInfo.userId,
+                    type: messageItem.type,
+                    fileId: messageItem.fileId,
+                    content: filePath,
+                    time: dayjs().format("YYYY-MM-DD HH:mm:ss")
+                };
+                websocketStore.socket.send(JSON.stringify(message));
+
+                // 添加文件信息至本地消息记录
+                message.fileName = messageItem.fileName;
+                message.fileType = messageItem.fileType;
+                message.fileSize = messageItem.fileSize;
+                chatHistory.value.push(message);
+
+                // 发送消息后滚动到底部
+                scrollToBottom("smooth");
+
+                // 广播消息
+                window.dispatchEvent(new CustomEvent("messageSend", {
+                    detail: message
+                }));
+
+                // 保存聊天记录
+                handleSaveChatHistory(message);
             }
-            else if (messageItem.type === "file") {
-                // 上传文件
-                filePath = await uploadChatFile(messageItem);
-            }
-
-            // 发送消息
-            const message = {
-                id: UUID.generate(),
-                sender: curLoginUser.value.userId,
-                receiver: props.chatInfo.userId,
-                type: messageItem.type,
-                fileId: messageItem.fileId,
-                content: filePath,
-                time: dayjs().format("YYYY-MM-DD HH:mm:ss")
-            };
-            websocketStore.socket.send(JSON.stringify(message));
-
-            // 添加文件信息至本地消息记录
-            message.fileName = messageItem.fileName;
-            message.fileType = messageItem.fileType;
-            message.fileSize = messageItem.fileSize;
-            chatHistory.value.push(message);
-
-            // 发送消息后滚动到底部
-            scrollToBottom("smooth");
-
-            // 广播消息
-            window.dispatchEvent(new CustomEvent("messageSend", {
-                detail: message
-            }));
-
-            // 保存聊天记录
-            handleSaveChatHistory(message);
+        }
+        else {
+            message.error("当前为离线状态，发送失败");
         }
     };
 

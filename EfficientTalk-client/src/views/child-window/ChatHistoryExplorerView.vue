@@ -268,21 +268,21 @@
                     allLastCount.value = res.data.chatHistory.length;
                     chatHistoryAllList.value = chatHistoryAllList.value.concat(res.data.chatHistory);
                     if(res.data.chatHistory.length === 0 && chatHistoryAllList.value.length !== 0){
-                        message.warning("没有更多消息了")
+                        message.warning("没有更多内容了")
                     }
                 }
                 else if (activeKey.value === "image/video") {
                     imageLastCount.value = res.data.chatHistory.length;
                     chatHistoryImageList.value = chatHistoryImageList.value.concat(res.data.chatHistory);
                     if(res.data.chatHistory.length === 0 && chatHistoryImageList.value.length !== 0){
-                        message.warning("没有更多消息了")
+                        message.warning("没有更多内容了")
                     }
                 }
                 else if (activeKey.value === "file") {
                     fileLastCount.value = res.data.chatHistory.length;
                     chatHistoryFileList.value = chatHistoryFileList.value.concat(res.data.chatHistory);
                     if(res.data.chatHistory.length === 0 && chatHistoryFileList.value.length !== 0){
-                        message.warning("没有更多消息了")
+                        message.warning("没有更多内容了")
                     }
                 }
             }
