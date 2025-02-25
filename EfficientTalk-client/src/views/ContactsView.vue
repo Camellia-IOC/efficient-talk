@@ -33,6 +33,7 @@
     width: 100%;
     height: 100%;
     border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
+    background-color: global-variable.$background-color;
 
     $friend-list-container-width: 250px;
 
@@ -40,11 +41,13 @@
       width: $friend-list-container-width;
       height: 100%;
       border-right: global-variable.$border-line-width solid global-variable.$border-line-color;
+      background-color: transparent;
     }
 
     .friend-detail-container {
       width: calc(100% - $friend-list-container-width);
       height: 100%;
+      background-color: transparent;
     }
   }
 </style>

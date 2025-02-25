@@ -1,30 +1,37 @@
 <template>
   <a-modal v-model:open="dialogOpenFlag"
-           :title="'状态'"
            centered
            :mask="false"
            width="350px"
            :footer="null"
            @cancel="dialogClose"
   >
+    <template #title>
+      <div class="dialog-title">
+        <div class="logo">
+          <Logo :color="themeColor" :size="30"/>
+        </div>
+        <label>用户状态</label>
+      </div>
+    </template>
     <div class="online-state-switcher-container">
       <div class="cur-state-container">
         <div class="cur-state"
              v-if="websocketStore.onlineState==='ONLINE'"
         >
-          <SmileFilled style="color: greenyellow"/>
+          <SmileFilled style="color: #67C23A"/>
           <label>在线</label>
         </div>
         <div class="cur-state"
              v-else-if="websocketStore.onlineState==='OUTLINE'"
         >
-          <FrownFilled style="color:red;"/>
+          <FrownFilled style="color:#F56C6C;"/>
           <label>离线</label>
         </div>
         <div class="cur-state"
              v-else-if="websocketStore.onlineState==='LEAVE'"
         >
-          <ClockCircleFilled style="color: orange"/>
+          <ClockCircleFilled style="color: #E6A23C"/>
           <label>离开</label>
         </div>
       </div>
@@ -33,7 +40,7 @@
              :class="{'active-state-item': websocketStore.onlineState==='ONLINE'}"
              @click="websocketStore.switchOnlineState('ONLINE')"
         >
-          <SmileFilled style="color: greenyellow"
+          <SmileFilled style="color: #67C23A"
                        class="state-icon"
           />
           <label>在线</label>
@@ -42,7 +49,7 @@
              :class="{'active-state-item': websocketStore.onlineState==='OUTLINE'}"
              @click="websocketStore.switchOnlineState('OUTLINE')"
         >
-          <FrownFilled style="color:red;"
+          <FrownFilled style="color:#F56C6C;"
                        class="state-icon"
           />
           <label>离线</label>
@@ -51,7 +58,7 @@
              :class="{'active-state-item': websocketStore.onlineState==='LEAVE'}"
              @click="websocketStore.switchOnlineState('LEAVE')"
         >
-          <ClockCircleFilled style="color: orange"
+          <ClockCircleFilled style="color: #E6A23C"
                              class="state-icon"
           />
           <label>离开</label>
@@ -68,7 +75,9 @@
         FrownFilled,
         ClockCircleFilled
     } from "@ant-design/icons-vue";
-    import { useWebSocketStore } from "../../../store/WebSocketStore.js";
+    import { useWebSocketStore } from "../../../../store/WebSocketStore.js";
+    import Logo from "../../../logo/Logo.vue";
+    import { themeColor } from "../../../../config/config.js";
 
     const websocketStore = useWebSocketStore();
 
@@ -90,7 +99,16 @@
 <style scoped
        lang="scss"
 >
-  @use "../../../assets/style/global-variable";
+  @use "../../../../assets/style/global-variable.css";
+
+  .dialog-title {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    width: 100%;
+  }
 
   .online-state-switcher-container {
     display: flex;

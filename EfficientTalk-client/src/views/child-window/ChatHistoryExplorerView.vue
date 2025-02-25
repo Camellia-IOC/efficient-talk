@@ -267,22 +267,22 @@
                 if (activeKey.value === "all") {
                     allLastCount.value = res.data.chatHistory.length;
                     chatHistoryAllList.value = chatHistoryAllList.value.concat(res.data.chatHistory);
-                    if(res.data.chatHistory.length === 0 && chatHistoryAllList.value.length !== 0){
-                        message.warning("没有更多内容了")
+                    if (res.data.chatHistory.length === 0 && chatHistoryAllList.value.length !== 0) {
+                        message.warning("没有更多内容了");
                     }
                 }
                 else if (activeKey.value === "image/video") {
                     imageLastCount.value = res.data.chatHistory.length;
                     chatHistoryImageList.value = chatHistoryImageList.value.concat(res.data.chatHistory);
-                    if(res.data.chatHistory.length === 0 && chatHistoryImageList.value.length !== 0){
-                        message.warning("没有更多内容了")
+                    if (res.data.chatHistory.length === 0 && chatHistoryImageList.value.length !== 0) {
+                        message.warning("没有更多内容了");
                     }
                 }
                 else if (activeKey.value === "file") {
                     fileLastCount.value = res.data.chatHistory.length;
                     chatHistoryFileList.value = chatHistoryFileList.value.concat(res.data.chatHistory);
-                    if(res.data.chatHistory.length === 0 && chatHistoryFileList.value.length !== 0){
-                        message.warning("没有更多内容了")
+                    if (res.data.chatHistory.length === 0 && chatHistoryFileList.value.length !== 0) {
+                        message.warning("没有更多内容了");
                     }
                 }
             }
@@ -352,6 +352,7 @@
     width: 100%;
     height: 100%;
     padding: 20px;
+    background-color: global-variable.$background-color;
 
     $search-area-height: 40px;
 
@@ -441,7 +442,7 @@
                     padding: $message-content-vertical-padding $message-content-horizontal-padding;
                     font-size: 14px;
                     color: black;
-                    background-color: #F0F2F5;
+                    background-color: white;
                     border-radius: 5px;
                     word-wrap: break-word; /* 强制换行 */
                     word-break: break-all; /* 在任意字符处换行 */
@@ -461,7 +462,7 @@
                     width: 40%;
                     height: 90px;
                     padding: 10px;
-                    background-color: #F5F7FA;
+                    background-color: white;
                     border-radius: 10px;
                     cursor: pointer;
 
@@ -533,7 +534,7 @@
             height: 90px;
             min-height: 90px;
             border-radius: 15px;
-            background-color: #F5F7FA;
+            background-color: white;
             margin-right: 1%;
             padding: 0 20px;
 

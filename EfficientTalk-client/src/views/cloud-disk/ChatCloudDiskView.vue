@@ -118,7 +118,7 @@
 
     // 计算表格高度
     let observer = null;
-    const cloudDiskViewRef = ref(null);
+    const cloudDiskViewRef = ref();
     const tableHeight = ref(0);
     const observeResize = () => {
         if (cloudDiskViewRef.value) {
@@ -266,5 +266,29 @@
         height: 100%;
       }
     }
+  }
+
+  :deep(.ant-table-wrapper){
+     width: 100% !important;
+     height: 100% !important;
+   }
+
+  :deep(.ant-spin-nested-loading){
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  :deep(.ant-spin-container){
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  :deep(.ant-table){
+    width: 100%;
+    height: 90%;
+  }
+
+  :deep(.ant-pagination){
+    margin-bottom: 0 !important;
   }
 </style>

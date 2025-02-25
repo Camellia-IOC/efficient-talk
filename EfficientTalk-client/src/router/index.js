@@ -58,7 +58,7 @@ const router = createRouter({
                             // 云盘-组织文件
                             path: "org-files",
                             name: "org-files",
-                            component: () => import("../views/EmptyView.vue")
+                            component: () => import("../views/cloud-disk/OrgCloudDiskView.vue")
                         },
                         {
                             // 云盘-聊天文件
@@ -67,6 +67,12 @@ const router = createRouter({
                             component: () => import("../views/cloud-disk/ChatCloudDiskView.vue")
                         }
                     ]
+                },
+                {
+                    // 通知公告
+                    path: "notification",
+                    name: "notification",
+                    component: () => import("../views/EmptyView.vue")
                 },
                 {
                     // 应用中心
@@ -87,6 +93,12 @@ const router = createRouter({
                     path: "child-window-chat-history",
                     name: "child-window-chat-history",
                     component: () => import("../views/child-window/ChatHistoryExplorerView.vue")
+                },
+                {
+                    // AI助手
+                    path: "child-window-ai-assistant",
+                    name: "child-window-ai-assistant",
+                    component: () => import("../views/child-window/AIAssistantView.vue")
                 }
             ]
         }

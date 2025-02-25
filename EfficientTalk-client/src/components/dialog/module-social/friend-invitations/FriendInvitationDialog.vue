@@ -1,12 +1,19 @@
 <template>
   <a-modal v-model:open="dialogOpenFlag"
-           title="好友通知"
            centered
            :mask="false"
            width="700px"
            :footer="null"
            @cancel="dialogClose"
   >
+    <template #title>
+      <div class="dialog-title">
+        <div class="logo">
+          <Logo :color="themeColor" :size="30"/>
+        </div>
+        <label>好友通知</label>
+      </div>
+    </template>
     <div class="invitations-container">
       <div v-if="invitationList.length !== 0"
            class="invitations-list"
@@ -31,10 +38,12 @@
     import {
         ref
     } from "vue";
-    import EmptyContainer from "../../empty-container/EmptyContainer.vue";
-    import SocialApi from "../../../api/modules/SocialApi.js";
+    import EmptyContainer from "../../../empty-container/EmptyContainer.vue";
+    import SocialApi from "../../../../api/modules/SocialApi.js";
     import { message } from "ant-design-vue";
     import FriendInvitationItem from "./components/FriendInvitationItem.vue";
+    import Logo from "../../../logo/Logo.vue";
+    import { themeColor } from "../../../../config/config.js";
 
     const props = defineProps({
         curLoginUserId: {
@@ -136,6 +145,15 @@
 <style scoped
        lang="scss"
 >
+  .dialog-title {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    width: 100%;
+  }
+
   .invitations-container {
     display: flex;
     flex-direction: column;

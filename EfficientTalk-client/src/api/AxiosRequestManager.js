@@ -15,7 +15,7 @@ const authServicePort = "18080";
 /** 用户服务端口 */
 const userServicePort = "18080";
 /** 资源服务端口 */
-const resourceServicePort = "18080";
+const cloudDiskServicePort = "18080";
 /** 社交服务端口 */
 const socialServicePort = "18080";
 /** 留言板服务端口 */
@@ -27,7 +27,7 @@ export const authService = new BaseAxiosInstance(serverIP, authServicePort, 1000
 /** 用户服务实例 */
 export const userService = new BaseAxiosInstance(serverIP, userServicePort, 10000);
 /** 资源服务实例 */
-export const resourceService = new BaseAxiosInstance(serverIP, resourceServicePort, 10000);
+export const cloudDiskService = new BaseAxiosInstance(serverIP, cloudDiskServicePort, 10000);
 /** 社交服务实例 */
 export const socialService = new BaseAxiosInstance(serverIP, socialServicePort, 10000);
 /** 留言板服务实例 */

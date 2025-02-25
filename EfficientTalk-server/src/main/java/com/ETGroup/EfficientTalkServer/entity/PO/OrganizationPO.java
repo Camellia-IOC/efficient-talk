@@ -7,4 +7,5 @@ public class OrganizationPO {
     private String orgId;
     private String orgName;
     private String orgLogo;
+    private String diskId;
 }

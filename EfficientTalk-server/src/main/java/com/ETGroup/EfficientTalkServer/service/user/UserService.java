@@ -23,4 +23,14 @@ public interface UserService {
      * @return 用户基本信息
      */
     UserBasicInfoResponseVO getUserBasicInfo(String userId);
+    
+    /**
+     * 设置用户在线状态
+     *
+     * @param userId      用户ID
+     * @param onlineState 用户状态
+     *
+     * @return 设置结果
+     */
+    Integer setUserOnlineState(String userId, String onlineState);
 }

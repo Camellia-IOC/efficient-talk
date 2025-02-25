@@ -112,12 +112,14 @@
         PoweroffOutlined,
         BarsOutlined,
         FrownFilled,
-        ClockCircleFilled
+        ClockCircleFilled,
+        BellOutlined,
+        BellFilled
     } from "@ant-design/icons-vue";
     import { useRouter } from "vue-router";
     import { getCurUserData } from "../../database/cur-user.js";
     import { useWebSocketStore } from "../../store/WebSocketStore.js";
-    import OnlineStateSwitcherDialog from "../dialog/online-state-switcher/OnlineStateSwitcherDialog.vue";
+    import OnlineStateSwitcherDialog from "../dialog/module-chat/online-state-switcher/OnlineStateSwitcherDialog.vue";
 
     const router = useRouter();
     const websocketStore = useWebSocketStore();
@@ -136,6 +138,9 @@
 
     // 处理退出登录
     const handleLogout = () => {
+        // 关闭socket连接
+        websocketStore.closeSocket()
+
         // TODO 使用electron运行时记得取消相应注释
         windowController.hide();
         appController.logout();
@@ -166,8 +171,15 @@
             path: "/app/cloud-disk"
         },
         {
-            name: "工作台",
+            name: "通知公告",
             index: 3,
+            icon: BellOutlined,
+            iconActive: BellFilled,
+            path: "/app/notification"
+        },
+        {
+            name: "工作台",
+            index: 4,
             icon: AppstoreOutlined,
             iconActive: AppstoreFilled,
             path: "/app/app-store"
@@ -274,15 +286,15 @@
             font-size: 12px;
 
             .online {
-              color: greenyellow;
+              color: #67C23A;
             }
 
             .outline {
-              color: red;
+              color: #F56C6C;
             }
 
             .leave {
-              color: orange;
+              color: #E6A23C;
             }
           }
 

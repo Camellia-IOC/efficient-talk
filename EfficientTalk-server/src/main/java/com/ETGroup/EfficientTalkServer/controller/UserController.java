@@ -1,5 +1,7 @@
 package com.ETGroup.EfficientTalkServer.controller;
 
+import com.ETGroup.EfficientTalkServer.entity.request.user.SetOnlineStateRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.entity.response.user.UserBasicInfoResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.user.UserDetailResponseVO;
@@ -31,5 +33,16 @@ public class UserController {
     public ResponseData<UserBasicInfoResponseVO> getUserBasicInfo(@RequestParam String userId) {
         UserBasicInfoResponseVO response = userService.getUserBasicInfo(userId);
         return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "设置用户在线状态")
+    @PutMapping("/setUserOnlineState")
+    public ResponseData<Object> setUserOnlineState(@RequestBody SetOnlineStateRequestParam param) {
+        if (userService.setUserOnlineState(param.getUserId(), param.getOnlineState()) == 1) {
+            return ResponseData.success();
+        }
+        else {
+            return ResponseData.error(ResponseConfig.LOGIN_FAILED);
+        }
     }
 }

@@ -198,7 +198,8 @@
 	<select id="getOrganizationInfo" resultType="com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO">
 		SELECT organizations.org_id   as orgId,
 			   organizations.org_name as orgName,
-			   organizations.org_logo as orgLogo
+			   organizations.org_logo as orgLogo,
+			   organizations.disk_id  as diskId
 		FROM organizations
 		WHERE organizations.org_id = #{orgId}
 	</select>

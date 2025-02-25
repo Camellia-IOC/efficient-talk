@@ -197,9 +197,9 @@
     } from "@ant-design/icons-vue";
     import SocialApi from "../../api/modules/SocialApi";
     import { getCurUserData } from "../../database/cur-user.js";
-    import FriendInvitationDialog from "../dialog/friend-invitations/FriendInvitationDialog.vue";
+    import FriendInvitationDialog from "../dialog/module-social/friend-invitations/FriendInvitationDialog.vue";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
-    import AddNewFriendDialog from "../dialog/add-friend/AddNewFriendDialog.vue";
+    import AddNewFriendDialog from "../dialog/module-social/add-friend/AddNewFriendDialog.vue";
     import { message } from "ant-design-vue";
 
     const emits = defineEmits(["setSelectedFriend"]);

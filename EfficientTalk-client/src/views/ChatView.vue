@@ -55,6 +55,7 @@
     width: 100%;
     height: 100%;
     border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
+    background-color: global-variable.$background-color;
 
     $chat-list-container-width: 250px;
 
@@ -62,11 +63,13 @@
       width: $chat-list-container-width;
       height: 100%;
       border-right: global-variable.$border-line-width solid global-variable.$border-line-color;
+      background-color: transparent;
     }
 
     .chat-detail-container {
       width: calc(100% - $chat-list-container-width);
       height: 100%;
+      background-color: transparent;
     }
   }
 </style>

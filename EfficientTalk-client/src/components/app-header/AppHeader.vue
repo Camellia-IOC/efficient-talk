@@ -1,7 +1,27 @@
 <template>
   <div class="app-header-container draggable">
     <div class="logo-container">
-      <Logo :color="'#FFFFFF'" :size="35"/>
+      <Logo :color="'#FFFFFF'"
+            :size="35"
+      />
+    </div>
+    <div class="toolbar-container">
+      <div class="org-info">
+        <img :src="orgInfo.orgLogo"
+             alt="org-logo"
+             class="org-logo"
+        />
+        <label class="org-name">{{ orgInfo.orgName }}</label>
+        <a-tag color="blue">组织归属</a-tag>
+      </div>
+      <div class="toolbar">
+        <a-button class="toolbar-btn no-drag toolbar-btn-ai"
+                  @click="openAiAssistantWindow"
+        >
+          <SlackOutlined/>
+          <label>小易</label>
+        </a-button>
+      </div>
     </div>
     <div class="window-controller">
       <a-button class="control-btn no-drag"
@@ -25,15 +45,21 @@
 </template>
 
 <script setup>
-    import { ref } from "vue";
+    import {
+        onBeforeMount,
+        ref
+    } from "vue";
     import {
         MinusOutlined,
         CompressOutlined,
         ExpandOutlined,
-        CloseOutlined
+        CloseOutlined,
+        SlackOutlined
     } from "@ant-design/icons-vue";
     import { Modal } from "ant-design-vue";
     import Logo from "../logo/Logo.vue";
+    import SocialApi from "../../api/modules/SocialApi.js";
+    import { getCurUserData } from "../../database/cur-user.js";
 
     // 窗口最大化状态
     const isMaximized = ref(false);
@@ -72,6 +98,59 @@
             isMaximized.value = false;
         }
     };
+
+    // 当前登录的用户信息
+    const curLoginUser = ref({});
+    const updateCurLoginUser = async () => {
+        curLoginUser.value = await getCurUserData();
+    };
+
+    // 获取组织信息
+    const orgInfo = ref({
+        orgId: null,
+        orgName: null,
+        orgLogo: null,
+        diskId: null
+    });
+    const getOrgInfo = async () => {
+        const response = await SocialApi.getOrganizationInfo({
+            orgId: curLoginUser.value.orgId
+        });
+
+        const res = response.data;
+        if (res.code === 0) {
+            if (res.data != null) {
+                orgInfo.value = res.data.orgInfo;
+                console.error(orgInfo.value);
+            }
+        }
+    };
+
+    // 打开AI助手窗口
+    const openAiAssistantWindow = () => {
+        const windowName = "aiAssistantWindow";
+        const routerUrl = "child-window-ai-assistant";
+        childWindowController.open({
+            windowName: windowName,
+            width: 400,
+            height: 600,
+            isChild: false,
+            url: `/child-window?windowName=${windowName}&url=${routerUrl}`,
+            config: {
+                title: "小易",
+                data: {
+                    userId: curLoginUser.value.userId
+                }
+            }
+        });
+    };
+
+    onBeforeMount(async () => {
+        // 初始化当前登录的用户信息
+        await updateCurLoginUser();
+
+        await getOrgInfo();
+    });
 </script>
 
 <style scoped
@@ -87,6 +166,7 @@
     height: 100%;
 
     $logo-container-width: 70px;
+    $window-controller-width: 100px;
 
     .logo-container {
       display: flex;
@@ -98,13 +178,79 @@
       background-color: global-variable.$theme-color;
     }
 
+    .toolbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: calc(100% - #{$logo-container-width} - #{$window-controller-width});
+      height: 100%;
+      padding: 15px;
+      background-color: global-variable.$background-color;
+
+      .org-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        .org-logo {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+        }
+
+        .org-name {
+          text-align: center;
+          font-weight: bold;
+        }
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        .toolbar-btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: black;
+          font-size: 20px;
+          border-radius: 12px;
+          border: 0;
+          box-shadow: none;
+          background-color: transparent;
+          gap: 5px;
+
+          label {
+            cursor: pointer;
+            font-size: 16px;
+          }
+
+          &:hover {
+            background-color: rgba(160, 160, 160, 0.1);
+          }
+        }
+
+        .toolbar-btn-ai {
+          color: white;
+          background-color: global-variable.$theme-color;
+
+          &:hover {
+            background-color: rgba(global-variable.$theme-color, 0.8);
+          }
+        }
+      }
+    }
+
     .window-controller {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      width: calc(100% - $logo-container-width);
+      width: $window-controller-width;
       height: 100%;
-      background-color: white;
+      background-color: global-variable.$background-color;
       padding-right: 10px;
 
       .control-btn {

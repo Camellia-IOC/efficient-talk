@@ -29,6 +29,20 @@
           {{ item.name }}
         </div>
       </div>
+
+      <div class="disk-info">
+        <div class="info-label">
+          <label>已使用：{{ translateFileSize(capacityConfig.usedCapacity) }}</label>
+          <label>总容量：{{ translateFileSize(capacityConfig.totalCapacity) }}</label>
+        </div>
+        <div class="info-chart">
+          <a-progress :percent="capacityConfig.percent"
+                      size="small"
+                      :show-info="false"
+                      :stroke-color="capacityConfig.getRestCapacityColor()"
+          />
+        </div>
+      </div>
     </div>
 
     <!--内容显示区域-->
@@ -47,6 +61,8 @@
     import { message } from "ant-design-vue";
     import SocialApi from "../api/modules/SocialApi.js";
     import { getCurUserData } from "../database/cur-user.js";
+    import CloudDiskApi from "../api/modules/CloudDiskApi.js";
+    import { translateFileSize } from "../utils/unit-utils.js";
 
     const router = useRouter();
 
@@ -55,6 +71,28 @@
     const updateCurLoginUser = async () => {
         curLoginUser.value = await getCurUserData();
     };
+
+    // 容量进度条配置
+    const capacityConfig = ref({
+        // 已使用空间
+        usedCapacity: 0,
+        // 总容量
+        totalCapacity: 0,
+        // 容量百分比
+        percent: 0,
+        // 容量百分比对应的颜色
+        getRestCapacityColor: () => {
+            if (capacityConfig.value.percent < 60) {
+                return "#52c41a";
+            }
+            else if (capacityConfig.value.percent < 80) {
+                return "#faad14";
+            }
+            else {
+                return "#f5222d";
+            }
+        }
+    });
 
     // 导航项配置
     const navItemList = [
@@ -79,7 +117,12 @@
     const curSelectedNavIndex = ref(0);
     const handleSelectNavItem = (index, path) => {
         curSelectedNavIndex.value = index;
-        router.push(path);
+        router.push({
+            path: path,
+            query: {
+                diskId: orgInfo.value.diskId
+            }
+        });
     };
 
     // 获取组织信息
@@ -101,12 +144,33 @@
         }
     };
 
+    //获取云盘信息
+    const getCloudDiskBasicInfo = async () => {
+        const response = await CloudDiskApi.getCloudDiskBasicInfo({
+            diskId: orgInfo.value.diskId
+        });
+
+        const res = response.data;
+        if (res.code === 0) {
+            if (res.data != null) {
+                capacityConfig.value.usedCapacity = res.data.diskSize;
+                capacityConfig.value.totalCapacity = res.data.diskCapacity;
+                capacityConfig.value.percent = (res.data.diskSize / res.data.diskCapacity) * 100;
+            }
+        }
+        else {
+            message.error("获取云盘数据失败");
+        }
+    };
+
     onBeforeMount(async () => {
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
 
         // 获取组织信息
         await getOrganizationInfo();
+
+        await getCloudDiskBasicInfo();
     });
 </script>
 
@@ -121,6 +185,7 @@
     width: 100%;
     height: 100%;
     border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
+    background-color: global-variable.$background-color;
 
     .nav-bar {
       display: flex;
@@ -129,6 +194,10 @@
       width: 250px;
       height: 100%;
       border-right: global-variable.$border-line-width solid global-variable.$border-line-color;
+      background-color: transparent;
+
+      $org-info-container-height: 120px;
+      $disk-nfo-container-height: 100px;
 
       .org-info {
         display: flex;
@@ -151,13 +220,13 @@
           }
         }
 
-        .org-detail{
+        .org-detail {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 15px;
 
-          .org-name{
+          .org-name {
             display: flex;
             justify-content: flex-start;
             align-items: center;
@@ -165,7 +234,7 @@
             font-size: 20px;
           }
 
-          .disk-tag{
+          .disk-tag {
             display: flex;
             justify-content: flex-start;
             align-items: center;
@@ -178,6 +247,7 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
+        height: calc(100% - #{$org-info-container-height} - #{$disk-nfo-container-height});
         padding: 20px;
         gap: 10px;
 
@@ -187,7 +257,7 @@
           align-items: center;
           width: 100%;
           height: 40px;
-          background-color: #F5F7FA;
+          background-color: #F2F3F5;
           border-radius: 10px;
           font-size: 14px;
           cursor: pointer;
@@ -199,6 +269,35 @@
           color: white;
         }
       }
+
+      .disk-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: $disk-nfo-container-height;
+        padding: 20px;
+
+        .info-label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+
+          label {
+            color: gray;
+            font-size: 14px;
+            width: 100%;
+          }
+        }
+
+        .info-chart {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+      }
     }
 
     .content-container {
@@ -206,6 +305,11 @@
       align-items: center;
       width: calc(100% - 250px);
       height: 100%;
+      background-color: transparent;
     }
+  }
+
+  :deep(.ant-progress) {
+    margin: 0;
   }
 </style>

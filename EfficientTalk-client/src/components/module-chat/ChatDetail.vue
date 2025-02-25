@@ -249,7 +249,7 @@
     import { getCurUserData } from "../../database/cur-user.js";
     import { formatMessageTime } from "../../utils/time-utils.js";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
-    import FileSelectorDialog from "../dialog/file-selector/FileSelectorDialog.vue";
+    import FileSelectorDialog from "../dialog/module-chat/file-selector/FileSelectorDialog.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
     import { translateFileSize } from "../../utils/unit-utils.js";
     import { getFileIcon } from "../../utils/file-utils.js";
@@ -597,6 +597,7 @@
       height: $header-height;
       padding: 20px;
       border-bottom: global-variable.$border-line-width solid global-variable.$border-line-color;
+      background-color: global-variable.$background-color;
 
       .user-info {
         display: flex;
@@ -631,6 +632,7 @@
       height: calc(100% - #{$header-height + $footer-height});
       overflow-y: auto;
       padding-bottom: 20px;
+      background-color: global-variable.$background-color;
 
       .load-btn-container {
         display: flex;
@@ -713,7 +715,7 @@
                 padding: $message-content-vertical-padding $message-content-horizontal-padding;
                 font-size: 14px;
                 color: black;
-                background-color: #F0F2F5;
+                background-color: white;
                 border-radius: 5px;
                 word-wrap: break-word; /* 强制换行 */
                 word-break: break-all; /* 在任意字符处换行 */
@@ -733,7 +735,7 @@
                 width: 40%;
                 height: 90px;
                 padding: 10px;
-                background-color: #F5F7FA;
+                background-color: white;
                 border-radius: 10px;
                 cursor: pointer;
 
@@ -852,7 +854,7 @@
                 width: 40%;
                 height: 90px;
                 padding: 10px;
-                background-color: #F5F7FA;
+                background-color: white;
                 border-radius: 10px;
                 cursor: pointer;
 
@@ -914,6 +916,7 @@
       align-items: center;
       width: 100%;
       height: $footer-height;
+      background-color: global-variable.$background-color;
 
       $operations-bar-height: 40px;
 
@@ -950,6 +953,7 @@
           border-radius: 50%;
           border: none;
           box-shadow: none;
+          background-color: global-variable.$background-color;
         }
       }
 

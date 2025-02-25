@@ -36,4 +36,17 @@ public class UserServiceImpl implements UserService {
     public UserBasicInfoResponseVO getUserBasicInfo(String userId) {
         return userMapper.getUserBasicInfo(userId);
     }
+    
+    /**
+     * 设置用户在线状态
+     *
+     * @param userId      用户ID
+     * @param onlineState 用户状态
+     *
+     * @return 设置结果
+     */
+    @Override
+    public Integer setUserOnlineState(String userId, String onlineState) {
+        return userMapper.setUserOnlineState(userId, onlineState);
+    }
 }

@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-    import { formatMessageTime } from "../../../../utils/time-utils.js";
+    import { formatMessageTime } from "../../../../../utils/time-utils.js";
     import {
         ref,
         watch

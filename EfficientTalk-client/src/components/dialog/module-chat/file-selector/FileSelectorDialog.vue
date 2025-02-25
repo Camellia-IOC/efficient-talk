@@ -1,12 +1,18 @@
 <template>
   <a-modal v-model:open="dialogOpenFlag"
-           :title="dialogTitle"
            centered
            :mask="false"
            width="700px"
            :footer="null"
            @cancel="dialogClose"
-  >
+  ><template #title>
+    <div class="dialog-title">
+      <div class="logo">
+        <Logo :color="themeColor" :size="30"/>
+      </div>
+      <label>{{ dialogTitle}}</label>
+    </div>
+  </template>
     <div class="file-selector-container">
       <div class="file-selector">
         <a-upload-dragger
@@ -14,7 +20,6 @@
                 name="file"
                 :multiple="multi"
                 :showUploadList="false"
-                @drop="handleDrop"
                 style="width: 100%"
                 :customRequest="()=>{}"
                 :beforeUpload="handleFileSelect"
@@ -30,7 +35,7 @@
         <div class="selected-picture-container"
              v-if="type==='image'"
         >
-          <div v-for="(file, index) in fileMessageList"
+          <div v-for="(file, index) in fileSelectedList"
                :key="index"
                class="file-item"
           >
@@ -60,7 +65,7 @@
         <div class="selected-file-container"
              v-else-if="type==='file'"
         >
-          <div v-for="(file, index) in fileMessageList"
+          <div v-for="(file, index) in fileSelectedList"
                :key="index"
                class="file-item"
           >
@@ -107,10 +112,12 @@
         InboxOutlined,
         DeleteOutlined
     } from "@ant-design/icons-vue";
-    import EmptyContainer from "../../empty-container/EmptyContainer.vue";
+    import EmptyContainer from "../../../empty-container/EmptyContainer.vue";
     import { UUID } from "uuidjs";
-    import { translateFileSize } from "../../../utils/unit-utils.js";
-    import { getFileIcon } from "../../../utils/file-utils.js";
+    import { translateFileSize } from "../../../../utils/unit-utils.js";
+    import { getFileIcon } from "../../../../utils/file-utils.js";
+    import { themeColor } from "../../../../config/config.js";
+    import Logo from "../../../logo/Logo.vue";
 
     const emit = defineEmits(["sendSelectedFile"]);
 
@@ -141,7 +148,7 @@
     const dialogClose = () => {
         dialogOpenFlag.value = false;
         fileList.value = [];
-        fileMessageList.value = [];
+        fileSelectedList.value = [];
     };
 
     // 获取准入文件类型
@@ -156,12 +163,12 @@
 
     // 文件列表
     const fileList = ref([]);
-    const fileMessageList = ref([]);
+    const fileSelectedList = ref([]);
 
     // 删除文件列表中的文件
     const deleteFileFromList = (index) => {
         fileList.value.splice(index, 1);
-        fileMessageList.value.splice(index, 1);
+        fileSelectedList.value.splice(index, 1);
     };
 
     // 选择文件回调
@@ -180,7 +187,7 @@
         });
 
         // 装填文件信息
-        fileMessageList.value.push({
+        fileSelectedList.value.push({
             type: props.type,
             fileId: UUID.generate(),
             fileName: fileName,
@@ -193,14 +200,10 @@
         return false;
     };
 
-    function handleDrop(e) {
-        console.log(e);
-    }
-
     // 发送文件
     const handleSend = () => {
         console.error(fileList.value);
-        emit("sendSelectedFile", fileMessageList.value);
+        emit("sendSelectedFile", fileSelectedList.value);
         dialogClose();
     };
 
@@ -213,7 +216,16 @@
 <style scoped
        lang="scss"
 >
-  @use "/src/assets/style/global-variable.scss";
+  @use "/src/assets/style/global-variable";
+
+  .dialog-title {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    width: 100%;
+  }
 
   .file-selector-container {
     display: flex;

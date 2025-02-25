@@ -3,5 +3,70 @@
 		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.CloudDiskMapper">
+	<!--获取云盘基础信息-->
+	<select id="getCloudDiskBasicInfo"
+			resultType="com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasicInfoResponseVO">
+		SELECT cloud_disk.disk_id       as diskId,
+			   cloud_disk.org_id        as orgId,
+			   cloud_disk.disk_size     as diskSize,
+			   cloud_disk.disk_capacity as diskCapacity
+		FROM cloud_disk
+		WHERE disk_id = #{diskId}
+	</select>
 
+	<!--获取当前层级内的文件夹数-->
+	<select id="getCurLevelFolderCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM cloud_disk_folders
+		WHERE cloud_disk_folders.parent_id = #{parentId}
+	</select>
+
+	<!--获取当前层级内的文件夹-->
+	<select id="getCurLevelFolders"
+			resultType="com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFolderDTO">
+		SELECT cloud_disk_folders.id          as id,
+			   cloud_disk_folders.folder_id   as folderId,
+			   cloud_disk_folders.folder_name as folderName,
+			   cloud_disk_folders.parent_id   as parentId,
+			   cloud_disk_folders.org_id      as orgId,
+			   cloud_disk_folders.disk_id     as diskId,
+			   cloud_disk_folders.creator     as creatorId,
+			   users.username                 as creatorName,
+			   users.avatar                   as creatorAvatar,
+			   cloud_disk_folders.update_time as updateTime
+		FROM cloud_disk_folders
+				 LEFT JOIN users ON cloud_disk_folders.creator = users.id
+		WHERE parent_id = #{parentId}
+		LIMIT #{pageSize}
+		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
+		OFFSET #{pageOffset}
+	</select>
+
+	<!--获取当前层级内的文件数-->
+	<select id="getCurLevelFileCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM cloud_disk_files
+		WHERE cloud_disk_files.folder_id = #{parentId}
+	</select>
+
+	<!--获取当前层级内的文件-->
+	<select id="getCurLevelFiles" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFileDTO">
+		SELECT cloud_disk_files.file_id     as fileId,
+			   cloud_disk_files.file_name   as fileName,
+			   cloud_disk_files.folder_id   as folderId,
+			   cloud_disk_files.org_id      as orgId,
+			   cloud_disk_files.disk_id     as diskId,
+			   cloud_disk_files.type        as fileType,
+			   cloud_disk_files.size        as fileSize,
+			   cloud_disk_files.creator     as creatorId,
+			   users.username               as creatorName,
+			   users.avatar                 as creatorAvatar,
+			   cloud_disk_files.update_time as updateTime
+		FROM cloud_disk_files
+				 LEFT JOIN users ON cloud_disk_files.creator = users.id
+		WHERE folder_id = #{parentId}
+		LIMIT #{pageSize}
+		<bind name="pageOffset" value="(pageIndex - 1) * pageSize + offset"/>
+		OFFSET #{pageOffset}
+	</select>
 </mapper>

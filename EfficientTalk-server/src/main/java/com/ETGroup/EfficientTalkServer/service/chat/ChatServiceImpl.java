@@ -128,7 +128,7 @@ public class ChatServiceImpl implements ChatService {
                                  String sender,
                                  String receiver,
                                  MultipartFile file) throws IOException {
-        String savePath = System.getProperty("user.dir") + "/resources/chat_files";
+        String savePath = System.getProperty("user.dir") + "\\resources\\chat_files\\";
         File saveFile = new File(savePath + file.getOriginalFilename());
         file.transferTo(saveFile);
         String filePath = savePath + file.getOriginalFilename();
@@ -171,7 +171,7 @@ public class ChatServiceImpl implements ChatService {
                                   String sender,
                                   String receiver,
                                   MultipartFile image) throws IOException {
-        String savePath = System.getProperty("user.dir") + "/resources/chat_images/";
+        String savePath = System.getProperty("user.dir") + "\\resources\\chat_images\\";
         File saveFile = new File(savePath + image.getOriginalFilename());
         image.transferTo(saveFile);
         String filePath = savePath + image.getOriginalFilename();

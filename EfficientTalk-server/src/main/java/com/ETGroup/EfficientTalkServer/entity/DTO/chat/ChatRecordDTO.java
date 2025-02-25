@@ -19,7 +19,7 @@ public class ChatRecordDTO {
     // 图片类型
     private String imageType;
     // 图片大小
-    private String imageSize;
+    private Long imageSize;
     // 文件ID
     private String fileId;
     // 文件名
@@ -27,7 +27,7 @@ public class ChatRecordDTO {
     // 文件类型
     private String fileType;
     // 文件大小
-    private String fileSize;
+    private Long fileSize;
     // 消息内容
     private String content;
     // 发送时间

@@ -25,4 +25,15 @@ export default class UserApi {
             data
         });
     };
+
+    /**
+     * 设置用户在线状态
+     * @param data
+     */
+    static setUserOnlineState = (data) => {
+        return service.put({
+            url: this.requestPath + "/setUserOnlineState",
+            data
+        });
+    };
 }

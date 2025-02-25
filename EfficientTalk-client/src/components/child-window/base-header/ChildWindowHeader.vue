@@ -91,6 +91,7 @@
     align-items: center;
     width: 100%;
     height: 100%;
+    background-color: global-variable.$background-color;
 
     $title-container-width: 80%;
 
@@ -121,7 +122,7 @@
       align-items: center;
       width: calc(100% - $title-container-width);
       height: 100%;
-      background-color: white;
+      background-color: global-variable.$background-color;
       padding-right: 10px;
 
       .control-btn {

@@ -231,6 +231,14 @@ ipcMain.handle("app-login", (e, param) => {
 
 // 登出
 ipcMain.handle("app-logout", (e, param) => {
+    // 退出登录时关闭所有子窗口
+    Object.keys(childWidowManager).forEach(windowName => {
+        if(childWidowManager[windowName] !== null){
+            childWidowManager[windowName].windowObject.close();
+            childWidowManager[windowName] = null;
+        }
+    });
+
     mainWindow.close();
     mainWindow = new BrowserWindow({
         width: 340,
@@ -252,8 +260,6 @@ ipcMain.handle("app-logout", (e, param) => {
 
     mainWindow.loadURL(projectUrl + "#/auth")
               .then();
-
-    // TODO 主窗口关闭或退出登录时关闭所有子窗口
 });
 
 // 处理文件选择(单选)

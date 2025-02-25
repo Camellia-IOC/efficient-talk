@@ -33,4 +33,11 @@
 		FROM users
 		WHERE users.id = #{userId}
 	</select>
+
+	<!--设置用户的在线状态-->
+	<update id="setUserOnlineState">
+		UPDATE users
+		SET online_state = #{onlineState}
+		WHERE id = #{userId}
+	</update>
 </mapper>

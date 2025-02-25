@@ -1,12 +1,21 @@
 <template>
   <a-modal v-model:open="dialogOpenFlag"
-           title="发起好友申请"
            centered
            :mask="false"
            width="400px"
            :footer="null"
            @cancel="dialogClose"
   >
+    <template #title>
+      <div class="dialog-title">
+        <div class="logo">
+          <Logo :color="themeColor"
+                :size="30"
+          />
+        </div>
+        <label>发起好友申请</label>
+      </div>
+    </template>
     <div class="edit-invitation-container">
       <div class="invitation-form">
         <div class="form-item">
@@ -42,7 +51,9 @@
 <script setup>
     import { ref } from "vue";
     import { message } from "ant-design-vue";
-    import SocialApi from "../../../api/modules/SocialApi.js";
+    import SocialApi from "../../../../api/modules/SocialApi.js";
+    import { themeColor } from "../../../../config/config.js";
+    import Logo from "../../../logo/Logo.vue";
 
     // 当前登录的用户ID
     const curLoginUserId = ref(null);
@@ -117,6 +128,15 @@
 <style scoped
        lang="scss"
 >
+  .dialog-title {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    width: 100%;
+  }
+
   .edit-invitation-container {
     display: flex;
     flex-direction: column;

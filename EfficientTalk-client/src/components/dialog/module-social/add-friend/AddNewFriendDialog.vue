@@ -1,12 +1,18 @@
 <template>
   <a-modal v-model:open="dialogOpenFlag"
-           title="添加好友"
            centered
            :mask="false"
            width="700px"
            :footer="null"
            @cancel="dialogClose"
-  >
+  ><template #title>
+    <div class="dialog-title">
+      <div class="logo">
+        <Logo :color="themeColor" :size="30"/>
+      </div>
+      <label>添加好友</label>
+    </div>
+  </template>
     <div class="add-new-friend-container">
       <div class="search-area">
         <a-input v-model:value="searchKey"
@@ -44,11 +50,13 @@
 
 <script setup>
     import { ref } from "vue";
-    import EmptyContainer from "../../empty-container/EmptyContainer.vue";
-    import SocialApi from "../../../api/modules/SocialApi.js";
+    import EmptyContainer from "../../../empty-container/EmptyContainer.vue";
+    import SocialApi from "../../../../api/modules/SocialApi.js";
     import { message } from "ant-design-vue";
     import NewFriendItem from "./components/NewFriendItem.vue";
     import EditInvitationDialog from "./EditInvitationDialog.vue";
+    import { themeColor } from "../../../../config/config.js";
+    import Logo from "../../../logo/Logo.vue";
 
     const props = defineProps({
         curLoginUserId: {
@@ -116,6 +124,15 @@
 <style scoped
        lang="scss"
 >
+  .dialog-title {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    width: 100%;
+  }
+
   .add-new-friend-container {
     display: flex;
     flex-direction: column;
