@@ -10,7 +10,7 @@
         <SearchOutlined/>
       </a-button>
     </div>
-    <div class="chat-list-area">
+    <a-spin :wrapper-class-name="'chat-list-area'" :spinning="isFriendListLoading">
       <EmptyContainer description="暂无进行中的会话"
                       v-if="chatListFilter(chatList).length === 0"
       />
@@ -61,7 +61,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 
@@ -95,6 +95,9 @@
     const updateCurLoginUser = async () => {
         curLoginUser.value = await getCurUserData();
     };
+
+    // 聊天列表加载标识符
+    const isFriendListLoading = ref(true);
 
     // 当前聊天对象的ID
     const curChatId = ref("");
@@ -253,6 +256,8 @@
 
     // 从服务器获取聊天列表
     const getCloudChatList = async (userId) => {
+        isFriendListLoading.value = true;
+
         // 从服务器获取聊天列表
         const response = await ChatApi.getChatList({
             userId: userId
@@ -262,9 +267,12 @@
         if (res.code === 0) {
             const data = res.data;
             if (data != null) {
+                isFriendListLoading.value = false;
                 return JSON.parse(data.chatList);
             }
         }
+
+        isFriendListLoading.value = false;
         return null;
     };
 
@@ -374,6 +382,7 @@
         chatList.value = await getCloudChatList(curLoginUser.value.userId);
         if (chatList.value === null) {
             chatList.value = await getChatList(curLoginUser.value.userId);
+            isFriendListLoading.value = false;
         }
 
         // 获取缓存的聊天记录，并更新至聊天列表
@@ -585,5 +594,10 @@
         }
       }
     }
+  }
+
+  :deep(.ant-spin-container) {
+    height: 100%;
+    width: 100%;
   }
 </style>

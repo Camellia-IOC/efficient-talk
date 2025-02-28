@@ -26,58 +26,65 @@
       />
     </div>
     <div class="list-container">
-      <a-spin v-if="activeType === 'FRIEND'"
-              :wrapper-class-name="'type-friend-list'"
-              :spinning="isFriendListLoading"
+      <div class="type-friend-list"
+           v-if="activeType === 'FRIEND'"
       >
-        <div class="empty-list"
-             v-if="friendList.total === 0"
-        >
-          <EmptyContainer :description="'暂无好友'"/>
+        <div class="friend-manager-container">
+          <a-button class="friend-manager-btn">好友管理器</a-button>
         </div>
-        <a-collapse v-model:activeKey="activeFriendGroupKey"
-                    ghost
-                    class="group-list"
-                    v-else
+        <a-spin :wrapper-class-name="'friend-group-list'"
+                :spinning="isFriendListLoading"
         >
-          <a-collapse-panel v-for="(group,index) in friendList.groupList"
-                            :key="index"
-                            :header="group.groupName"
-                            class="group-list-item"
+          <div class="empty-list"
+               v-if="friendList.total === 0"
           >
-            <template #extra><label style="color: gray;font-size: 12px">{{ group.friendList.length }}</label></template>
-            <div class="friend-list">
-              <div v-for="(friend,index) in group.friendList"
-                   :key="index"
-                   class="friend-list-item"
-                   :class="{'friend-list-item-active': curFriendId === friend.userId}"
-                   @click="handleSelectFriend(friend)"
-              >
-                <div class="user-avatar">
-                  <img v-if="friend.userAvatar!==null"
-                       :src="friend.userAvatar"
-                       alt="avatar"
-                       class="avatar"
-                  >
-                  <a-avatar v-else
-                            class="avatar"
-                  >{{ friend.userName.substring(0, 2) }}
-                  </a-avatar>
-                </div>
-                <div class="user-info">
-                  <div class="user-name">{{ friend.userName }}</div>
-                  <div class="user-dept"
-                       v-if="friend.deptName!==null && friend.deptId!==null"
-                  >
-                    <CrownTwoTone/>
-                    {{ friend.deptName }}
+            <EmptyContainer :description="'暂无好友'"/>
+          </div>
+          <a-collapse v-model:activeKey="activeFriendGroupKey"
+                      ghost
+                      class="group-list"
+                      v-else
+          >
+            <a-collapse-panel v-for="(group,index) in friendList.groupList"
+                              :key="index"
+                              :header="group.groupName"
+                              class="group-list-item"
+            >
+              <template #extra><label style="color: gray;font-size: 12px">{{ group.friendList.length }}</label>
+              </template>
+              <div class="friend-list">
+                <div v-for="(friend,index) in group.friendList"
+                     :key="index"
+                     class="friend-list-item"
+                     :class="{'friend-list-item-active': curFriendId === friend.userId}"
+                     @click="handleSelectFriend(friend)"
+                >
+                  <div class="user-avatar">
+                    <img v-if="friend.userAvatar!==null"
+                         :src="friend.userAvatar"
+                         alt="avatar"
+                         class="avatar"
+                    >
+                    <a-avatar v-else
+                              class="avatar"
+                    >{{ friend.userName.substring(0, 2) }}
+                    </a-avatar>
+                  </div>
+                  <div class="user-info">
+                    <div class="user-name">{{ friend.userName }}</div>
+                    <div class="user-dept"
+                         v-if="friend.deptName!==null && friend.deptId!==null"
+                    >
+                      <CrownTwoTone/>
+                      {{ friend.deptName }}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </a-collapse-panel>
-        </a-collapse>
-      </a-spin>
+            </a-collapse-panel>
+          </a-collapse>
+        </a-spin>
+      </div>
       <div v-else-if="activeType === 'ORG'"
            class="type-org-list"
       >
@@ -332,10 +339,10 @@
         }
     });
 
-    onBeforeUnmount(()=>{
+    onBeforeUnmount(() => {
         // 移除监听器防止事件多次触发
         window.removeEventListener("updateFriendList", handleUpdateFriendList);
-    })
+    });
 </script>
 
 <style scoped
@@ -435,86 +442,110 @@
         align-items: center;
         width: 100%;
         height: 100%;
-        overflow-y: auto;
 
-        .empty-list {
+        $friend-manager-height: 40px;
+
+        .friend-manager-container {
           display: flex;
           justify-content: center;
           align-items: center;
           width: 100%;
-          height: 100%;
-          font-size: 14px;
-          color: gray;
+          height: $friend-manager-height;
+
+          .friend-manager-btn{
+            width: 90%;
+            background-color: global-variable.$theme-color;
+            color: white;
+          }
         }
 
-        .group-list {
+        .friend-group-list {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
           width: 100%;
+          height: calc(100% - $friend-manager-height);
+          overflow-y: auto;
 
-          .group-list-item {
+          .empty-list {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+            color: gray;
+          }
+
+          .group-list {
             width: 100%;
 
-            .friend-list {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
+            .group-list-item {
               width: 100%;
 
-              .friend-list-item-active {
-                background-color: rgba(global-variable.$theme-color, 0.1);
-
-                &:hover {
-                  background-color: rgba(global-variable.$theme-color, 0.1) !important;
-                }
-              }
-
-              .friend-list-item {
+              .friend-list {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 width: 100%;
-                height: 80px;
-                min-height: 80px;
-                padding: 5px 15px;
-                cursor: pointer;
 
-                &:hover {
-                  background-color: global-variable.$hover-background-color;
+                .friend-list-item-active {
+                  background-color: rgba(global-variable.$theme-color, 0.1);
+
+                  &:hover {
+                    background-color: rgba(global-variable.$theme-color, 0.1) !important;
+                  }
                 }
 
-                .user-avatar {
+                .friend-list-item {
                   display: flex;
-                  justify-content: center;
                   align-items: center;
+                  width: 100%;
+                  height: 80px;
+                  min-height: 80px;
+                  padding: 5px 15px;
+                  cursor: pointer;
 
-                  .avatar {
+                  &:hover {
+                    background-color: global-variable.$hover-background-color;
+                  }
+
+                  .user-avatar {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
-                  }
-                }
 
-                .user-info {
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: center;
-                  align-items: flex-start;
-                  width: 100%;
-                  height: 65%;
-                  padding-left: 15px;
-                  gap: 5px;
-
-                  .user-name {
-                    font-size: 14px;
+                    .avatar {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      width: 50px;
+                      height: 50px;
+                      border-radius: 50%;
+                    }
                   }
 
-                  .user-dept {
+                  .user-info {
                     display: flex;
-                    align-items: center;
-                    font-size: 12px;
-                    color: gray;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: flex-start;
+                    width: 100%;
+                    height: 65%;
+                    padding-left: 15px;
                     gap: 5px;
+
+                    .user-name {
+                      font-size: 14px;
+                    }
+
+                    .user-dept {
+                      display: flex;
+                      align-items: center;
+                      font-size: 12px;
+                      color: gray;
+                      gap: 5px;
+                    }
                   }
                 }
               }
