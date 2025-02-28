@@ -99,7 +99,7 @@
 <style scoped
        lang="scss"
 >
-  @use "../../../../assets/style/global-variable.css";
+  @use "/src/assets/style/global-variable.scss";
 
   .dialog-title {
     display: flex;

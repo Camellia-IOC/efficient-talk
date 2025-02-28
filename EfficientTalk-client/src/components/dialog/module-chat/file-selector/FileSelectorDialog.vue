@@ -45,7 +45,7 @@
                      alt="icon"
                      class="file-icon"
                 >
-                <div class="file-name">{{ file.fileName + "." + file.fileType }}</div>
+                <div class="file-name single-line-ellipsis">{{ file.fileName + "." + file.fileType }}</div>
               </div>
               <div class="file-size">{{ translateFileSize(file.fileSize) }}</div>
             </div>
@@ -75,7 +75,7 @@
                      alt="icon"
                      class="file-icon"
                 >
-                <div class="file-name">{{ file.fileName + "." + file.fileType }}</div>
+                <div class="file-name single-line-ellipsis">{{ file.fileName + "." + file.fileType }}</div>
               </div>
               <div class="file-size">{{ translateFileSize(file.fileSize) }}</div>
             </div>
@@ -339,14 +339,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 85%;
+            width: 90%;
             height: 100%;
 
             .file-info {
               display: flex;
               justify-content: flex-start;
               align-items: center;
-              width: 90%;
+              width: 85%;
               gap: 15px;
 
               .file-icon {
@@ -359,7 +359,6 @@
 
               .file-name {
                 font-size: 16px;
-                font-weight: bold;
               }
             }
 
@@ -367,7 +366,7 @@
               display: flex;
               justify-content: center;
               align-items: center;
-              width: 10%;
+              width: 15%;
               color: gray;
             }
           }
@@ -376,7 +375,7 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            width: 15%;
+            width: 10%;
             height: 100%;
           }
         }

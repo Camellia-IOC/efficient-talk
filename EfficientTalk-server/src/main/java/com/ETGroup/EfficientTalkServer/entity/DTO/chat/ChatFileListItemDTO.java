@@ -12,5 +12,6 @@ public class ChatFileListItemDTO {
     private Long fileSize;
     private String sender;
     private String senderName;
+    private String senderAvatar;
     private LocalDateTime createTime;
 }

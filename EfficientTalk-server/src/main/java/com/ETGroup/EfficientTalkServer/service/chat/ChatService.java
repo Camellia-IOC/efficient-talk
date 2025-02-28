@@ -7,7 +7,6 @@ import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponse
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -90,7 +89,7 @@ public interface ChatService {
                           Long fileSize,
                           String sender,
                           String receiver,
-                          MultipartFile file) throws IOException;
+                          MultipartFile file);
     
     /**
      * 保存聊天图片
@@ -111,7 +110,7 @@ public interface ChatService {
                            Long imageSize,
                            String sender,
                            String receiver,
-                           MultipartFile image) throws IOException;
+                           MultipartFile image);
     
     /**
      * 获取聊天文件列表

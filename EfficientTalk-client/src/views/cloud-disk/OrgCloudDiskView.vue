@@ -24,7 +24,10 @@
         >
           <ReloadOutlined/>
         </a-button>
-        <a-button type="primary">新建</a-button>
+        <a-button type="primary"
+                  @click="handleFolderCreatorDialogOpen"
+        >新建
+        </a-button>
         <a-button type="primary"
                   @click="handleFileUploaderDialogOpen"
         >上传
@@ -111,7 +114,7 @@
               >
                 <DownloadOutlined/>
               </a-button>
-              <a-button @click="openFolder(record.id, record.name, null)"
+              <a-button @click="openFolder(record.folderId, record.name, null)"
                         shape="circle"
                         style="display:flex;justify-content:center;align-items:center;font-size: 18px;"
                         v-else-if="record.type==='folder'"
@@ -125,9 +128,15 @@
     </div>
   </div>
 
+  <!--文件夹创建对话框-->
+  <FolderCreatorDialog ref="folderCreatorDialogRef"
+                       @refresh-folder="refreshCurrentFolder"
+  />
+
   <!--文件上传对话框-->
   <FileUploaderDialog ref="fileUploaderDialogRef"
                       :multi="true"
+                      @upload-selected-file="uploadFileToCloudDisk"
   />
 </template>
 
@@ -154,13 +163,27 @@
     import { useRoute } from "vue-router";
     import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
     import FileUploaderDialog from "../../components/dialog/module-cloud-disk/file-uploader/FileUploaderDialog.vue";
+    import { getCurUserData } from "../../database/cur-user.js";
+    import FolderCreatorDialog from "../../components/dialog/module-cloud-disk/folder-creator/FolderCreatorDialog.vue";
 
     const route = useRoute();
+
+    // 当前登录的用户信息
+    const curLoginUser = ref({});
+    const updateCurLoginUser = async () => {
+        curLoginUser.value = await getCurUserData();
+    };
+
+    // 文件夹创建对话框
+    const folderCreatorDialogRef = ref();
+    const handleFolderCreatorDialogOpen = () => {
+        folderCreatorDialogRef.value.dialogOpen(openedFolder.value[openedFolder.value.length - 1].folderId, curLoginUser.value.userId, route.query.orgId, route.query.diskId);
+    };
 
     // 文件上传对话框
     const fileUploaderDialogRef = ref();
     const handleFileUploaderDialogOpen = () => {
-        fileUploaderDialogRef.value.dialogOpen();
+        fileUploaderDialogRef.value.dialogOpen(openedFolder.value[openedFolder.value.length - 1].folderId, curLoginUser.value.userId, route.query.orgId, route.query.diskId);
     };
 
     // 加载标志
@@ -242,6 +265,16 @@
     const cloudDiskFiles = ref([]);
     const tableData = ref([]);
 
+    // 获取打开文件夹的路径串
+    const getFileSavePath = () => {
+        let path = "";
+        for (let i = 0; i < openedFolder.value.length; i++) {
+            path += openedFolder.value[i].folderId;
+            path += "\\";
+        }
+        return path;
+    };
+
     // 获取云盘数据
     const getCloudDiskData = async (parentId = null) => {
         isLoading.value = true;
@@ -267,7 +300,7 @@
                     const item = cloudDiskFolders.value[i];
                     const folder = {
                         type: "folder",
-                        id: item.id,
+                        folderId: item.folderId,
                         name: item.folderName,
                         parentId: item.parentId,
                         orgId: item.orgId,
@@ -283,9 +316,9 @@
                 // 导入文件数据
                 for (let i = 0; i < cloudDiskFiles.value.length; i++) {
                     const item = cloudDiskFiles.value[i];
-                    const folder = {
+                    const file = {
                         type: "file",
-                        id: item.id,
+                        fileId: item.fileId,
                         name: item.fileName + "." + item.fileType,
                         fileSize: item.fileSize,
                         fileType: item.fileType,
@@ -297,7 +330,7 @@
                         creatorAvatar: item.creatorAvatar,
                         updateTime: item.updateTime
                     };
-                    tableData.value.push(folder);
+                    tableData.value.push(file);
                 }
             }
 
@@ -329,7 +362,35 @@
         getCloudDiskData();
     };
 
+    // 上传文件
+    const uploadProgressList = ref([]);
+    const uploadFileToCloudDisk = async (fileList) => {
+        const savePath = getFileSavePath();
+
+        for (let i = 0; i < fileList.length; i++) {
+            let formData = new FormData();
+            formData.set("fileId", fileList[i].fileId);
+            formData.set("fileName", fileList[i].fileName);
+            formData.set("folderId", fileList[i].folderId);
+            formData.set("orgId", fileList[i].orgId);
+            formData.set("diskId", fileList[i].diskId);
+            formData.set("fileType", fileList[i].fileType);
+            formData.set("fileSize", fileList[i].fileSize);
+            formData.set("creatorId", fileList[i].creatorId);
+            formData.set("file", fileList[i].origin);
+            formData.set("savePath", savePath);
+
+            const response = await CloudDiskApi.uploadOrgCloudDiskFile(formData);
+            const res = response.data;
+        }
+
+        refreshCurrentFolder();
+    };
+
     onBeforeMount(async () => {
+        // 初始化当前登录的用户信息
+        await updateCurLoginUser();
+
         // 接收云盘ID
         openedFolder.value.push({
             folderId: route.query.diskId,

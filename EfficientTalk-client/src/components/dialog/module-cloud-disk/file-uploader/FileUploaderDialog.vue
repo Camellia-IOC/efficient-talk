@@ -46,7 +46,7 @@
                      alt="icon"
                      class="file-icon"
                 >
-                <div class="file-name">{{ file.fileName + "." + file.fileType }}</div>
+                <div class="file-name single-line-ellipsis">{{ file.fileName + "." + file.fileType }}</div>
               </div>
               <div class="file-size">{{ translateFileSize(file.fileSize) }}</div>
             </div>
@@ -107,15 +107,35 @@
         }
     });
 
+    // 上传信息配置
+    const uploaderConfig = ref({
+        folderId: null,
+        userId: null,
+        orgId: null,
+        diskId: null
+    });
+
+    // 更新上传器配置
+    const setUploaderConfig = (folderId, userId, orgId, diskId) => {
+        uploaderConfig.value.folderId = folderId;
+        uploaderConfig.value.userId = userId;
+        uploaderConfig.value.orgId = orgId;
+        uploaderConfig.value.diskId = diskId;
+    };
+
     // 对话框控制
     const dialogOpenFlag = ref(false);
-    const dialogOpen = () => {
+    const dialogOpen = (folderId, userId, orgId, diskId) => {
         dialogOpenFlag.value = true;
+        setUploaderConfig(folderId, userId, orgId, diskId);
     };
     const dialogClose = () => {
         dialogOpenFlag.value = false;
+
+        // 重置数据
         fileList.value = [];
         fileSelectedList.value = [];
+        setUploaderConfig(null, null, null, null);
     };
 
     // 获取准入文件类型
@@ -152,8 +172,12 @@
         fileSelectedList.value.push({
             fileId: UUID.generate(),
             fileName: fileName,
+            folderId: uploaderConfig.value.folderId,
+            orgId:uploaderConfig.value.orgId,
+            diskId: uploaderConfig.value.diskId,
             fileType: fileType.toLowerCase(),
             fileSize: file.size,
+            creatorId: uploaderConfig.value.userId,
             origin: file
         });
 
@@ -226,6 +250,7 @@
           align-items: center;
           width: 100%;
           height: 80px;
+          min-height: 80px;
           padding: 0 20px;
           background-color: #F5F7FA;
           border-radius: 15px;
@@ -234,14 +259,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 85%;
+            width: 90%;
             height: 100%;
 
             .file-info {
               display: flex;
               justify-content: flex-start;
               align-items: center;
-              width: 90%;
+              width: 85%;
               gap: 15px;
 
               .file-icon {
@@ -254,7 +279,6 @@
 
               .file-name {
                 font-size: 16px;
-                font-weight: bold;
               }
             }
 
@@ -262,7 +286,7 @@
               display: flex;
               justify-content: center;
               align-items: center;
-              width: 10%;
+              width: 15%;
               color: gray;
             }
           }
@@ -271,7 +295,7 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            width: 15%;
+            width: 10%;
             height: 100%;
           }
         }

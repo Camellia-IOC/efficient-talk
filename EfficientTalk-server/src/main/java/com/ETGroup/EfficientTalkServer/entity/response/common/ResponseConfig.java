@@ -23,6 +23,8 @@ public enum ResponseConfig {
     RESOURCE_UPLOAD_FAILED(400, "资源上传失败，请重新尝试"),
     RESOURCE_DELETE_FAILED(401, "资源删除失败，请重新尝试"),
     RESOURCE_DOWNLOAD_FAILED(402, "资源下载失败，请重新尝试"),
+    RESOURCE_NAME_SAME_ERROR(403, "名称重复"),
+    RESOURCE_NAME_INVALID_ERROR(404, "名称不合法"),
     
     // 聊天模块：5xx
     SAVE_CHAT_LIST_FAILED(500, "保存对话列表失败"),

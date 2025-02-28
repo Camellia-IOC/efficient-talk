@@ -121,7 +121,6 @@
         if (res.code === 0) {
             if (res.data != null) {
                 orgInfo.value = res.data.orgInfo;
-                console.error(orgInfo.value);
             }
         }
     };

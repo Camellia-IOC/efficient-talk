@@ -24,8 +24,7 @@
 	<!--获取当前层级内的文件夹-->
 	<select id="getCurLevelFolders"
 			resultType="com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFolderDTO">
-		SELECT cloud_disk_folders.id          as id,
-			   cloud_disk_folders.folder_id   as folderId,
+		SELECT cloud_disk_folders.folder_id   as folderId,
 			   cloud_disk_folders.folder_name as folderName,
 			   cloud_disk_folders.parent_id   as parentId,
 			   cloud_disk_folders.org_id      as orgId,
@@ -67,6 +66,77 @@
 		WHERE folder_id = #{parentId}
 		LIMIT #{pageSize}
 		<bind name="pageOffset" value="(pageIndex - 1) * pageSize + offset"/>
+		OFFSET #{pageOffset}
+	</select>
+
+	<!--在组织云盘上传文件-->
+	<insert id="uploadOrgCloudDiskFile">
+		INSERT INTO cloud_disk_files
+		(file_id, file_name, folder_id, org_id, disk_id, type, size, file_path, creator, update_time)
+		VALUES (#{fileId}, #{fileName}, #{folderId}, #{orgId}, #{diskId}, #{fileType}, #{fileSize}, #{filePath},
+				#{creator},
+				#{updateTime})
+	</insert>
+
+	<!--根据文件夹ID获取文件夹路径-->
+	<select id="getFolderPath" resultType="java.lang.String">
+		SELECT cloud_disk_folders.folder_path
+		FROM cloud_disk_folders
+		WHERE cloud_disk_folders.folder_id = #{folderId}
+	</select>
+
+	<!--在组织云盘创建文件夹-->
+	<insert id="createOrgCloudDiskFolder">
+		INSERT INTO cloud_disk_folders (folder_id, folder_name, parent_id, org_id, disk_id, creator, update_time,
+										folder_path)
+		VALUES (#{folderId}, #{folderName}, #{parentId}, #{orgId}, #{diskId}, #{creator}, #{updateTime}, #{folderPath})
+	</insert>
+
+	<!--根据ID获取云盘路径-->
+	<select id="getDiskPath" resultType="java.lang.String">
+		SELECT cloud_disk.disk_path
+		FROM cloud_disk
+		WHERE disk_id = #{diskId}
+	</select>
+
+	<!--检查文件夹名称是否重复-->
+	<select id="checkSameFolderName" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM cloud_disk_folders
+		WHERE folder_name = #{folderName}
+		  AND parent_id = #{parentId}
+		  AND org_id = #{orgId}
+		  AND disk_id = #{diskId}
+	</select>
+
+	<!--删除云盘文件-->
+	<delete id="deleteCloudDiskFile">
+		DELETE
+		FROM cloud_disk_files
+		WHERE file_id = #{fileId}
+	</delete>
+
+	<!--获取组织云盘最近文件-->
+	<select id="getRecentCloudDiskFiles"
+			resultType="com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFileDTO">
+		SELECT cloud_disk_files.file_id     as fileId,
+			   cloud_disk_files.file_name   as fileName,
+			   cloud_disk_files.folder_id   as folderId,
+			   cloud_disk_files.org_id      as orgId,
+			   cloud_disk_files.disk_id     as diskId,
+			   cloud_disk_files.type        as fileType,
+			   cloud_disk_files.size        as fileSize,
+			   cloud_disk_files.creator     as creatorId,
+			   users.username               as creatorName,
+			   users.avatar                 as creatorAvatar,
+			   cloud_disk_files.update_time as updateTime
+		FROM cloud_disk_files
+				 LEFT JOIN users ON users.id = cloud_disk_files.creator
+		WHERE cloud_disk_files.org_id = #{orgId}
+		  AND cloud_disk_files.disk_id = #{diskId}
+		ORDER BY cloud_disk_files.update_time DESC
+		LIMIT #{pageSize}
+		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
 		OFFSET #{pageOffset}
 	</select>
 </mapper>

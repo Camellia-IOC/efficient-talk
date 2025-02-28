@@ -25,4 +25,26 @@ export default class CloudDiskApi {
             data
         });
     };
+
+    /**
+     * 上传组织云盘文件
+     * @param data
+     */
+    static uploadOrgCloudDiskFile = (data) => {
+        return cloudDiskService.upload({
+            url: this.requestPath + "/uploadOrgCloudDiskFile",
+            data
+        });
+    };
+
+    /**
+     * 创建组织云盘文件夹
+     * @param data
+     */
+    static createOrgCloudDiskFolder = (data) => {
+        return cloudDiskService.post({
+            url: this.requestPath + "/createOrgCloudDiskFolder",
+            data
+        });
+    };
 }

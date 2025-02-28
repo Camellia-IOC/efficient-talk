@@ -2,7 +2,10 @@ package com.ETGroup.EfficientTalkServer.mapper;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFileDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFolderDTO;
+import com.ETGroup.EfficientTalkServer.entity.PO.CloudDiskFilePO;
+import com.ETGroup.EfficientTalkServer.entity.PO.CloudDiskFolderPO;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasicInfoResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskFileListResponseVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,4 +32,31 @@ public interface CloudDiskMapper {
                                                  @Param("pageIndex") Integer pageIndex,
                                                  @Param("pageSize") Integer pageSize,
                                                  @Param("offset") Integer offset);
+    
+    // 在组织云盘上传文件
+    Integer uploadOrgCloudDiskFile(CloudDiskFilePO cloudDiskFile);
+    
+    // 根据ID获取文件夹路径
+    String getFolderPath(@Param("folderId") String folderId);
+    
+    // 根据ID获取云盘路径
+    String getDiskPath(@Param("diskId") String diskId);
+    
+    // 在组织云盘新建文件夹
+    Integer createOrgCloudDiskFolder(CloudDiskFolderPO cloudDiskFolder);
+    
+    // 检查文件夹名称是否重复
+    Integer checkSameFolderName(@Param("folderName") String folderName,
+                                @Param("parentId") String parentId,
+                                @Param("orgId") String orgId,
+                                @Param("diskId") String diskId);
+    
+    // 删除云盘文件
+    Integer deleteCloudDiskFile(@Param("fileId") String fileId);
+    
+    // 获取组织云盘最近文件
+    ArrayList<CloudDiskFileDTO> getRecentCloudDiskFiles(@Param("orgId") String orgId,
+                                                        @Param("diskId") String diskId,
+                                                        @Param("pageIndex") Integer pageIndex,
+                                                        @Param("pageSize") Integer pageSize);
 }

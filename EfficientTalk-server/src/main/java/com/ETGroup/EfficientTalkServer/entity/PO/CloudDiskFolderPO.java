@@ -1,18 +1,17 @@
-package com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk;
+package com.ETGroup.EfficientTalkServer.entity.PO;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class CloudDiskFolderDTO {
+public class CloudDiskFolderPO {
     private String folderId;
     private String folderName;
     private String parentId;
     private String orgId;
     private String diskId;
-    private String creatorId;
-    private String creatorName;
-    private String creatorAvatar;
+    private String creator;
     private LocalDateTime updateTime;
+    private String folderPath;
 }

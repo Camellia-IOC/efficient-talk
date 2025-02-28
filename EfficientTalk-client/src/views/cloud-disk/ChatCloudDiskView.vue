@@ -5,17 +5,6 @@
     <div class="cloud-disk-info">
       <div class="title">聊天文件</div>
     </div>
-    <div class="folder-nav">
-      <a-breadcrumb>
-        <a-breadcrumb-item href="">
-          root
-        </a-breadcrumb-item>
-        <a-breadcrumb-item href="">
-          <span>Application List</span>
-        </a-breadcrumb-item>
-        <a-breadcrumb-item>Application</a-breadcrumb-item>
-      </a-breadcrumb>
-    </div>
     <div class="result-table-container">
       <a-table :data-source="tableData"
                :columns="tableColumns"
@@ -40,14 +29,22 @@
                    alt="icon"
                    style="width: 30px;height: 30px;margin-right: 10px"
               />
-              <label class="single-line-ellipsis" style="min-width: calc(100% - 40px);text-align: left;font-weight: bold">
+              <label class="single-line-ellipsis"
+                     style="min-width: calc(100% - 40px);text-align: left;font-weight: bold"
+              >
                 {{ record.fileName + "." + record.fileType }}
               </label>
             </div>
           </template>
           <template v-else-if="column.dataIndex === 'uploadUser'">
-            <div style="display: flex;justify-content: center;align-items: center">
-              {{ record.senderName }}
+            <div style="display: flex;justify-content: center;align-items: center;gap: 5px">
+              <img :src="record.senderAvatar"
+                   alt="avatar"
+                   style="width: 20px;height: 20px;border-radius: 50%"
+              >
+              <div style="display: flex;justify-content: center;align-items: center">
+                {{ record.senderName }}
+              </div>
             </div>
           </template>
           <template v-else-if="column.dataIndex === 'uploadTime'">
@@ -67,7 +64,7 @@
                         shape="circle"
                         style="display:flex;justify-content:center;align-items:center;font-size: 18px;font-weight: bold"
               >
-                <DownloadOutlined />
+                <DownloadOutlined/>
               </a-button>
             </div>
           </template>
@@ -197,7 +194,6 @@
     const handleDownloadFile = (fileId) => {
         console.error(fileId);
         // TODO 下载请求
-        console.error(chatCloudDiskViewRef.value);
     };
 
     onBeforeMount(async () => {
@@ -230,7 +226,6 @@
     padding: 20px 30px;
 
     $cloud-disk-info-height: 50px;
-    $folder-nav-height: 50px;
 
     .cloud-disk-info {
       display: flex;
@@ -246,20 +241,12 @@
       }
     }
 
-    .folder-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      height: $folder-nav-height;
-    }
-
     .result-table-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 100%;
-      height: calc(100% - #{$cloud-disk-info-height + $folder-nav-height});
+      height: calc(100% - #{$cloud-disk-info-height});
 
       .result-table {
         width: 100%;
@@ -268,27 +255,27 @@
     }
   }
 
-  :deep(.ant-table-wrapper){
-     width: 100% !important;
-     height: 100% !important;
-   }
-
-  :deep(.ant-spin-nested-loading){
+  :deep(.ant-table-wrapper) {
     width: 100% !important;
     height: 100% !important;
   }
 
-  :deep(.ant-spin-container){
+  :deep(.ant-spin-nested-loading) {
     width: 100% !important;
     height: 100% !important;
   }
 
-  :deep(.ant-table){
+  :deep(.ant-spin-container) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  :deep(.ant-table) {
     width: 100%;
     height: 90%;
   }
 
-  :deep(.ant-pagination){
+  :deep(.ant-pagination) {
     margin-bottom: 0 !important;
   }
 </style>

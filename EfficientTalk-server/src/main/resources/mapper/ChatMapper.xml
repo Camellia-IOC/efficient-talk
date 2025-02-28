@@ -105,6 +105,7 @@
 			   chat_files.file_size   as fileSize,
 			   chat_files.sender      as sender,
 			   users.username         as senderName,
+			   users.avatar           as senderAvatar,
 			   chat_files.create_time as createTime
 		FROM chat_files
 				 LEFT JOIN users ON chat_files.sender = users.id

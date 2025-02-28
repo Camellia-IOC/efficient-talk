@@ -127,27 +127,33 @@ public class ChatServiceImpl implements ChatService {
                                  Long fileSize,
                                  String sender,
                                  String receiver,
-                                 MultipartFile file) throws IOException {
-        String savePath = System.getProperty("user.dir") + "\\resources\\chat_files\\";
-        File saveFile = new File(savePath + file.getOriginalFilename());
-        file.transferTo(saveFile);
-        String filePath = savePath + file.getOriginalFilename();
-        LocalDateTime createTime = LocalDateTime.now();
-        
-        ChatFilePO chatFile = new ChatFilePO();
-        chatFile.setFileId(fileId);
-        chatFile.setFileName(fileName);
-        chatFile.setFilePath(filePath);
-        chatFile.setFileType(fileType);
-        chatFile.setFileSize(fileSize);
-        chatFile.setSender(sender);
-        chatFile.setReceiver(receiver);
-        chatFile.setCreateTime(createTime.toString());
-        
-        if (chatMapper.uploadChatFile(chatFile) == 1) {
-            return filePath;
+                                 MultipartFile file) {
+        try {
+            String savePath = System.getProperty("user.dir") + "\\resources\\chat_files\\";
+            File saveFile = new File(savePath + file.getOriginalFilename());
+            file.transferTo(saveFile);
+            String filePath = savePath + file.getOriginalFilename();
+            LocalDateTime createTime = LocalDateTime.now();
+            
+            ChatFilePO chatFile = new ChatFilePO();
+            chatFile.setFileId(fileId);
+            chatFile.setFileName(fileName);
+            chatFile.setFilePath(filePath);
+            chatFile.setFileType(fileType);
+            chatFile.setFileSize(fileSize);
+            chatFile.setSender(sender);
+            chatFile.setReceiver(receiver);
+            chatFile.setCreateTime(createTime.toString());
+            
+            if (chatMapper.uploadChatFile(chatFile) == 1) {
+                return filePath;
+            }
+            return null;
         }
-        return null;
+        catch (IOException e) {
+            log.error("保存聊天文件失败:{}", e.toString());
+            return null;
+        }
     }
     
     /**
@@ -170,27 +176,33 @@ public class ChatServiceImpl implements ChatService {
                                   Long imageSize,
                                   String sender,
                                   String receiver,
-                                  MultipartFile image) throws IOException {
-        String savePath = System.getProperty("user.dir") + "\\resources\\chat_images\\";
-        File saveFile = new File(savePath + image.getOriginalFilename());
-        image.transferTo(saveFile);
-        String filePath = savePath + image.getOriginalFilename();
-        LocalDateTime createTime = LocalDateTime.now();
-        
-        ChatImagePO chatImage = new ChatImagePO();
-        chatImage.setImageId(imageId);
-        chatImage.setImageName(imageName);
-        chatImage.setImagePath(filePath);
-        chatImage.setImageType(imageType);
-        chatImage.setImageSize(imageSize);
-        chatImage.setSender(sender);
-        chatImage.setReceiver(receiver);
-        chatImage.setCreateTime(createTime.toString());
-        
-        if (chatMapper.uploadChatImage(chatImage) == 1) {
-            return filePath;
+                                  MultipartFile image) {
+        try {
+            String savePath = System.getProperty("user.dir") + "\\resources\\chat_images\\";
+            File saveFile = new File(savePath + image.getOriginalFilename());
+            image.transferTo(saveFile);
+            String filePath = savePath + image.getOriginalFilename();
+            LocalDateTime createTime = LocalDateTime.now();
+            
+            ChatImagePO chatImage = new ChatImagePO();
+            chatImage.setImageId(imageId);
+            chatImage.setImageName(imageName);
+            chatImage.setImagePath(filePath);
+            chatImage.setImageType(imageType);
+            chatImage.setImageSize(imageSize);
+            chatImage.setSender(sender);
+            chatImage.setReceiver(receiver);
+            chatImage.setCreateTime(createTime.toString());
+            
+            if (chatMapper.uploadChatImage(chatImage) == 1) {
+                return filePath;
+            }
+            return null;
         }
-        return null;
+        catch (IOException e) {
+            log.error("保存聊天图片失败:{}", e.toString());
+            return null;
+        }
     }
     
     /**

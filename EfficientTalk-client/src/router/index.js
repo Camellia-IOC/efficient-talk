@@ -49,6 +49,12 @@ const router = createRouter({
                     component: () => import("../views/CloudDiskView.vue"),
                     children: [
                         {
+                            // 云盘-最近文件
+                            path: "recent-files",
+                            name: "recent-files",
+                            component: () => import("../views/EmptyView.vue")
+                        },
+                        {
                             // 云盘-我的文件
                             path: "my-files",
                             name: "my-files",

@@ -97,29 +97,35 @@
     // 导航项配置
     const navItemList = [
         {
-            index: 0,
+            index: 1,
+            name: "最近文件",
+            path: "/app/cloud-disk/recent-files"
+        },
+        {
+            index: 2,
             name: "我的文件",
             path: "/app/cloud-disk/my-files"
         },
         {
-            index: 1,
+            index: 3,
             name: "组织文件",
             path: "/app/cloud-disk/org-files"
         },
         {
-            index: 2,
+            index: 4,
             name: "聊天文件",
             path: "/app/cloud-disk/chat-files"
         }
     ];
 
     // 选择导航
-    const curSelectedNavIndex = ref(0);
+    const curSelectedNavIndex = ref(1);
     const handleSelectNavItem = (index, path) => {
         curSelectedNavIndex.value = index;
         router.push({
             path: path,
             query: {
+                orgId: orgInfo.value.orgId,
                 diskId: orgInfo.value.diskId
             }
         });

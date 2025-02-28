@@ -64,40 +64,40 @@ public class ChatController {
     
     @Operation(summary = "保存聊天文件")
     @PostMapping("/uploadChatFile")
-    public ResponseData<Object> uploadChatFile(@RequestParam String fileId,
+    public ResponseData<UploadChatFileResponseVO> uploadChatFile(@RequestParam String fileId,
                                                @RequestParam String fileName,
                                                @RequestParam String fileType,
                                                @RequestParam Long fileSize,
                                                @RequestParam String sender,
                                                @RequestParam String receiver,
                                                @RequestParam MultipartFile file) {
-        try {
-            String filePath = chatService.uploadChatFile(fileId, fileName, fileType, fileSize, sender, receiver, file);
+        String filePath = chatService.uploadChatFile(fileId, fileName, fileType, fileSize, sender, receiver, file);
+        if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
             response.setFilePath(filePath);
             return ResponseData.success(response);
         }
-        catch (IOException e) {
+        else {
             return ResponseData.error(ResponseConfig.RESOURCE_UPLOAD_FAILED);
         }
     }
     
     @Operation(summary = "保存聊天图片")
     @PostMapping("/uploadChatImage")
-    public ResponseData<Object> uploadChatImage(@RequestParam String imageId,
+    public ResponseData<UploadChatFileResponseVO> uploadChatImage(@RequestParam String imageId,
                                                 @RequestParam String imageName,
                                                 @RequestParam String imageType,
                                                 @RequestParam Long imageSize,
                                                 @RequestParam String sender,
                                                 @RequestParam String receiver,
                                                 @RequestParam MultipartFile image) {
-        try {
-            String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image);
+        String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image);
+        if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
             response.setFilePath(filePath);
             return ResponseData.success(response);
         }
-        catch (IOException e) {
+        else {
             return ResponseData.error(ResponseConfig.RESOURCE_UPLOAD_FAILED);
         }
     }
