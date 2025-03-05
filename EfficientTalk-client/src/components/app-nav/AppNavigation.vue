@@ -120,6 +120,7 @@
     import { getCurUserData } from "../../database/cur-user.js";
     import { useWebSocketStore } from "../../store/WebSocketStore.js";
     import OnlineStateSwitcherDialog from "../dialog/module-chat/online-state-switcher/OnlineStateSwitcherDialog.vue";
+    import MainWindowController from "../../window-controller/main-window-controller.js";
 
     const router = useRouter();
     const websocketStore = useWebSocketStore();
@@ -139,12 +140,12 @@
     // 处理退出登录
     const handleLogout = () => {
         // 关闭socket连接
-        websocketStore.closeSocket()
+        websocketStore.closeSocket();
 
-        // TODO 使用electron运行时记得取消相应注释
-        windowController.hide();
-        appController.logout();
-        windowController.show();
+        // 处理登出
+        MainWindowController.hideMainWindow();
+        MainWindowController.systemLogout();
+        MainWindowController.showMainWindow();
     };
 
     // 导航配置

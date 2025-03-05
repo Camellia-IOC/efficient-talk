@@ -21,6 +21,7 @@
         useRoute,
         useRouter
     } from "vue-router";
+    import ChildWindowController from "../window-controller/child-window-controller.js";
 
     const route = useRoute();
     const router = useRouter();
@@ -36,7 +37,7 @@
     onBeforeMount(async () => {
         childWindowName.value = route.query.windowName;
         childWindowUrl.value = route.query.url;
-        childWindowConfig.value = await childWindowController.getWindowConfig(childWindowName.value);
+        childWindowConfig.value = await ChildWindowController.getChildWindowConfig(childWindowName.value);
         await router.push({
             name: childWindowUrl.value,
             query: {

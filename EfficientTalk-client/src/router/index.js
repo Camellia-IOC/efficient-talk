@@ -84,7 +84,7 @@ const router = createRouter({
                     // 应用中心
                     path: "app-store",
                     name: "app-store",
-                    component: () => import("../views/EmptyView.vue")
+                    component: () => import("../views/AppStoreView.vue")
                 }
             ]
         },
@@ -107,19 +107,13 @@ const router = createRouter({
                     component: () => import("../views/child-window/AIAssistantView.vue")
                 }
             ]
+        },
+        {
+            // 应用窗口模块
+            path: "/app-window",
+            name: "/app-window",
+            component: () => import("../views/AppWindowContainerView.vue")
         }
-        // {
-        //     // 用户个人信息页
-        //     path: "/user-home",
-        //     name: "user-home",
-        //     component: () => import("../views/UserHomeView.vue")
-        // },
-        // {
-        //     path: "/ai-assistant",
-        //     name: "ai-assistant",
-        //     component: () => import("../views/AiAssistantView.vue")
-        //
-        // }
     ]
 });
 

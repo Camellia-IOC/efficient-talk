@@ -39,8 +39,10 @@ public class CloudDiskController {
     @GetMapping("/getCloudDiskLevelContent")
     public ResponseData<CloudDiskLevelContentResponseVO> getCloudDiskLevelContent(@RequestParam String parentId,
                                                                                   @RequestParam Integer pageIndex,
-                                                                                  @RequestParam Integer pageSize) {
-        CloudDiskLevelContentResponseVO response = cloudDiskService.getCloudDiskLevelContent(parentId, pageIndex, pageSize);
+                                                                                  @RequestParam Integer pageSize,
+                                                                                  @RequestParam(required = false) String orderByKey,
+                                                                                  @RequestParam(required = false) String orderByType) {
+        CloudDiskLevelContentResponseVO response = cloudDiskService.getCloudDiskLevelContent(parentId, pageIndex, pageSize, orderByKey, orderByType);
         return ResponseData.success(response);
     }
     
@@ -111,5 +113,5 @@ public class CloudDiskController {
                                                                              @RequestParam Integer pageSize) {
         CloudDiskFileListResponseVO response = cloudDiskService.getRecentCloudDiskFiles(orgId, diskId, pageIndex, pageSize);
         return ResponseData.success(response);
-   }
+    }
 }

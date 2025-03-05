@@ -3,7 +3,6 @@ const {
     ipcRenderer
 } = require("electron");
 
-// TODO:频道改成xxx-xxx格式,然后把前端中的调用方法封装一下
 // 主窗口控制器
 contextBridge.exposeInMainWorld("windowController", {
     hide: () => ipcRenderer.invoke("window-hide"),
@@ -24,10 +23,20 @@ contextBridge.exposeInMainWorld("childWindowController", {
     getWindowConfig: (windowName) => ipcRenderer.invoke("child-window-get-config", windowName)
 });
 
-// 应用控制器
-contextBridge.exposeInMainWorld("appController", {
-    login: (params) => ipcRenderer.invoke("app-login", params),
-    logout: (params) => ipcRenderer.invoke("app-logout", params)
+// 应用窗口控制器
+contextBridge.exposeInMainWorld("appWindowController", {
+    open: (params) => ipcRenderer.invoke("app-window-open", params),
+    close: (appId) => ipcRenderer.invoke("app-window-close", appId),
+    minimize: (appId) => ipcRenderer.invoke("app-window-minimize", appId),
+    maximize: (appId) => ipcRenderer.invoke("app-window-maximize", appId),
+    recover: (appId) => ipcRenderer.invoke("app-window-recover", appId),
+    getWindowConfig: (appId) => ipcRenderer.invoke("app-window-get-config", appId)
+});
+
+// 系统控制器
+contextBridge.exposeInMainWorld("systemController", {
+    login: (params) => ipcRenderer.invoke("system-login", params),
+    logout: (params) => ipcRenderer.invoke("system-logout", params)
 });
 
 // 文件选择器

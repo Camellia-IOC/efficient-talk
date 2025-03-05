@@ -1,11 +1,14 @@
 package com.ETGroup.EfficientTalkServer.mapper;
 
+import com.ETGroup.EfficientTalkServer.entity.PO.PermissionPO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.auth.UserLoginDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.ArrayList;
 
 @Mapper
 public interface AuthMapper extends BaseMapper<UserPO> {
@@ -26,4 +29,22 @@ public interface AuthMapper extends BaseMapper<UserPO> {
      * @return 用户id信息
      */
     UserLoginDTO getUserLoginDTO(@Param("userId") String userId);
+    
+    /**
+     * 获取指定用户权限列表
+     *
+     * @param userId 用户ID
+     *
+     * @return 权限列表
+     */
+    ArrayList<PermissionPO> getPermissionByUserId(@Param("userId") String userId);
+    
+    /**
+     * 获取指定用户权限ID列表
+     *
+     * @param userId 用户ID
+     *
+     * @return 权限列表
+     */
+    ArrayList<String> getUserPermissionIdList(@Param("userId") String userId);
 }

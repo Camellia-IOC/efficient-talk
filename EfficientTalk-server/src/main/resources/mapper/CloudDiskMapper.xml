@@ -36,6 +36,12 @@
 		FROM cloud_disk_folders
 				 LEFT JOIN users ON cloud_disk_folders.creator = users.id
 		WHERE parent_id = #{parentId}
+		<!--<if test="orderByKey != null and orderByKey != ''">-->
+		<!--	ORDER BY ${orderByKey}-->
+		<!--	<if test="orderByType == 'DESC'">-->
+		<!--		DESC-->
+		<!--	</if>-->
+		<!--</if>-->
 		LIMIT #{pageSize}
 		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
 		OFFSET #{pageOffset}

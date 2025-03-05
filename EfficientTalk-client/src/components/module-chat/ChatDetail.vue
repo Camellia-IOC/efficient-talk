@@ -253,6 +253,7 @@
     import ChatApi from "../../api/modules/ChatApi.js";
     import { translateFileSize } from "../../utils/unit-utils.js";
     import { getFileIcon } from "../../utils/file-utils.js";
+    import { openChatHistoryChildWindow } from "../../window-controller/controller/ChildWindowController.js";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -523,20 +524,11 @@
 
     // 打开聊天记录浏览窗口
     const handleOpenChatHistoryWindow = () => {
-        childWindowController.open({
-            windowName: "chatHistoryWindow",
-            width: 800,
-            height: 600,
-            isChild: false,
-            url: "/child-window?windowName=chatHistoryWindow&url=child-window-chat-history",
-            config: {
-                title: "聊天记录",
-                data: {
-                    userId: curLoginUser.value.userId,
-                    friendId: props.chatInfo.userId,
-                }
-            }
-        });
+        const data = {
+            userId: curLoginUser.value.userId,
+            friendId: props.chatInfo.userId,
+        };
+        openChatHistoryChildWindow(data);
     };
 
     // 聊天对象变化

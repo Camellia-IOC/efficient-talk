@@ -6,13 +6,20 @@
       />
     </div>
     <div class="toolbar-container">
-      <div class="org-info">
+      <div class="org-info"
+           v-if="curLoginUser.orgId!==null"
+      >
         <img :src="orgInfo.orgLogo"
              alt="org-logo"
              class="org-logo"
         />
         <label class="org-name">{{ orgInfo.orgName }}</label>
         <a-tag color="blue">组织归属</a-tag>
+      </div>
+      <div class="org-info"
+           v-else
+      >
+        <a-tag>暂无归属组织</a-tag>
       </div>
       <div class="toolbar">
         <a-button class="toolbar-btn no-drag toolbar-btn-ai"
@@ -47,6 +54,7 @@
 <script setup>
     import {
         onBeforeMount,
+        onUnmounted,
         ref
     } from "vue";
     import {
@@ -60,6 +68,8 @@
     import Logo from "../logo/Logo.vue";
     import SocialApi from "../../api/modules/SocialApi.js";
     import { getCurUserData } from "../../database/cur-user.js";
+    import { openAiAssistantChildWindow } from "../../window-controller/controller/ChildWindowController.js";
+    import MainWindowController from "../../window-controller/main-window-controller.js";
 
     // 窗口最大化状态
     const isMaximized = ref(false);
@@ -71,7 +81,7 @@
             title: "退出",
             content: "您确定要退出吗？",
             onOk() {
-                windowController.close();
+                MainWindowController.closeMainWindow();
             },
             okText: "确定",
             okType: "danger",
@@ -84,17 +94,17 @@
 
     // 最小化窗口
     const windowMinimize = () => {
-        windowController.minimize();
+        MainWindowController.minimizeMainWindow();
     };
 
     // 最大化窗口
     const windowMaximize = () => {
         if (!isMaximized.value) {
-            windowController.maximize();
+            MainWindowController.maximizeMainWindow();
             isMaximized.value = true;
         }
         else {
-            windowController.recover();
+            MainWindowController.recoverMainWindow();
             isMaximized.value = false;
         }
     };
@@ -127,28 +137,25 @@
 
     // 打开AI助手窗口
     const openAiAssistantWindow = () => {
-        const windowName = "aiAssistantWindow";
-        const routerUrl = "child-window-ai-assistant";
-        childWindowController.open({
-            windowName: windowName,
-            width: 400,
-            height: 600,
-            isChild: false,
-            url: `/child-window?windowName=${windowName}&url=${routerUrl}`,
-            config: {
-                title: "小易",
-                data: {
-                    userId: curLoginUser.value.userId
-                }
-            }
-        });
+        const data = {
+            userId: curLoginUser.value.userId
+        };
+        openAiAssistantChildWindow(data);
     };
 
     onBeforeMount(async () => {
+        // 注册当前登录用户更新事件
+        window.addEventListener("updateCurLoginUser", updateCurLoginUser);
+
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
 
         await getOrgInfo();
+    });
+
+    onUnmounted(() => {
+        // 注销当前登录用户更新事件
+        window.removeEventListener("updateCurLoginUser", updateCurLoginUser);
     });
 </script>
 

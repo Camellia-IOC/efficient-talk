@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ETGroup.EfficientTalkServer.mapper.AppStoreMapper">
+	<!--获取应用商店应用列表-->
+	<select id="getAppList" resultType="com.ETGroup.EfficientTalkServer.entity.PO.ApplicationPO">
+		SELECT id          as id,
+			   app_id      as appId,
+			   app_name    as appName,
+			   app_url     as appUrl,
+			   icon_url    as iconUrl,
+			   org_id      as orgId,
+			   creator     as creator,
+			   create_time as createTime,
+			   type        as type
+		FROM applications
+		WHERE org_id = #{orgId}
+		   OR type = 'SYSTEM'
+	</select>
+</mapper>

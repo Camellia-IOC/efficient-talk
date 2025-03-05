@@ -41,29 +41,35 @@ public class CloudDiskServiceImpl implements CloudDiskService {
     /**
      * 按层级获取云盘内容
      *
-     * @param parentId  父目录ID
-     * @param pageIndex 页码
-     * @param pageSize  每页大小
+     * @param parentId    父目录ID
+     * @param pageIndex   页码
+     * @param pageSize    每页大小
+     * @param orderByKey  排序字段
+     * @param orderByType 排序方式
      *
      * @return 该层级的云盘内容
      */
     @Override
-    public CloudDiskLevelContentResponseVO getCloudDiskLevelContent(String parentId, Integer pageIndex, Integer pageSize) {
+    public CloudDiskLevelContentResponseVO getCloudDiskLevelContent(String parentId,
+                                                                    Integer pageIndex,
+                                                                    Integer pageSize,
+                                                                    String orderByKey,
+                                                                    String orderByType) {
         try {
             CloudDiskLevelContentResponseVO response = new CloudDiskLevelContentResponseVO();
             Integer folderCount = cloudDiskMapper.getCurLevelFolderCount(parentId);
             Integer fileCount = cloudDiskMapper.getCurLevelFileCount(parentId);
-            ArrayList<CloudDiskFolderDTO> folders = cloudDiskMapper.getCurLevelFolders(parentId, pageIndex, pageSize);
+            ArrayList<CloudDiskFolderDTO> folders = cloudDiskMapper.getCurLevelFolders(parentId, pageIndex, pageSize, orderByKey, orderByType);
             ArrayList<CloudDiskFileDTO> files;
             
             if (folders.size() == pageSize) {
                 files = new ArrayList<>();
             }
             else if (folders.isEmpty()) {
-                files = cloudDiskMapper.getCurLevelFiles(parentId, pageIndex, pageSize, 0);
+                files = cloudDiskMapper.getCurLevelFiles(parentId, pageIndex, pageSize, 0, orderByKey, orderByType);
             }
             else if (folders.size() < pageSize) {
-                files = cloudDiskMapper.getCurLevelFiles(parentId, 1, (pageSize - folders.size()), 0);
+                files = cloudDiskMapper.getCurLevelFiles(parentId, 1, (pageSize - folders.size()), 0, orderByKey, orderByType);
             }
             else {
                 int startPageIndex = (folderCount - 1) / pageSize + 1;
@@ -72,7 +78,7 @@ public class CloudDiskServiceImpl implements CloudDiskService {
                 if (rest != 0) {
                     offset = pageSize - rest;
                 }
-                files = cloudDiskMapper.getCurLevelFiles(parentId, pageIndex - startPageIndex, pageSize, offset);
+                files = cloudDiskMapper.getCurLevelFiles(parentId, pageIndex - startPageIndex, pageSize, offset, orderByKey, orderByType);
             }
             
             response.setFolderCount(folderCount);

@@ -22,8 +22,17 @@ public class UserPO {
     @TableField("avatar")
     private String avatar;
     
-    @TableField("deptId")
+    @TableField("employee_id")
+    private String employeeId;
+    
+    @TableField("dept_id")
     private String deptId;
+    
+    @TableField("org_id")
+    private String orgId;
+    
+    @TableField("job_id")
+    private String jobId;
     
     @TableField("register_time")
     private LocalDateTime registerTime;
@@ -36,4 +45,7 @@ public class UserPO {
     
     @TableField("token")
     private String token;
+    
+    @TableField("online_state")
+    private Integer onlineState;
 }

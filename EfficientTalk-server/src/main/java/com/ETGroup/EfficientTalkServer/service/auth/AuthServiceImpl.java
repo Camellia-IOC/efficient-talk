@@ -1,5 +1,6 @@
 package com.ETGroup.EfficientTalkServer.service.auth;
 
+import com.ETGroup.EfficientTalkServer.entity.PO.PermissionPO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
 import com.ETGroup.EfficientTalkServer.entity.request.auth.LoginRequestParam;
@@ -11,7 +12,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+import java.util.ArrayList;
 
 @Slf4j
 @Service
@@ -68,5 +69,39 @@ public class AuthServiceImpl extends ServiceImpl<AuthMapper, UserPO> implements 
         }
         
         return registerResponseVO;
+    }
+    
+    /**
+     * 检查用户是否有权限
+     *
+     * @param userId     用户ID
+     * @param permission 权限
+     *
+     * @return permission 是否有权限
+     */
+    @Override
+    public boolean hasPermission(String userId, String permission) {
+        ArrayList<PermissionPO> userPermissions = authMapper.getPermissionByUserId(userId);
+        for (PermissionPO userPermission : userPermissions) {
+            if (userPermission.getPermissionName()
+                              .equals(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 获取用户权限
+     *
+     * @param userId 用户ID
+     *
+     * @return permission 权限列表
+     */
+    @Override
+    public ArrayList<String> getUserPermission(String userId) {
+        ArrayList<String> permissionIdList;
+        permissionIdList = authMapper.getUserPermissionIdList(userId);
+        return permissionIdList;
     }
 }

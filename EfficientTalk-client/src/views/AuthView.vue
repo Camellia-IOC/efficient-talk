@@ -1,6 +1,6 @@
 <template>
   <div class="auth-view-container">
-    <div class="container-header">
+    <div class="container-header draggable">
       <a-button class="window-header-btn no-drag"
                 @click="windowClose"
       >
@@ -47,13 +47,14 @@
     import AuthApi from "../api/modules/AuthApi.js";
     import { saveCurUserData } from "../database/cur-user.js";
     import { message } from "ant-design-vue";
+    import MainWindowController from "../window-controller/main-window-controller.js";
 
     const accountInput = ref("");
     const passwordInput = ref("");
 
     // 关闭窗口
     const windowClose = () => {
-        windowController.close();
+        MainWindowController.closeMainWindow();
     };
 
     // 处理登录操作
@@ -72,10 +73,10 @@
                     // 保存当前登录用户信息到数据库中
                     await saveCurUserData(data);
 
-                    // TODO 使用electron运行时记得取消相应注释
-                    windowController.hide();
-                    appController.login();
-                    windowController.show();
+                    // 处理登录
+                    MainWindowController.hideMainWindow();
+                    MainWindowController.systemLogin();
+                    MainWindowController.showMainWindow();
                 }
             }
             else {

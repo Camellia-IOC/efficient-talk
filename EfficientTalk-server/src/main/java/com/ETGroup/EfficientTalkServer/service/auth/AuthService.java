@@ -8,6 +8,8 @@ import com.ETGroup.EfficientTalkServer.entity.response.auth.LoginResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.auth.RegisterResponseVO;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public interface AuthService extends IService<UserPO> {
     /**
@@ -17,7 +19,7 @@ public interface AuthService extends IService<UserPO> {
      *
      * @return permission 是否允许登录
      */
-    LoginResponseVO userLogin (LoginRequestParam param);
+    LoginResponseVO userLogin(LoginRequestParam param);
     
     /**
      * 用户注册
@@ -26,5 +28,24 @@ public interface AuthService extends IService<UserPO> {
      *
      * @return userID 用户ID
      */
-    RegisterResponseVO userRegister (RegisterRequestParam param);
+    RegisterResponseVO userRegister(RegisterRequestParam param);
+    
+    /**
+     * 检查用户是否有权限
+     *
+     * @param userId 用户ID
+     * @param permission 权限
+     *
+     * @return permission 是否有权限
+     */
+    boolean hasPermission(String userId, String permission);
+    
+    /**
+     * 获取用户权限
+     *
+     * @param userId 用户ID
+     *
+     * @return permission 权限列表
+     */
+    ArrayList<String> getUserPermission(String userId);
 }

@@ -21,4 +21,24 @@
 		FROM users
 		WHERE users.id = #{userId}
 	</select>
+
+	<!--获取指定用户的权限列表-->
+	<select id="getPermissionByUserId" resultType="com.ETGroup.EfficientTalkServer.entity.PO.PermissionPO">
+		SELECT permissions.permission_id as permissionId, permissions.permission_name as permissionName
+		FROM users
+				 JOIN jobs ON jobs.job_id = users.job_id
+				 JOIN role_permission_map ON role_permission_map.role_id = jobs.role_id
+				 JOIN permissions ON permissions.permission_id = role_permission_map.permission_id
+		WHERE users.id = #{userId}
+	</select>
+
+	<!--获取指定用户的权限ID列表-->
+	<select id="getUserPermissionIdList" resultType="java.lang.String">
+		SELECT permissions.permission_id
+		FROM users
+				 JOIN jobs ON jobs.job_id = users.job_id
+				 JOIN role_permission_map ON role_permission_map.role_id = jobs.role_id
+				 JOIN permissions ON permissions.permission_id = role_permission_map.permission_id
+		WHERE users.id = #{userId}
+	</select>
 </mapper>

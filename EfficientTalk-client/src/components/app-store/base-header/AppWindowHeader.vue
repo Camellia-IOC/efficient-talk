@@ -1,5 +1,5 @@
 <template>
-  <div class="child-window-header-container draggable">
+  <div class="app-window-header-container draggable">
     <div class="title-container">
       <div class="logo">
         <Logo :color="themeColor"
@@ -39,10 +39,10 @@
     } from "@ant-design/icons-vue";
     import Logo from "../../logo/Logo.vue";
     import { themeColor } from "../../../config/config.js";
-    import ChildWindowController from "../../../window-controller/child-window-controller.js";
+    import AppWindowController from "../../../window-controller/app-window-controller.js";
 
     const props = defineProps({
-        windowName: {
+        appId: {
             type: String,
             default: ""
         },
@@ -60,22 +60,22 @@
 
     // 关闭窗口
     const windowClose = () => {
-        ChildWindowController.closeChildWindow(props.windowName);
+        AppWindowController.closeAppWindow(props.appId);
     };
 
     // 最小化窗口
     const windowMinimize = () => {
-        ChildWindowController.minimizeChildWindow(props.windowName);
+        AppWindowController.minimizeAppWindow(props.appId);
     };
 
     // 最大化窗口
     const windowMaximize = () => {
         if (!isMaximized.value) {
-            ChildWindowController.maximizeChildWindow(props.windowName);
+            AppWindowController.maximizeAppWindow(props.appId);
             isMaximized.value = true;
         }
         else {
-            ChildWindowController.recoverChildWindow(props.windowName);
+            AppWindowController.recoverAppWindow(props.appId);
             isMaximized.value = false;
         }
     };
@@ -86,7 +86,7 @@
 >
   @use "/src/assets/style/global-variable.scss";
 
-  .child-window-header-container {
+  .app-window-header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -111,7 +111,7 @@
         margin-right: 5px;
       }
 
-      .title {
+      .title{
         font-size: 14px;
         font-weight: bold;
       }

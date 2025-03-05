@@ -45,7 +45,7 @@
             // 如果当前登录用户信息为空则退出到登录页面
             // TODO 使用electron运行时记得取消相应注释
             windowController.hide();
-            appController.logout();
+            systemController.logout();
             windowController.show();
         }
 

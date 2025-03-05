@@ -22,7 +22,9 @@ public interface CloudDiskMapper {
     // 获取云盘内当前层级的目录
     ArrayList<CloudDiskFolderDTO> getCurLevelFolders(@Param("parentId") String parentId,
                                                      @Param("pageIndex") Integer pageIndex,
-                                                     @Param("pageSize") Integer pageSize);
+                                                     @Param("pageSize") Integer pageSize,
+                                                     @Param("orderByKey") String orderByKey,
+                                                     @Param("orderByType") String orderByType);
     
     // 获取云盘内当前层级的文件数
     Integer getCurLevelFileCount(@Param("parentId") String parentId);
@@ -31,7 +33,9 @@ public interface CloudDiskMapper {
     ArrayList<CloudDiskFileDTO> getCurLevelFiles(@Param("parentId") String parentId,
                                                  @Param("pageIndex") Integer pageIndex,
                                                  @Param("pageSize") Integer pageSize,
-                                                 @Param("offset") Integer offset);
+                                                 @Param("offset") Integer offset,
+                                                 @Param("orderByKey") String orderByKey,
+                                                 @Param("orderByType") String orderByType);
     
     // 在组织云盘上传文件
     Integer uploadOrgCloudDiskFile(CloudDiskFilePO cloudDiskFile);

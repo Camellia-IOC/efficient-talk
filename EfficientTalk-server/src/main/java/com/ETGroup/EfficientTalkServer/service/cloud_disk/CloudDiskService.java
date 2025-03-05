@@ -21,13 +21,19 @@ public interface CloudDiskService {
     /**
      * 按层级获取云盘内容
      *
-     * @param parentId  父目录ID
-     * @param pageIndex 页码
-     * @param pageSize  每页大小
+     * @param parentId   父目录ID
+     * @param pageIndex  页码
+     * @param pageSize   每页大小
+     * @param orderByKey 排序字段
+     * @param orderByType 排序方式
      *
      * @return 该层级的云盘内容
      */
-    CloudDiskLevelContentResponseVO getCloudDiskLevelContent(String parentId, Integer pageIndex, Integer pageSize);
+    CloudDiskLevelContentResponseVO getCloudDiskLevelContent(String parentId,
+                                                             Integer pageIndex,
+                                                             Integer pageSize,
+                                                             String orderByKey,
+                                                             String orderByType);
     
     /**
      * 在组织云盘上传文件
@@ -57,24 +63,30 @@ public interface CloudDiskService {
     
     /**
      * 在组织云盘新建文件夹
+     *
      * @param param 新建文件夹参数
+     *
      * @return 是否成功
      */
     boolean createOrgCloudDiskFolder(CreateCloudDiskFolderRequestParam param);
     
     /**
      * 在组织云盘删除文件
+     *
      * @param fileId 文件ID
+     *
      * @return 是否成功
      */
     boolean deleteCloudDiskFile(String fileId);
     
     /**
      * 获取组织云盘最近文件
-     * @param orgId 组织ID
-     * @param diskId 云盘ID
+     *
+     * @param orgId     组织ID
+     * @param diskId    云盘ID
      * @param pageIndex 页码
-     * @param pageSize 页面大小
+     * @param pageSize  页面大小
+     *
      * @return 最近文件列表
      */
     CloudDiskFileListResponseVO getRecentCloudDiskFiles(String orgId, String diskId, Integer pageIndex, Integer pageSize);
