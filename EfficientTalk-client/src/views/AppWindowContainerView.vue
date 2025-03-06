@@ -8,7 +8,9 @@
     <div class="app-window-content"
          v-show="isAppLoading"
     >
-      <a-spin size="large" tip="应用加载中，请耐心等待~"/>
+      <a-spin size="large"
+              tip="应用加载中，请耐心等待~"
+      />
     </div>
     <div id="app-container"
          class="app-window-content"
@@ -50,6 +52,7 @@
 
         // 创建并挂载iframe对象
         const appFrame = document.createElement("iframe");
+        appFrame.id = "app-frame";
         appFrame.src = appWindowConfig.value.url;
         appFrame.style.display = "block";
         appFrame.style.border = "none";
@@ -63,7 +66,7 @@
 <style scoped
        lang="scss"
 >
- @use "/src/assets/style/global-variable.scss";
+  @use "/src/assets/style/global-variable.scss";
 
   .app-window-container-view {
     width: 100%;

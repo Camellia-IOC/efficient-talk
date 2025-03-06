@@ -158,6 +158,9 @@ const openChildWindow = (params) => {
             config: params.config
         };
     }
+    else {
+        childWindowManager[params.windowName].windowObject.show();
+    }
 };
 
 // 打开子窗口
@@ -229,6 +232,9 @@ const openAppWindow = (params) => {
             config: params.config
         };
     }
+    else {
+        appWindowManager[params.appId].windowObject.show();
+    }
 };
 
 // 打开应用窗口
@@ -298,6 +304,14 @@ ipcMain.handle("system-logout", (e, param) => {
         if (childWindowManager[windowName] !== null) {
             childWindowManager[windowName].windowObject.close();
             childWindowManager[windowName] = null;
+        }
+    });
+
+    // 退出登录时关闭所有应用窗口
+    Object.keys(appWindowManager).forEach(appId => {
+        if (appWindowManager[appId] !== null) {
+            appWindowManager[appId].windowObject.close();
+            appWindowManager[appId] = null;
         }
     });
 
