@@ -150,7 +150,7 @@ const openChildWindow = (params) => {
                    .then();
 
         // 程序启动后开启开发者工具
-        childWindow.webContents.openDevTools();
+        // childWindow.webContents.openDevTools();
 
         // 保存子窗口对象
         childWindowManager[params.windowName] = {

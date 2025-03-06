@@ -1,14 +1,26 @@
 <template>
   <div class="media-file-preview-view-container">
-    <!--图片预览-->
-    <div class="images"
-         v-viewer="imagePreviewConfig"
-         v-if="fileType === 'image'"
+    <!--加载容器-->
+    <div class="loading-container"
+         v-show="isLoading"
     >
-      <img :src="imageUrl"
-           alt="img"
-           v-show="false"
+      <a-spin :spinning="isLoading"
+              size="large"
+              :tip="'文件加载中...'"
+      ></a-spin>
+    </div>
+    <div class="preview-container"
+         v-show="!isLoading"
+    >
+      <!--图片预览-->
+      <div v-viewer="imagePreviewConfig"
+           v-if="fileType === 'image'"
       >
+        <img :src="imageUrl"
+             alt="img"
+             v-show="false"
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -43,11 +55,12 @@
             fileId: fileId.value,
             type: "media"
         });
-        isLoading.value = false;
 
         // 获取文件Blob并转换为ArrayBuffer
         fileBlob.value = new Blob([response.data]);
         imageUrl.value = URL.createObjectURL(fileBlob.value);
+
+        isLoading.value = false;
     };
 
     onBeforeMount(async () => {
@@ -64,11 +77,24 @@
   @use "/src/assets/style/global-variable.scss";
 
   .media-file-preview-view-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     width: 100%;
     height: 100%;
     background-color: global-variable.$background-color;
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
   }
 </style>
