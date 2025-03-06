@@ -72,6 +72,13 @@
                   <label class="file-name">{{ item.fileName + "." + item.fileType }}</label>
                 </div>
                 <div class="file-info">
+                  <div class="operations-bar">
+                    <a-button class="operation-btn">下载</a-button>
+                    <a-button class="operation-btn"
+                              @click="handleFilePreview"
+                    >预览
+                    </a-button>
+                  </div>
                   <label class="file-size">{{ translateFileSize(item.fileSize) }}</label>
                 </div>
               </div>
@@ -115,6 +122,13 @@
                 </div>
                 <div class="file-info">
                   <label class="file-size">{{ translateFileSize(item.fileSize) }}</label>
+                  <div class="operations-bar">
+                    <a-button class="operation-btn">下载</a-button>
+                    <a-button class="operation-btn"
+                              @click="handleFilePreview"
+                    >预览
+                    </a-button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -253,7 +267,11 @@
     import ChatApi from "../../api/modules/ChatApi.js";
     import { translateFileSize } from "../../utils/unit-utils.js";
     import { getFileIcon } from "../../utils/file-utils.js";
-    import { openChatHistoryChildWindow } from "../../window-controller/controller/ChildWindowController.js";
+    import {
+        openChatHistoryChildWindow,
+        openFilePreviewChildWindow
+    } from "../../window-controller/controller/ChildWindowController.js";
+    import ChildWindowController from "../../window-controller/child-window-controller.js";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -549,6 +567,12 @@
         scrollToBottom("auto");
     };
 
+    // 处理文件预览
+    const handleFilePreview = () => {
+        const data = {};
+        openFilePreviewChildWindow(data);
+    };
+
     onBeforeMount(async () => {
         // 注册消息监听事件
         window.addEventListener("messageReceive", handleMessageReceive);
@@ -724,12 +748,12 @@
                 flex-direction: column;
                 justify-content: space-between;
                 align-items: center;
-                width: 40%;
-                height: 90px;
+                width: 260px;
                 padding: 10px;
                 background-color: white;
                 border-radius: 10px;
                 cursor: pointer;
+                gap: 15px;
 
                 &:hover {
                   background-color: #EBEDF0;
@@ -757,12 +781,32 @@
 
                 .file-info {
                   display: flex;
-                  justify-content: flex-end;
+                  justify-content: space-between;
                   align-items: center;
                   width: 100%;
                   cursor: pointer;
 
+                  .operations-bar {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+
+                    .operation-btn {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      width: 75px;
+                      height: 25px;
+
+                      &:hover {
+                        border: none;
+                      }
+                    }
+                  }
+
                   .file-size {
+                    text-align: center;
                     font-size: 12px;
                     color: gray;
                     cursor: pointer;
@@ -843,12 +887,12 @@
                 flex-direction: column;
                 justify-content: space-between;
                 align-items: center;
-                width: 40%;
-                height: 90px;
+                width: 260px;
                 padding: 10px;
                 background-color: white;
                 border-radius: 10px;
                 cursor: pointer;
+                gap: 15px;
 
                 &:hover {
                   background-color: #EBEDF0;
@@ -876,12 +920,32 @@
 
                 .file-info {
                   display: flex;
-                  justify-content: flex-end;
+                  justify-content: space-between;
                   align-items: center;
                   width: 100%;
                   cursor: pointer;
 
+                  .operations-bar {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+
+                    .operation-btn {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      width: 75px;
+                      height: 25px;
+
+                      &:hover {
+                        border: none;
+                      }
+                    }
+                  }
+
                   .file-size {
+                    text-align: center;
                     font-size: 12px;
                     color: gray;
                     cursor: pointer;

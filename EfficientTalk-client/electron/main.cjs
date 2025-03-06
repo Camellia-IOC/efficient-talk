@@ -112,7 +112,7 @@ ipcMain.handle("window-maximize", () => {
 
 // 恢复主窗口大小
 ipcMain.handle("window-recover", () => {
-    mainWindow.restore();
+    mainWindow.unmaximize();
 });
 // 主窗口相关操作 end #####################################################################################################
 
@@ -186,7 +186,7 @@ ipcMain.handle("child-window-maximize", (e, windowName) => {
 
 // 恢复子窗口大小
 ipcMain.handle("child-window-recover", (e, windowName) => {
-    childWindowManager[windowName].windowObject.restore();
+    childWindowManager[windowName].windowObject.unmaximize();
 });
 
 // 获取子窗口数据
@@ -260,7 +260,7 @@ ipcMain.handle("app-window-maximize", (e, appId) => {
 
 // 恢复应用窗口大小
 ipcMain.handle("app-window-recover", (e, appId) => {
-    appWindowManager[appId].windowObject.restore();
+    appWindowManager[appId].windowObject.unmaximize();
 });
 
 // 获取应用窗口数据

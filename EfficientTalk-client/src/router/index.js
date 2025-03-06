@@ -105,6 +105,12 @@ const router = createRouter({
                     path: "child-window-ai-assistant",
                     name: "child-window-ai-assistant",
                     component: () => import("../views/child-window/AIAssistantView.vue")
+                },
+                {
+                    // 文件预览
+                    path: "child-window-file-preview",
+                    name: "child-window-file-preview",
+                    component: () => import("../views/child-window/FilePreviewView.vue")
                 }
             ]
         },
