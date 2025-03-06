@@ -111,6 +111,12 @@ const router = createRouter({
                     path: "child-window-file-preview",
                     name: "child-window-file-preview",
                     component: () => import("../views/child-window/FilePreviewView.vue")
+                },
+                {
+                    // 媒体文件预览
+                    path: "child-window-media-file-preview",
+                    name: "child-window-media-file-preview",
+                    component: () => import("../views/child-window/MediaFilePreviewView.vue")
                 }
             ]
         },

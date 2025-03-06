@@ -91,4 +91,15 @@ export default class ChatApi {
             data
         });
     };
+
+    /**
+     * 获取聊天文件
+     * @param data
+     */
+    static getChatFileBlob = (data) => {
+        return service.download({
+            url: this.requestPath + "/getChatFileBlob",
+            data
+        });
+    };
 }

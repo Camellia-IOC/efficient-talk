@@ -7,15 +7,21 @@ import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatHistoryResponseV
 import com.ETGroup.EfficientTalkServer.entity.response.chat.UploadChatFileResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
+import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.service.chat.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Tag(name = "通讯相关接口", description = "通讯相关接口")
@@ -26,6 +32,9 @@ import java.time.LocalDateTime;
 public class ChatController {
     @Resource
     private ChatService chatService;
+    
+    @Resource
+    private ChatMapper chatMapper;
     
     @Operation(summary = "保存对话列表")
     @PutMapping("/saveChatList")
@@ -65,12 +74,12 @@ public class ChatController {
     @Operation(summary = "保存聊天文件")
     @PostMapping("/uploadChatFile")
     public ResponseData<UploadChatFileResponseVO> uploadChatFile(@RequestParam String fileId,
-                                               @RequestParam String fileName,
-                                               @RequestParam String fileType,
-                                               @RequestParam Long fileSize,
-                                               @RequestParam String sender,
-                                               @RequestParam String receiver,
-                                               @RequestParam MultipartFile file) {
+                                                                 @RequestParam String fileName,
+                                                                 @RequestParam String fileType,
+                                                                 @RequestParam Long fileSize,
+                                                                 @RequestParam String sender,
+                                                                 @RequestParam String receiver,
+                                                                 @RequestParam MultipartFile file) {
         String filePath = chatService.uploadChatFile(fileId, fileName, fileType, fileSize, sender, receiver, file);
         if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
@@ -85,12 +94,12 @@ public class ChatController {
     @Operation(summary = "保存聊天图片")
     @PostMapping("/uploadChatImage")
     public ResponseData<UploadChatFileResponseVO> uploadChatImage(@RequestParam String imageId,
-                                                @RequestParam String imageName,
-                                                @RequestParam String imageType,
-                                                @RequestParam Long imageSize,
-                                                @RequestParam String sender,
-                                                @RequestParam String receiver,
-                                                @RequestParam MultipartFile image) {
+                                                                  @RequestParam String imageName,
+                                                                  @RequestParam String imageType,
+                                                                  @RequestParam Long imageSize,
+                                                                  @RequestParam String sender,
+                                                                  @RequestParam String receiver,
+                                                                  @RequestParam MultipartFile image) {
         String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image);
         if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
@@ -124,5 +133,47 @@ public class ChatController {
         ChatHistoryResponseVO response = new ChatHistoryResponseVO();
         response.setChatHistory(chatService.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime));
         return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取聊天文件Blob")
+    @GetMapping("/getChatFileBlob")
+    public ResponseEntity<byte[]> getChatFileBlob(@RequestParam String fileId, @RequestParam String type) {
+        String filePath;
+        if (type.equals("media")) {
+            filePath = chatMapper.getChatMediaFilePath(fileId);
+        }
+        else if (type.equals("file")) {
+            filePath = chatMapper.getChatFilePath(fileId);
+        }
+        else {
+            filePath = null;
+        }
+        
+        if (filePath == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else {
+            File file = new File(filePath);
+            byte[] fileContent = new byte[(int) file.length()];
+            
+            // 读取文件内容
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                fileInputStream.read(fileContent);
+                fileInputStream.close();
+            }
+            catch (IOException e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            
+            // 设置响应头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                                                            .filename(URLEncoder.encode(file.getName(), StandardCharsets.UTF_8))
+                                                            .build());
+            headers.setContentType(MediaType.parseMediaType("application/octet-stream;charset=UTF-8"));
+            
+            return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+        }
     }
 }

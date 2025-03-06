@@ -175,4 +175,18 @@
 		ORDER BY send_time DESC
 		LIMIT #{pageSize}
 	</select>
+
+	<!--获取聊天文件路径-->
+	<select id="getChatFilePath" resultType="java.lang.String">
+		SELECT file_path
+		FROM chat_files
+		WHERE file_id = #{fileId}
+	</select>
+
+	<!--获取聊天媒体文件路径-->
+	<select id="getChatMediaFilePath" resultType="java.lang.String">
+		SELECT image_path
+		FROM chat_images
+		WHERE image_id = #{fileId}
+	</select>
 </mapper>

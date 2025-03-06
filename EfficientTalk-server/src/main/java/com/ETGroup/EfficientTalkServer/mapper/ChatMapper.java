@@ -61,4 +61,10 @@ public interface ChatMapper {
                                                   @Param("type") String type,
                                                   @Param("searchKey") String searchKey,
                                                   @Param("lastTime") LocalDateTime lastTime);
+    
+    // 获取聊天文件路径
+    String getChatFilePath(@Param("fileId") String fileId);
+    
+    // 获取聊天媒体文件路径
+    String getChatMediaFilePath(@Param("fileId") String fileId);
 }
