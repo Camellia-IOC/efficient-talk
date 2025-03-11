@@ -76,7 +76,6 @@
 
     // 关闭窗口
     const windowClose = () => {
-        // TODO:改成弹出子窗口
         Modal.confirm({
             title: "退出",
             content: "您确定要退出吗？",

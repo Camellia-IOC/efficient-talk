@@ -4,8 +4,6 @@
   >
     <div class="cloud-disk-info">
       <div class="title">组织文件</div>
-    </div>
-    <div class="folder-nav">
       <a-breadcrumb class="opened-folder-nav">
         <template #separator>
           <RightOutlined/>
@@ -18,20 +16,34 @@
           <a-tag :bordered="false">{{ item.folderName }}</a-tag>
         </a-breadcrumb-item>
       </a-breadcrumb>
-      <div class="operation-bar">
+    </div>
+    <div class="folder-nav">
+      <div class="operation-bar-left">
+        <a-button @click="exitCurFolder"
+                  :disabled="openedFolder.length===1"
+        >
+          <ArrowLeftOutlined/>
+        </a-button>
+        <a-button type="primary"
+                  @click="handleFolderCreatorDialogOpen"
+        >
+          <PlusOutlined/>
+          新建
+        </a-button>
+        <a-button type="primary"
+                  @click="handleFileUploaderDialogOpen"
+        >
+          <UploadOutlined/>
+          上传
+        </a-button>
         <a-button shape="circle"
                   @click="refreshCurrentFolder"
         >
           <ReloadOutlined/>
         </a-button>
-        <a-button type="primary"
-                  @click="handleFolderCreatorDialogOpen"
-        >新建
-        </a-button>
-        <a-button type="primary"
-                  @click="handleFileUploaderDialogOpen"
-        >上传
-        </a-button>
+      </div>
+      <div class="operation-bar-right">
+        <a-select></a-select>
       </div>
     </div>
     <div class="result-table-container">
@@ -50,6 +62,8 @@
                    onChange: paginationConfig.pageChange,
                    position: ['bottomCenter']
                }"
+               :custom-row="handleRowOperation"
+               :row-class-name="tableRowClassName"
       >
         <template #emptyText>
           <EmptyContainer :height="tableHeight"
@@ -106,20 +120,20 @@
           </template>
           <template v-else-if="column.dataIndex === 'operation'">
             <div style="display: flex;justify-content: center;align-items: center">
-              <a-button type="primary"
-                        @click="handleDownloadFile(record.fileId)"
+              <a-button @click.stop="handleDownloadFile(record.fileId)"
                         shape="circle"
                         style="display:flex;justify-content:center;align-items:center;font-size: 18px;"
                         v-if="record.type==='file'"
               >
-                <DownloadOutlined/>
+                <EllipsisOutlined />
               </a-button>
-              <a-button @click="openFolder(record.folderId, record.name, null)"
+              <a-button @click.stop="openFolder(record.folderId, record.name, null)"
                         shape="circle"
                         style="display:flex;justify-content:center;align-items:center;font-size: 18px;"
                         v-else-if="record.type==='folder'"
+                        :disabled="record.creatorId!==curLoginUser.userId"
               >
-                <FolderOpenOutlined/>
+                <EllipsisOutlined />
               </a-button>
             </div>
           </template>
@@ -155,10 +169,12 @@
     } from "../../utils/time-utils.js";
     import { translateFileSize } from "../../utils/unit-utils.js";
     import {
-        DownloadOutlined,
-        FolderOpenOutlined,
+        EllipsisOutlined,
         ReloadOutlined,
-        RightOutlined
+        RightOutlined,
+        UploadOutlined,
+        PlusOutlined,
+        ArrowLeftOutlined
     } from "@ant-design/icons-vue";
     import { useRoute } from "vue-router";
     import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
@@ -204,6 +220,23 @@
             getCloudDiskData();
         }
     });
+
+    // 表格行类名
+    const tableRowClassName = (record, index) => {
+        return "cloud-disk-table-row";
+    };
+
+    // 处理表格行点击事件
+    const handleRowOperation = (record) => {
+        return {
+            onClick: () => {
+                console.error(record);
+                if (record.type === "folder") {
+                    openFolder(record.folderId, record.name, null);
+                }
+            }
+        };
+    };
 
     // 计算表格高度
     let observer = null;
@@ -341,19 +374,28 @@
         }
     };
 
+    // 退出当前文件夹
+    const exitCurFolder = () => {
+        const folder = openedFolder.value.pop();
+        paginationConfig.value.pageIndex = folder.prePageIndex;
+        getCloudDiskData(openedFolder.value.at(-1).folderId);
+    };
+
     // 打开文件夹
     const openFolder = (folderId, folderName, index) => {
         if (index === null) {
             openedFolder.value.push({
                 folderId: folderId,
-                folderName: folderName
+                folderName: folderName,
+                prePageIndex: paginationConfig.value.pageIndex
             });
+            paginationConfig.value.pageIndex = 1;
         }
         else {
+            const pageIndex = openedFolder.value[index + 1].prePageIndex;
             openedFolder.value.splice(index + 1, openedFolder.value.length - index - 1);
+            paginationConfig.value.pageIndex = pageIndex;
         }
-
-        paginationConfig.value.pageIndex = 1;
         getCloudDiskData(folderId);
     };
 
@@ -394,7 +436,8 @@
         // 接收云盘ID
         openedFolder.value.push({
             folderId: route.query.diskId,
-            folderName: "根目录"
+            folderName: "根目录",
+            prePageIndex: 1
         });
 
         // 获取云盘数据
@@ -439,6 +482,22 @@
         font-size: 20px;
         font-weight: bold;
         color: black;
+        width: 100px;
+      }
+
+      .opened-folder-nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        width: calc(100% - 100px);
+        background-color: white;
+        padding: 8px 12px;
+        border-radius: 15px;
+        overflow-x: auto;
+
+        :deep(.ant-tag) {
+          margin: 0;
+        }
       }
     }
 
@@ -449,26 +508,19 @@
       width: 100%;
       height: $folder-nav-height;
 
-      .opened-folder-nav {
+      .operation-bar-left {
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        width: 70%;
-        background-color: white;
-        padding: 8px 12px;
-        border-radius: 15px;
-        overflow-x: auto;
-
-        :deep(.ant-tag) {
-          margin: 0;
-        }
+        width: 50%;
+        gap: 10px;
       }
 
-      .operation-bar {
+      .operation-bar-right {
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        width: 30%;
+        width: 50%;
         gap: 10px;
       }
     }
@@ -509,5 +561,16 @@
 
   :deep(.ant-pagination) {
     margin-bottom: 0 !important;
+  }
+
+  // 表格行
+  :deep(.cloud-disk-table-row) {
+    td {
+      cursor: pointer;
+
+      label {
+        cursor: pointer;
+      }
+    }
   }
 </style>

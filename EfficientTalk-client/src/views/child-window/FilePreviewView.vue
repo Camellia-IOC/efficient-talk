@@ -62,7 +62,9 @@
     import { useRoute } from "vue-router";
     import "viewerjs/dist/viewer.css";
     import {
+        nextTick,
         onBeforeMount,
+        onMounted,
         ref
     } from "vue";
     import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
@@ -92,7 +94,8 @@
         inline: true,
         navbar: false,
         fullscreen: false,
-        button: false
+        button: false,
+        title: false
     };
 
     // 文档渲染回调
@@ -123,11 +126,14 @@
         }
     };
 
-    onBeforeMount(async () => {
+    onBeforeMount(() => {
         const data = JSON.parse(route.query.data);
         fileId.value = data.fileId;
         fileType.value = data.fileType;
-        await getFileBlob();
+    });
+
+    onMounted(() => {
+        getFileBlob();
     });
 </script>
 

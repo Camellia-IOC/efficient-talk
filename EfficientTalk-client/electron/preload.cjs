@@ -36,21 +36,23 @@ contextBridge.exposeInMainWorld("appWindowController", {
 // 系统控制器
 contextBridge.exposeInMainWorld("systemController", {
     login: (params) => ipcRenderer.invoke("system-login", params),
-    logout: (params) => ipcRenderer.invoke("system-logout", params)
+    logout: (params) => ipcRenderer.invoke("system-logout", params),
+    copyToClipboard: (content) => ipcRenderer.invoke("copy-to-clipboard", content),
+    readFromClipboard: () => ipcRenderer.invoke("read-from-clipboard")
 });
 
-// 文件选择器
-contextBridge.exposeInMainWorld("fileSelector", {
-    selectFile: (params) => ipcRenderer.invoke("select-file", params),
-    selectFiles: (params) => ipcRenderer.invoke("select-files", params),
-});
-
-// 文件控制器
-contextBridge.exposeInMainWorld("fileController",{
-    checkIsExist: (path) => ipcRenderer.invoke("file-check-is-exist", path),
-})
-
-// 通知控制器
-contextBridge.exposeInMainWorld("notificationController", {
-    showNotification: (params) => ipcRenderer.invoke("show-notification", params),
-});
+// // 文件选择器
+// contextBridge.exposeInMainWorld("fileSelector", {
+//     selectFile: (params) => ipcRenderer.invoke("select-file", params),
+//     selectFiles: (params) => ipcRenderer.invoke("select-files", params),
+// });
+//
+// // 文件控制器
+// contextBridge.exposeInMainWorld("fileController",{
+//     checkIsExist: (path) => ipcRenderer.invoke("file-check-is-exist", path),
+// })
+//
+// // 通知控制器
+// contextBridge.exposeInMainWorld("notificationController", {
+//     showNotification: (params) => ipcRenderer.invoke("show-notification", params),
+// });

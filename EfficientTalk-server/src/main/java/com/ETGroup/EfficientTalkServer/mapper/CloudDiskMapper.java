@@ -63,4 +63,13 @@ public interface CloudDiskMapper {
                                                         @Param("diskId") String diskId,
                                                         @Param("pageIndex") Integer pageIndex,
                                                         @Param("pageSize") Integer pageSize);
+    
+    // 删除云盘文件夹
+    Integer deleteCloudDiskFolder(@Param("folderId") String folderId);
+    
+    // 重命名组织云盘文件夹
+    Integer renameOrgCloudDiskFolder(@Param("folderId") String folderId, @Param("newFolderName") String newFolderName);
+    
+    // 重命名组织云盘文件
+    Integer renameOrgCloudDiskFile(@Param("fileId") String fileId, @Param("newFileName") String newFileName);
 }

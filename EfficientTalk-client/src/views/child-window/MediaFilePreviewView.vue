@@ -46,7 +46,8 @@
         inline: true,
         navbar: false,
         fullscreen: false,
-        button: false
+        button: false,
+        title: false
     };
 
     // 获取文件流

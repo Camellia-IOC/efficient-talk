@@ -50,7 +50,27 @@
               <div class="text-message"
                    v-if="item.type === 'text'"
               >
-                <div>{{ item.content }}</div>
+                <a-dropdown :trigger="['contextmenu']">
+                  <div>{{ item.content }}</div>
+                  <template #overlay>
+                    <div class="context-menu-container">
+                      <div class="context-menu-item"
+                           @click="copyToClipboard(item.content)"
+                      >
+                        <CopyOutlined/>
+                        复制
+                      </div>
+                      <div class="context-menu-item">
+                        <ExportOutlined/>
+                        转发
+                      </div>
+                      <div class="context-menu-item">
+                        <DeleteOutlined/>
+                        删除
+                      </div>
+                    </div>
+                  </template>
+                </a-dropdown>
               </div>
               <div class="image-message"
                    v-else-if="item.type === 'image'"
@@ -200,17 +220,46 @@
         </div>
       </div>
       <div class="input-area">
-        <a-textarea class="input"
-                    v-model:value="chatInput"
-                    :bordered="false"
-                    :autoSize="false"
-                    @pressEnter="handleSend"
-        ></a-textarea>
-        <a-button type="primary"
-                  class="btn-send"
-                  @click="handleSend"
-        >发送
-        </a-button>
+        <a-dropdown :trigger="['contextmenu']">
+          <a-textarea class="input"
+                      v-model:value="chatInput"
+                      :bordered="false"
+                      :autoSize="false"
+                      @pressEnter.prevent="handleSend"
+          ></a-textarea>
+          <template #overlay>
+            <div class="context-menu-container">
+              <div class="context-menu-item">
+                <ScissorOutlined/>
+                剪切
+              </div>
+              <div class="context-menu-item"
+                   @click="copyToClipboard(getSelectedContent())"
+              >
+                <CopyOutlined/>
+                复制
+              </div>
+              <div class="context-menu-item"
+                   @click="readFromClipboard"
+              >
+                <ReconciliationOutlined/>
+                粘贴
+              </div>
+              <div class="context-menu-item">
+                <CheckCircleOutlined />
+                全选
+              </div>
+            </div>
+          </template>
+        </a-dropdown>
+        <div class="operation-bar">
+          <label class="tip-label">按下Enter键发送</label>
+          <a-button type="primary"
+                    class="btn-send"
+                    @click="handleSend"
+          >发送
+          </a-button>
+        </div>
       </div>
     </div>
   </div>
@@ -251,7 +300,13 @@
         HistoryOutlined,
         SmileOutlined,
         PictureOutlined,
-        CloudSyncOutlined
+        CloudSyncOutlined,
+        CopyOutlined,
+        ExportOutlined,
+        DeleteOutlined,
+        ScissorOutlined,
+        ReconciliationOutlined,
+        CheckCircleOutlined
     } from "@ant-design/icons-vue";
     import dayjs from "dayjs";
     import { UUID } from "uuidjs";
@@ -272,7 +327,12 @@
         openFilePreviewChildWindow,
         openMediaFilePreviewChildWindow
     } from "../../window-controller/controller/ChildWindowController.js";
-    import ChildWindowController from "../../window-controller/child-window-controller.js";
+    import MainWindowController from "../../window-controller/main-window-controller.js";
+    import {
+        copyToClipboard,
+        getSelectedContent,
+        readFromClipboard
+    } from "../../utils/system-utils.js";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -1056,15 +1116,26 @@
 
         .input {
           width: 100%;
-          height: 100%;
+          height: 75%;
           resize: none;
         }
 
-        .btn-send {
-          position: absolute;
-          right: 15px;
-          bottom: 15px;
-          background-color: global-variable.$theme-color;
+        .operation-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          height: 25%;
+          padding: 0 8px;
+
+          .tip-label {
+            color: gray;
+            font-size: 12px;
+          }
+
+          .btn-send {
+            background-color: global-variable.$theme-color;
+          }
         }
       }
     }

@@ -36,6 +36,9 @@ public interface ChatMapper {
     // 保存对话列表
     Integer saveChatList(SaveChatListRequestParam param);
     
+    // 创建对话列表
+    Integer createChatList(ChatListPO chatList);
+    
     // 获取对话列表
     ChatListPO getChatList(String userId);
     

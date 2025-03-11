@@ -145,4 +145,27 @@
 		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
 		OFFSET #{pageOffset}
 	</select>
+
+	<!--删除云盘文件夹-->
+	<delete id="deleteCloudDiskFolder">
+		DELETE
+		FROM cloud_disk_folders
+		WHERE folder_id = #{folderId}
+	</delete>
+
+	<!--重命名组织云盘文件夹-->
+	<update id="renameOrgCloudDiskFolder">
+		UPDATE cloud_disk_folders
+		SET folder_name = #{newFolderName},
+			update_time = now()
+		WHERE folder_id = #{folderId}
+	</update>
+
+	<!--重命名组织云盘文件-->
+	<update id="renameOrgCloudDiskFile">
+		UPDATE cloud_disk_files
+		SET file_name = #{newFileName},
+			update_time = now()
+		WHERE file_id = #{fileId}
+	</update>
 </mapper>

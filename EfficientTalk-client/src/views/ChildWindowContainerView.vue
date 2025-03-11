@@ -50,9 +50,12 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .child-window-container-view {
     width: 100%;
     height: 100%;
+    background-color: global-variable.$background-color;
 
     $child-window-header-height: 40px;
 

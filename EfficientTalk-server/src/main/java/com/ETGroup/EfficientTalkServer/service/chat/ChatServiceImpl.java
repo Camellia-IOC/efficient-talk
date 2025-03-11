@@ -88,7 +88,17 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public ChatListPO getChatList(String userId) {
-        return chatMapper.getChatList(userId);
+        ChatListPO result = chatMapper.getChatList(userId);
+        if (result == null) {
+            ChatListPO chatList = new ChatListPO();
+            chatList.setUserId(userId);
+            chatList.setChatList("{\"vipList\":[ ],\"commonList\":[ ]}");
+            if (chatMapper.createChatList(chatList) != 1) {
+                log.error("创建对话列表失败");
+            }
+            return chatList;
+        }
+        return result;
     }
     
     /**

@@ -213,4 +213,42 @@ public class CloudDiskServiceImpl implements CloudDiskService {
         response.setFileList(fileList);
         return response;
     }
+    
+    /**
+     * 删除组织云盘文件夹
+     *
+     * @param folderId 文件夹ID
+     *
+     * @return 是否成功
+     */
+    @Override
+    public boolean deleteCloudDiskFolder(String folderId) {
+        return cloudDiskMapper.deleteCloudDiskFolder(folderId) == 1;
+    }
+    
+    /**
+     * 重命名组织云盘文件夹
+     *
+     * @param folderId      文件夹ID
+     * @param newFolderName 文件夹名称
+     *
+     * @return 是否成功
+     */
+    @Override
+    public boolean renameOrgCloudDiskFolder(String folderId, String newFolderName) {
+        return cloudDiskMapper.renameOrgCloudDiskFolder(folderId, newFolderName) == 1;
+    }
+    
+    /**
+     * 重命名组织云盘文件
+     *
+     * @param fileId      文件ID
+     * @param newFileName 文件名
+     *
+     * @return 是否成功
+     */
+    @Override
+    public boolean renameOrgCloudDiskFile(String fileId, String newFileName) {
+        return cloudDiskMapper.renameOrgCloudDiskFile(fileId, newFileName) == 1;
+    }
 }

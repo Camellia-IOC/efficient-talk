@@ -256,7 +256,9 @@
     };
 
     // 好友列表
-    const friendList = ref({});
+    const friendList = ref({
+        total: 0
+    });
 
     // 组织列表
     const openedNodeStack = ref([]);
@@ -452,7 +454,7 @@
           width: 100%;
           height: $friend-manager-height;
 
-          .friend-manager-btn{
+          .friend-manager-btn {
             width: 90%;
             background-color: global-variable.$theme-color;
             color: white;

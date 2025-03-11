@@ -55,4 +55,28 @@ export default class MainWindowController {
     static systemLogout = () => {
         systemController.logout().then();
     };
+
+    /**
+     * 复制到剪贴板
+     * @param content 复制的内容
+     */
+    static copyToClipboard = (content) => {
+        systemController.copyToClipboard(content);
+    };
+
+    /**
+     * 从剪贴板读取内容
+     * @returns {string} 读取到的内容
+     */
+    static readFromClipboard = () => {
+        let content;
+        systemController.readFromClipboard().then((result) => {
+            console.log("读取剪贴板内容：" + result);
+            content = result;
+            return content;
+        }).catch((error) => {
+            console.error("读取剪贴板内容失败：" + error);
+            return "";
+        });
+    };
 }

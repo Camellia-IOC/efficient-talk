@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ResponseConfig {
     // 临时错误码
-    ERROR(-1, "请求错误"),
+    ERROR(-1, "error"),
     
     // 标准正确状态码
     SUCCESS(0, "success"),

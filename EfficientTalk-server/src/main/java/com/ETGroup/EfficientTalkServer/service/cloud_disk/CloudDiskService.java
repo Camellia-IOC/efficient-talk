@@ -90,4 +90,27 @@ public interface CloudDiskService {
      * @return 最近文件列表
      */
     CloudDiskFileListResponseVO getRecentCloudDiskFiles(String orgId, String diskId, Integer pageIndex, Integer pageSize);
+    
+    /**
+     * 删除组织云盘文件夹
+     * @param folderId 文件夹ID
+     * @return 是否成功
+     */
+    boolean deleteCloudDiskFolder(String folderId);
+    
+    /**
+     * 重命名组织云盘文件夹
+     * @param folderId 文件夹ID
+     * @param newFolderName 文件夹名称
+     * @return 是否成功
+     */
+    boolean renameOrgCloudDiskFolder(String folderId, String newFolderName);
+    
+    /**
+     * 重命名组织云盘文件
+     * @param fileId 文件ID
+     * @param newFileName 文件名
+     * @return 是否成功
+     */
+    boolean renameOrgCloudDiskFile(String fileId, String newFileName);
 }

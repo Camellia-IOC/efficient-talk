@@ -1,28 +1,35 @@
-// 窗口主体
-const {
+// Electron功能模块
+import {
     app,
     BrowserWindow,
     session,
     dialog,
-    Notification
-} = require("electron");
-
-// 托盘
-const {
+    Notification,
+    clipboard,
     Tray,
-    Menu
-} = require("electron");
-
-// 异步通信
-const {ipcMain} = require("electron");
+    Menu,
+    ipcMain
+} from "electron";
 
 // Node模块
-const path = require("node:path");
-const fs = require("node:fs");
+import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "url";
 
 // 持久化存储
-import Store from 'electron-store';
-const store = new Store();
+import Store from "electron-store";
+
+// 文件路径
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 持久化存储仓库
+const configStore = new Store();
+const initStore = () => {
+    if (configStore.has("downloadPath")) {
+        configStore.set("downloadPath", path.join(app.getPath("downloads"), "易飞讯"));
+    }
+};
 
 // 会话ID
 const sessionId = new Date().getTime().toString();
@@ -34,10 +41,13 @@ const iconPath = "./resources/logo.ico";
 app.commandLine.appendSwitch("--disable-http-cache");
 app.whenReady()
    .then(() => {
+       // 初始化仓库
+       initStore();
+
        // 托盘图标功能
        const contextMenu = Menu.buildFromTemplate([
            {
-               label: "Item1",
+               label: "退出",
                type: "radio",
                checked: true
            },
@@ -291,6 +301,7 @@ ipcMain.handle("system-login", (e, param) => {
         icon: path.join(__dirname, iconPath),
         // 是否使用自带标题栏
         frame: false,
+        resizable: true,
         transparent: true,
     });
 
@@ -343,47 +354,57 @@ ipcMain.handle("system-logout", (e, param) => {
               .then();
 });
 
-// 处理文件选择(单选)
-ipcMain.handle("select-file", async (event, params) => {
-    const result = await dialog.showOpenDialog({
-        properties: ["openFile", "multiSelections"],
-        filters: params.filters,
-        title: params.title,
-    });
-
-    if (result.canceled) {
-        return [];
-    }
-
-    return result.filePaths;
+// 复制到剪贴板
+ipcMain.handle("copy-to-clipboard", (event, content) => {
+    clipboard.writeText(content);
 });
 
-// 处理文件选择(多选)
-ipcMain.handle("select-files", async (event, params) => {
-    const result = await dialog.showOpenDialog({
-        properties: ["openFile", "multiSelections"],
-        filters: params.filters,
-        title: params.title,
-    });
-
-    if (result.canceled) {
-        return [];
-    }
-
-    return result.filePaths;
+//从剪贴板读取内容
+ipcMain.handle("read-from-clipboard", () => {
+    return clipboard.readText();
 });
 
-// 判断文件是否存在
-ipcMain.handle("file-check-is-exist", (event, path) => {
-    return fs.existsSync(path);
-});
-
-// 显示通知
-ipcMain.handle("show-notification", (event, params) => {
-    new Notification({
-        title: params.title,
-        body: params.body,
-        icon: params.icon,
-    }).show();
-});
+// // 处理文件选择(单选)
+// ipcMain.handle("select-file", async (event, params) => {
+//     const result = await dialog.showOpenDialog({
+//         properties: ["openFile", "multiSelections"],
+//         filters: params.filters,
+//         title: params.title,
+//     });
+//
+//     if (result.canceled) {
+//         return [];
+//     }
+//
+//     return result.filePaths;
+// });
+//
+// // 处理文件选择(多选)
+// ipcMain.handle("select-files", async (event, params) => {
+//     const result = await dialog.showOpenDialog({
+//         properties: ["openFile", "multiSelections"],
+//         filters: params.filters,
+//         title: params.title,
+//     });
+//
+//     if (result.canceled) {
+//         return [];
+//     }
+//
+//     return result.filePaths;
+// });
+//
+// // 判断文件是否存在
+// ipcMain.handle("file-check-is-exist", (event, path) => {
+//     return fs.existsSync(path);
+// });
+//
+// // 显示通知
+// ipcMain.handle("show-notification", (event, params) => {
+//     new Notification({
+//         title: params.title,
+//         body: params.body,
+//         icon: params.icon,
+//     }).show();
+// });
 // 业务功能 end ##########################################################################################################

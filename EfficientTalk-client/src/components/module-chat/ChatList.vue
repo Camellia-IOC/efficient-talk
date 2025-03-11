@@ -10,56 +10,175 @@
         <SearchOutlined/>
       </a-button>
     </div>
-    <a-spin :wrapper-class-name="'chat-list-area'" :spinning="isFriendListLoading">
+    <a-spin :wrapper-class-name="'chat-list-area'"
+            :spinning="isFriendListLoading"
+    >
       <EmptyContainer description="暂无进行中的会话"
-                      v-if="chatListFilter(chatList).length === 0"
+                      v-show="chatListFilter(chatList.commonList).length===0&&chatListFilter(chatList.vipList).length===0"
       />
-      <div v-for="(item,index) in chatListFilter(chatList)"
-           :key="index"
-           class="chat-list-item"
-           :class="{'chat-list-item-active': curChatId === item.userId}"
-           @click="handleSelectChat(item)"
-           @contextmenu="handleContextMenu"
-           v-else
+      <div class="chat-list-item-container"
+           v-show="chatListFilter(chatList.vipList).length!==0"
       >
-        <div class="item-avatar">
-          <img class="avatar"
-               v-if="item.userAvatar!==null"
-               :src="item.userAvatar"
-               alt=""
-          />
-          <a-avatar class="avatar"
-                    v-else
-          >{{ item.userName.substring(0, 2) }}
-          </a-avatar>
-        </div>
-        <div class="item-detail">
-          <div class="detail-header">
-            <div class="username">{{ item.userName }}</div>
-            <div class="time">{{ formatMessageTime(item.lastMessageTime, "chat-list") }}</div>
-          </div>
-          <div class="detail-content">
-            <div class="detail-message single-line-ellipsis"
-                 :class="{ 'detail-message-unread': item.unreadCount!==0 }"
-            >{{ item.lastMessage }}
+        <a-dropdown :trigger="['contextmenu']"
+                    v-for="(item,index) in chatListFilter(chatList.vipList) "
+                    :key="index"
+        >
+          <div class="chat-list-item chat-list-item-top"
+               :class="{'chat-list-item-active': curChatId === item.userId}"
+               @click="handleSelectChat(item)"
+          >
+            <div class="item-avatar">
+              <img class="avatar"
+                   v-if="item.userAvatar!==null"
+                   :src="item.userAvatar"
+                   alt=""
+              />
+              <a-avatar class="avatar"
+                        v-else
+              >{{ item.userName.substring(0, 2) }}
+              </a-avatar>
             </div>
-            <div class="unread-count"
-                 v-if="item.unreadCount!==0"
-            >
-              <div class="unread-count-badge"
-                   style="font-size: 7px"
-                   v-if="item.unreadCount>99"
-              >
-                99+
+            <div class="item-detail">
+              <div class="detail-header">
+                <div class="username">{{ item.userName }}</div>
+                <div class="time">{{ formatMessageTime(item.lastMessageTime, "chat-list") }}</div>
               </div>
-              <div class="unread-count-badge"
-                   v-else
-              >
-                {{ item.unreadCount }}
+              <div class="detail-content">
+                <div class="detail-message single-line-ellipsis"
+                     :class="{ 'detail-message-unread': item.unreadCount!==0 }"
+                >{{ item.lastMessage }}
+                </div>
+                <div class="unread-count"
+                     v-if="item.unreadCount!==0"
+                >
+                  <div class="unread-count-badge"
+                       style="font-size: 7px"
+                       v-if="item.unreadCount>99"
+                  >
+                    99+
+                  </div>
+                  <div class="unread-count-badge"
+                       v-else
+                  >
+                    {{ item.unreadCount }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+          <template #overlay>
+            <div class="context-menu-container">
+              <div class="context-menu-item"
+                   @click="setUserMessageToCommon(item.userId)"
+              >
+                <CloseCircleOutlined/>
+                取消置顶
+              </div>
+              <div class="context-menu-item"
+                   v-if="item.unreadCount===0"
+                   @click="setMessageReadState(item.userId,false)"
+              >
+                <EyeInvisibleOutlined/>
+                标记未读
+              </div>
+              <div class="context-menu-item"
+                   v-if="item.unreadCount!==0"
+                   @click="setMessageReadState(item.userId,true)"
+              >
+                <EyeOutlined/>
+                标记已读
+              </div>
+              <div class="context-menu-item"
+                   @click="deleteFromChatList(item.userId)"
+              >
+                <DeleteOutlined/>
+                从聊天列表中移除
+              </div>
+            </div>
+          </template>
+        </a-dropdown>
+      </div>
+      <div class="chat-list-item-container"
+           v-show="chatListFilter(chatList.commonList).length!==0"
+      >
+        <a-dropdown :trigger="['contextmenu']"
+                    v-for="(item,index) in chatListFilter(chatList.commonList) "
+                    :key="index"
+        >
+          <div class="chat-list-item"
+               :class="{'chat-list-item-active': curChatId === item.userId}"
+               @click="handleSelectChat(item)"
+          >
+            <div class="item-avatar">
+              <img class="avatar"
+                   v-if="item.userAvatar!==null"
+                   :src="item.userAvatar"
+                   alt=""
+              />
+              <a-avatar class="avatar"
+                        v-else
+              >{{ item.userName.substring(0, 2) }}
+              </a-avatar>
+            </div>
+            <div class="item-detail">
+              <div class="detail-header">
+                <div class="username">{{ item.userName }}</div>
+                <div class="time">{{ formatMessageTime(item.lastMessageTime, "chat-list") }}</div>
+              </div>
+              <div class="detail-content">
+                <div class="detail-message single-line-ellipsis"
+                     :class="{ 'detail-message-unread': item.unreadCount!==0 }"
+                >{{ item.lastMessage }}
+                </div>
+                <div class="unread-count"
+                     v-if="item.unreadCount!==0"
+                >
+                  <div class="unread-count-badge"
+                       style="font-size: 7px"
+                       v-if="item.unreadCount>99"
+                  >
+                    99+
+                  </div>
+                  <div class="unread-count-badge"
+                       v-else
+                  >
+                    {{ item.unreadCount }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <template #overlay>
+            <div class="context-menu-container">
+              <div class="context-menu-item"
+                   @click="setUserMessageToTop(item.userId)"
+              >
+                <VerticalAlignTopOutlined/>
+                置顶
+              </div>
+              <div class="context-menu-item"
+                   v-if="item.unreadCount===0"
+                   @click="setMessageReadState(item.userId,false)"
+              >
+                <EyeInvisibleOutlined/>
+                标记未读
+              </div>
+              <div class="context-menu-item"
+                   v-if="item.unreadCount!==0"
+                   @click="setMessageReadState(item.userId,true)"
+              >
+                <EyeOutlined/>
+                标记已读
+              </div>
+              <div class="context-menu-item"
+                   @click="deleteFromChatList(item.userId)"
+              >
+                <DeleteOutlined/>
+                从聊天列表中移除
+              </div>
+            </div>
+          </template>
+        </a-dropdown>
       </div>
     </a-spin>
   </div>
@@ -76,12 +195,20 @@
         getChatList
     } from "../../database/chat-list.js";
     import { getCurUserData } from "../../database/cur-user.js";
-    import { SearchOutlined } from "@ant-design/icons-vue";
+    import {
+        VerticalAlignTopOutlined,
+        EyeOutlined,
+        EyeInvisibleOutlined,
+        DeleteOutlined,
+        SearchOutlined,
+        CloseCircleOutlined
+    } from "@ant-design/icons-vue";
     import { formatMessageTime } from "../../utils/time-utils.js";
     import UserApi from "../../api/modules/UserApi.js";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
     import { saveChatRecord } from "../../database/chat-history.js";
+    import { copyToClipboard } from "../../utils/system-utils.js";
 
     const props = defineProps({
         friendInfo: {
@@ -134,6 +261,74 @@
         await saveCloudChatList(curLoginUser.value.userId, chatListJson);
     };
 
+    /**
+     * 将消息设为置顶/取消置顶
+     * @param {string} userId 用户ID
+     */
+    const setUserMessageToTop = (userId) => {
+        for (let i = 0; i < chatList.value.commonList.length; i++) {
+            if (chatList.value.commonList[i].userId === userId) {
+                chatList.value.vipList.unshift(chatList.value.commonList[i]);
+                chatList.value.commonList.splice(i, 1);
+            }
+        }
+        handleSaveChatList(chatList.value);
+    };
+    const setUserMessageToCommon = (userId) => {
+        for (let i = 0; i < chatList.value.vipList.length; i++) {
+            if (chatList.value.vipList[i].userId === userId) {
+                chatList.value.commonList.unshift(chatList.value.vipList[i]);
+                chatList.value.vipList.splice(i, 1);
+            }
+        }
+        handleSaveChatList(chatList.value);
+    };
+
+    /**
+     * 设置消息已读状态
+     * @param {string} userId 用户ID
+     * @param {boolean} state 已读状态
+     */
+    const setMessageReadState = (userId, state) => {
+        for (let i = 0; i < chatList.value.vipList.length; i++) {
+            if (chatList.value.vipList[i].userId === userId) {
+                const unreadCount = chatList.value.vipList[i].unreadCount === 0 ? 1 : chatList.value.vipList[i].unreadCount;
+                chatList.value.vipList[i].unreadCount = state ? 0 : unreadCount;
+                handleSaveChatList(chatList.value);
+                return;
+            }
+        }
+        for (let i = 0; i < chatList.value.commonList.length; i++) {
+            if (chatList.value.commonList[i].userId === userId) {
+                const unreadCount = chatList.value.commonList[i].unreadCount === 0 ? 1 : chatList.value.commonList[i].unreadCount;
+                chatList.value.commonList[i].unreadCount = state ? 0 : unreadCount;
+                handleSaveChatList(chatList.value);
+                return;
+            }
+        }
+    };
+
+    /**
+     * 从聊天列表中删除
+     * @param {string} userId 用户ID
+     */
+    const deleteFromChatList = (userId) => {
+        for (let i = 0; i < chatList.value.vipList.length; i++) {
+            if (chatList.value.vipList[i].userId === userId) {
+                chatList.value.vipList.splice(i, 1);
+                handleSaveChatList(chatList.value);
+                return;
+            }
+        }
+        for (let i = 0; i < chatList.value.commonList.length; i++) {
+            if (chatList.value.commonList[i].userId === userId) {
+                chatList.value.commonList.splice(i, 1);
+                handleSaveChatList(chatList.value);
+                return;
+            }
+        }
+    };
+
     // 接收消息
     const handleMessageReceive = async (event) => {
         const message = event.detail;
@@ -142,20 +337,38 @@
         let existFlag = false;
 
         // 遍历消息列表，修改相应的元素内容
-        for (let i = 0; i < chatList.value.length; i++) {
-            if (chatList.value[i].userId === message.sender) {
-                chatList.value[i].lastMessage = translateMessageContent(message.type, message.content);
-                chatList.value[i].lastMessageTime = message.time;
+        for (let i = 0; i < chatList.value.vipList.length; i++) {
+            if (chatList.value.vipList[i].userId === message.sender) {
+                chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
+                chatList.value.vipList[i].lastMessageTime = message.time;
 
                 // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
                 if (curChatId.value !== message.sender) {
-                    chatList.value[i].unreadCount++;
+                    chatList.value.vipList[i].unreadCount++;
                 }
 
                 // 将对应元素提到数组第一个
-                chatList.value.unshift(chatList.value.splice(i, 1)[0]);
+                chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
                 existFlag = true;
                 break;
+            }
+        }
+        if (!existFlag) {
+            for (let i = 0; i < chatList.value.commonList.length; i++) {
+                if (chatList.value.commonList[i].userId === message.sender) {
+                    chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
+                    chatList.value.commonList[i].lastMessageTime = message.time;
+
+                    // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
+                    if (curChatId.value !== message.sender) {
+                        chatList.value.commonList[i].unreadCount++;
+                    }
+
+                    // 将对应元素提到数组第一个
+                    chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
+                    existFlag = true;
+                    break;
+                }
             }
         }
 
@@ -189,7 +402,7 @@
                 newMessage.userAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png";
             });
 
-            chatList.value.unshift(newMessage);
+            chatList.value.commonList.unshift(newMessage);
         }
 
         // 保存聊天列表至本地和云端
@@ -202,14 +415,29 @@
         const receiver = message.receiver;
 
         // 遍历消息列表，修改相应的元素内容
-        for (let i = 0; i < chatList.value.length; i++) {
-            if (chatList.value[i].userId === receiver) {
+        let existFlag = false;
+        for (let i = 0; i < chatList.value.vipList.length; i++) {
+            if (chatList.value.vipList[i].userId === receiver) {
+                existFlag = true;
                 // 根据消息类型修改消息内容
-                chatList.value[i].lastMessage = translateMessageContent(message.type, message.content);
-                chatList.value[i].lastMessageTime = message.time;
+                chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
+                chatList.value.vipList[i].lastMessageTime = message.time;
                 // 将对应元素提到数组第一个
-                chatList.value.unshift(chatList.value.splice(i, 1)[0]);
+                chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
                 break;
+            }
+        }
+        if (!existFlag) {
+            for (let i = 0; i < chatList.value.commonList.length; i++) {
+                if (chatList.value.commonList[i].userId === receiver) {
+                    existFlag = true;
+                    // 根据消息类型修改消息内容
+                    chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
+                    chatList.value.commonList[i].lastMessageTime = message.time;
+                    // 将对应元素提到数组第一个
+                    chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
+                    break;
+                }
             }
         }
 
@@ -219,14 +447,9 @@
 
     const emits = defineEmits(["setSelectedChat"]);
 
-    // 右键菜单
-    const handleContextMenu = () => {
-        alert("context menu");
-    };
-
     // 选择聊天
     const handleSelectChat = async (item) => {
-        if(curChatId.value !== item.userId) {
+        if (curChatId.value !== item.userId) {
             curChatId.value = item.userId;
             const chatInfo = {
                 userId: item.userId,
@@ -252,7 +475,12 @@
     };
 
     // 聊天列表
-    const chatList = ref([]);
+    const chatList = ref({
+        // 置顶列表
+        vipList: [],
+        // 普通列表
+        commonList: []
+    });
 
     // 从服务器获取聊天列表
     const getCloudChatList = async (userId) => {
@@ -312,21 +540,43 @@
                 await saveChatRecord(message);
 
                 let existFlag = false;
-                for (let j = 0; j < chatList.value.length; j++) {
-                    if (chatList.value[j].userId === message.sender) {
-                        if (chatList.value[j].lastMessageTime < message.time) {
-                            chatList.value[j].lastMessage = translateMessageContent(message.type, message.content);
-                            chatList.value[j].lastMessageTime = message.time;
+                // 遍历置顶列表
+                for (let j = 0; j < chatList.value.vipList.length; j++) {
+                    if (chatList.value.vipList[j].userId === message.sender) {
+                        if (chatList.value.vipList[j].lastMessageTime < message.time) {
+                            chatList.value.vipList[j].lastMessage = translateMessageContent(message.type, message.content);
+                            chatList.value.vipList[j].lastMessageTime = message.time;
 
                             // 将对应元素提到数组第一个
-                            chatList.value.unshift(chatList.value.splice(j, 1)[0]);
+                            chatList.value.vipList.unshift(chatList.value.vipList.splice(j, 1)[0]);
                         }
                         // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
                         if (curChatId.value !== message.sender) {
-                            chatList.value[j].unreadCount++;
+                            chatList.value.vipList[j].unreadCount++;
                         }
                         existFlag = true;
                         break;
+                    }
+                }
+
+                // 如果在置顶列表中没有找到，再遍历普通列表
+                if (existFlag) {
+                    for (let j = 0; j < chatList.value.commonList.length; j++) {
+                        if (chatList.value.commonList[j].userId === message.sender) {
+                            if (chatList.value.commonList[j].lastMessageTime < message.time) {
+                                chatList.value.commonList[j].lastMessage = translateMessageContent(message.type, message.content);
+                                chatList.value.commonList[j].lastMessageTime = message.time;
+
+                                // 将对应元素提到数组第一个
+                                chatList.value.commonList.unshift(chatList.value.commonList.splice(j, 1)[0]);
+                            }
+                            // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
+                            if (curChatId.value !== message.sender) {
+                                chatList.value.commonList[j].unreadCount++;
+                            }
+                            existFlag = true;
+                            break;
+                        }
                     }
                 }
 
@@ -360,7 +610,7 @@
                         newMessage.userAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png";
                     });
 
-                    chatList.value.unshift(newMessage);
+                    chatList.value.commonList.unshift(newMessage);
                 }
             }
         }
@@ -378,6 +628,7 @@
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
 
+        // TODO 逻辑需要修改，先获取本地，没有再获取云端
         // 读取聊天列表
         chatList.value = await getCloudChatList(curLoginUser.value.userId);
         if (chatList.value === null) {
@@ -391,21 +642,37 @@
         // 如果传入的好友ID不为null,则将聊天对象设置为该好友
         if (props.friendInfo !== null) {
             let flag = false;
-            for (let i = 0; i < chatList.value.length; i++) {
-                if (chatList.value[i].userId === props.friendInfo.userId) {
+            // 遍历置顶列表
+            for (let i = 0; i < chatList.value.vipList.length; i++) {
+                if (chatList.value.vipList[i].userId === props.friendInfo.userId) {
                     flag = true;
                     // 更新聊天对象的名称和头像
-                    chatList.value[i].userName = props.friendInfo.userName;
-                    chatList.value[i].userAvatar = props.friendInfo.userAvatar;
+                    chatList.value.vipList[i].userName = props.friendInfo.userName;
+                    chatList.value.vipList[i].userAvatar = props.friendInfo.userAvatar;
                     // 清空未读消息数
-                    chatList.value[i].unreadCount = 0;
+                    chatList.value.vipList[i].unreadCount = 0;
                     break;
                 }
             }
 
             if (!flag) {
+                // 如果在置顶列表没有找到，遍历普通列表
+                for (let i = 0; i < chatList.value.commonList.length; i++) {
+                    if (chatList.value.commonList[i].userId === props.friendInfo.userId) {
+                        flag = true;
+                        // 更新聊天对象的名称和头像
+                        chatList.value.commonList[i].userName = props.friendInfo.userName;
+                        chatList.value.commonList[i].userAvatar = props.friendInfo.userAvatar;
+                        // 清空未读消息数
+                        chatList.value.commonList[i].unreadCount = 0;
+                        break;
+                    }
+                }
+            }
+
+            if (!flag) {
                 // 在聊天列表的头部添加该好友
-                chatList.value.unshift({
+                chatList.value.commonList.unshift({
                     userId: props.friendInfo.userId,
                     userName: props.friendInfo.userName,
                     userAvatar: props.friendInfo.userAvatar,
@@ -433,11 +700,11 @@
         }
     });
 
-    onBeforeUnmount(()=>{
+    onBeforeUnmount(() => {
         // 移除监听器防止事件多次触发
         window.removeEventListener("messageReceive", handleMessageReceive);
         window.removeEventListener("messageSend", handleMessageSend);
-    })
+    });
 </script>
 
 <style scoped
@@ -498,99 +765,108 @@
       width: 100%;
       height: calc(100% - $search-area-height);
 
-      .chat-list-item-active {
-        background-color: rgba(global-variable.$theme-color, 0.1);
-
-        &:hover {
-          background-color: rgba(global-variable.$theme-color, 0.1) !important;
-        }
-      }
-
-      .chat-list-item {
-        display: flex;
-        align-items: center;
+      .chat-list-item-container {
         width: 100%;
-        min-height: 75px;
-        padding: 0 15px;
+        height: fit-content;
 
-        $item-avatar-size: 40px;
+        .chat-list-item-top {
+          background-color: global-variable.$hover-background-color;
+        }
 
-        .item-avatar {
+        .chat-list-item-active {
+          background-color: rgba(global-variable.$theme-color, 0.1);
+
+          &:hover {
+            background-color: rgba(global-variable.$theme-color, 0.1) !important;
+          }
+        }
+
+        .chat-list-item {
           display: flex;
-          justify-content: center;
           align-items: center;
-          width: $item-avatar-size;
-          height: $item-avatar-size;
-          margin-right: 15px;
+          width: 100%;
+          min-height: 75px;
+          padding: 0 15px;
 
-          .avatar {
+          $item-avatar-size: 40px;
+
+          .item-avatar {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-          }
-        }
+            width: $item-avatar-size;
+            height: $item-avatar-size;
+            margin-right: 15px;
 
-        .item-detail {
-          display: flex;
-          flex-direction: column;
-          width: calc(100% - #{$item-avatar-size} - 15px);
-
-          .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-
-            .username {
-              font-size: 14px;
-            }
-
-            .time {
-              font-size: 10px;
-              color: gray;
-            }
-          }
-
-          .detail-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-
-            .detail-message {
-              font-size: 12px;
-              color: gray;
+            .avatar {
+              display: flex;
+              justify-content: center;
+              align-items: center;
               width: 100%;
+              height: 100%;
+              border-radius: 50%;
+            }
+          }
+
+          .item-detail {
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - #{$item-avatar-size} - 15px);
+
+            .detail-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              width: 100%;
+
+              .username {
+                font-size: 14px;
+              }
+
+              .time {
+                font-size: 10px;
+                color: gray;
+              }
             }
 
-            .detail-message-unread {
-              width: 90%;
-            }
+            .detail-content {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              width: 100%;
 
-            .unread-count {
-              width: 10%;
+              .detail-message {
+                font-size: 12px;
+                color: gray;
+                width: 100%;
+              }
 
-              .unread-count-badge {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                background-color: red;
-                font-size: 9px;
-                color: white;
+              .detail-message-unread {
+                width: 90%;
+              }
+
+              .unread-count {
+                width: 10%;
+
+                .unread-count-badge {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                  background-color: red;
+                  font-size: 9px;
+                  color: white;
+                }
               }
             }
           }
-        }
 
-        &:hover {
-          background-color: global-variable.$hover-background-color;
-          cursor: pointer;
+          &:hover {
+            background-color: global-variable.$hover-background-color;
+            cursor: pointer;
+          }
         }
       }
     }

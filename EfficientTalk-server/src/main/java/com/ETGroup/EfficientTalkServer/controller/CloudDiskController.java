@@ -93,6 +93,42 @@ public class CloudDiskController {
         }
     }
     
+    @Operation(summary = "重命名组织云盘文件夹")
+    @PutMapping("/renameOrgCloudDiskFolder")
+    public ResponseData<Void> renameOrgCloudDiskFolder(@RequestParam String folderId, @RequestParam String newFolderName) {
+        boolean result = cloudDiskService.renameOrgCloudDiskFolder(folderId, newFolderName);
+        if (result) {
+            return ResponseData.success();
+        }
+        else {
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "在组织云盘删除文件夹")
+    @DeleteMapping("/deleteOrgCloudDiskFolder")
+    public ResponseData<Void> deleteOrgCloudDiskFolder(@RequestParam String folderId) {
+        boolean result = cloudDiskService.deleteCloudDiskFolder(folderId);
+        if (result) {
+            return ResponseData.success();
+        }
+        else {
+            return ResponseData.error(ResponseConfig.RESOURCE_DELETE_FAILED);
+        }
+    }
+    
+    @Operation(summary = "重命名组织云盘文件")
+    @PutMapping("/renameOrgCloudDiskFile")
+    public ResponseData<Void> renameOrgCloudDisFile(@RequestParam String fileId, @RequestParam String newFileName) {
+        boolean result = cloudDiskService.renameOrgCloudDiskFile(fileId, newFileName);
+        if (result) {
+            return ResponseData.success();
+        }
+        else {
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
     @Operation(summary = "在组织云盘删除文件")
     @DeleteMapping("/deleteCloudDiskFile")
     public ResponseData<Void> deleteCloudDiskFile(@RequestParam String fileId) {
