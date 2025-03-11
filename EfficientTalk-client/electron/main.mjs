@@ -20,6 +20,10 @@ const {ipcMain} = require("electron");
 const path = require("node:path");
 const fs = require("node:fs");
 
+// 持久化存储
+import Store from 'electron-store';
+const store = new Store();
+
 // 会话ID
 const sessionId = new Date().getTime().toString();
 
