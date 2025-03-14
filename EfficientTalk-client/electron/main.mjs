@@ -8,7 +8,8 @@ import {
     clipboard,
     Tray,
     Menu,
-    ipcMain
+    ipcMain,
+    screen
 } from "electron";
 
 // Node模块
@@ -283,7 +284,86 @@ ipcMain.handle("app-window-get-config", (e, appId) => {
 });
 // 应用窗口相关操作 end ###################################################################################################
 
+// 系统通知窗口相关操作 start ##############################################################################################
+// 系统通知窗口
+let systemNoticeWindow = null;
+
+// 新建系统通知窗口
+const openSystemNoticeWindow = () => {
+    if (systemNoticeWindow === null || systemNoticeWindow === undefined) {
+        systemNoticeWindow = new BrowserWindow({
+            width: 400,
+            height: 600,
+            webPreferences: {
+                webSecurity: false,
+                nodeIntegration: true,
+                preload: path.join(__dirname, "preload.cjs"),
+                session: session.fromPartition(`persist:${sessionId}`)
+            },
+            icon: path.join(__dirname, iconPath),
+            // 禁用大小调节
+            resizable: false,
+            // 是否使用自带标题栏
+            frame: false,
+            transparent: true,
+        });
+
+        // 窗口路由
+        systemNoticeWindow.loadURL(projectUrl + "#" + "/system-notice")
+                          .then();
+
+        // 程序启动后开启开发者工具
+        systemNoticeWindow.webContents.openDevTools();
+
+        // 窗口位置设置
+        systemNoticeWindow.setAlwaysOnTop(true);
+        const windowSize = systemNoticeWindow.getSize(); // 获取窗口的大小
+        const mainScreen = screen.getPrimaryDisplay(); // 获取主屏幕的信息
+        const workArea = mainScreen.workArea; // 获取工作区域（排除任务栏等）
+        const x = workArea.x + workArea.width - windowSize[0];
+        const y = workArea.y + workArea.height - windowSize[1];
+        systemNoticeWindow.setPosition(x, y);
+    }
+    else {
+        systemNoticeWindow.show();
+    }
+};
+
+// 关闭系统通知窗口
+const closeSystemNoticeWindow = () => {
+    systemNoticeWindow.close();
+    systemNoticeWindow = null;
+};
+
+// 关闭系统通知
+ipcMain.handle("system-notice-window-close", () => {
+    closeSystemNoticeWindow();
+});
+// 系统通知窗口相关操作 end ################################################################################################
+
 // 业务功能 start ########################################################################################################
+// 关闭所有窗口
+const closeAllWindow = () => {
+    // 退出登录时关闭所有子窗口
+    Object.keys(childWindowManager).forEach(windowName => {
+        if (childWindowManager[windowName] !== null) {
+            childWindowManager[windowName].windowObject.close();
+            childWindowManager[windowName] = null;
+        }
+    });
+
+    // 退出登录时关闭所有应用窗口
+    Object.keys(appWindowManager).forEach(appId => {
+        if (appWindowManager[appId] !== null) {
+            appWindowManager[appId].windowObject.close();
+            appWindowManager[appId] = null;
+        }
+    });
+
+    // 关闭系统通知窗口
+    closeSystemNoticeWindow();
+};
+
 // 登录
 ipcMain.handle("system-login", (e, param) => {
     mainWindow.close();
@@ -310,25 +390,15 @@ ipcMain.handle("system-login", (e, param) => {
 
     mainWindow.loadURL(projectUrl + "#/app")
               .then();
+
+    // 打开系统通知窗口
+    openSystemNoticeWindow();
 });
 
 // 登出
 ipcMain.handle("system-logout", (e, param) => {
-    // 退出登录时关闭所有子窗口
-    Object.keys(childWindowManager).forEach(windowName => {
-        if (childWindowManager[windowName] !== null) {
-            childWindowManager[windowName].windowObject.close();
-            childWindowManager[windowName] = null;
-        }
-    });
-
-    // 退出登录时关闭所有应用窗口
-    Object.keys(appWindowManager).forEach(appId => {
-        if (appWindowManager[appId] !== null) {
-            appWindowManager[appId].windowObject.close();
-            appWindowManager[appId] = null;
-        }
-    });
+    // 关闭所有窗口
+    closeAllWindow();
 
     mainWindow.close();
     mainWindow = new BrowserWindow({

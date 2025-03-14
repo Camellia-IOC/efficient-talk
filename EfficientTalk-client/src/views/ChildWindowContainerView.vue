@@ -1,5 +1,5 @@
 <template>
-  <div class="child-window-container-view">
+  <div class="child-window-container-view window-frame-border">
     <div class="child-window-header">
       <ChildWindowHeader :window-name="childWindowName"
                          :config="childWindowConfig"

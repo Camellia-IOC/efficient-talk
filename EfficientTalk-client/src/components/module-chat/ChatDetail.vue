@@ -32,6 +32,7 @@
       <div class="message-item"
            v-for="(item,index) in chatHistory"
            :key="index"
+           :id="item.id"
       >
         <div v-if="item.sender !== curLoginUser.userId"
              class="others-message"
@@ -226,10 +227,13 @@
                       :bordered="false"
                       :autoSize="false"
                       @pressEnter.prevent="handleSend"
+                      ref="chatInputRef"
           ></a-textarea>
           <template #overlay>
             <div class="context-menu-container">
-              <div class="context-menu-item">
+              <div class="context-menu-item"
+                   @click="cutChatInput"
+              >
                 <ScissorOutlined/>
                 剪切
               </div>
@@ -240,20 +244,22 @@
                 复制
               </div>
               <div class="context-menu-item"
-                   @click="readFromClipboard"
+                   @click="pasteToChatInput"
               >
                 <ReconciliationOutlined/>
                 粘贴
               </div>
-              <div class="context-menu-item">
-                <CheckCircleOutlined />
+              <div class="context-menu-item"
+                   @click="selectAllInputContent"
+              >
+                <CheckCircleOutlined/>
                 全选
               </div>
             </div>
           </template>
         </a-dropdown>
         <div class="operation-bar">
-          <label class="tip-label">按下Enter键发送</label>
+          <label class="tip-label">按下<code>Enter</code>键以发送</label>
           <a-button type="primary"
                     class="btn-send"
                     @click="handleSend"
@@ -327,12 +333,12 @@
         openFilePreviewChildWindow,
         openMediaFilePreviewChildWindow
     } from "../../window-controller/controller/ChildWindowController.js";
-    import MainWindowController from "../../window-controller/main-window-controller.js";
     import {
         copyToClipboard,
         getSelectedContent,
         readFromClipboard
     } from "../../utils/system-utils.js";
+    import { chatInfoObject } from "../../type/type.js";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -371,23 +377,36 @@
 
     // 输入消息
     const chatInput = ref("");
+    const chatInputRef = ref(null);
     const selectedEmoji = ref();
     const handleEmojiSelect = (emoji) => {
         chatInput.value += emoji.i;
         selectedEmoji.value = "";
     };
+    // 粘贴内容
+    const pasteToChatInput = async () => {
+        const content = await readFromClipboard();
+        chatInput.value += content;
+    };
+    // 剪切内容
+    const cutChatInput = () => {
+        const inputElement = document.querySelector("textarea.input");
+        const startIndex = inputElement.selectionStart;
+        const endIndex = inputElement.selectionEnd;
+        const content = chatInput.value.substring(startIndex, endIndex);
+        copyToClipboard(content);
+        chatInput.value = chatInput.value.substring(0, startIndex) + chatInput.value.substring(endIndex);
+    };
+    // 全选内容
+    const selectAllInputContent = () => {
+        const inputElement = document.querySelector("textarea.input");
+        inputElement.select();
+    };
 
     //传入参数
     const props = defineProps({
         chatInfo: {
-            type: Object,
-            default: () => {
-                return {
-                    userId: "",
-                    userName: "",
-                    userAvatar: ""
-                };
-            }
+            type: chatInfoObject
         }
     });
 
@@ -444,7 +463,7 @@
                 content: chatInput.value,
                 time: dayjs().format("YYYY-MM-DD HH:mm:ss")
             };
-            websocketStore.socket.send(JSON.stringify(message));
+            websocketStore.sendMessage(message);
             chatHistory.value.push(message);
 
             // 发送消息后滚动到底部
@@ -526,7 +545,7 @@
                     content: filePath,
                     time: dayjs().format("YYYY-MM-DD HH:mm:ss")
                 };
-                websocketStore.socket.send(JSON.stringify(message));
+                websocketStore.sendMessage(message);
 
                 // 添加文件信息至本地消息记录
                 message.fileName = messageItem.fileName;
@@ -534,8 +553,13 @@
                 message.fileSize = messageItem.fileSize;
                 chatHistory.value.push(message);
 
-                // 发送消息后滚动到底部
-                scrollToBottom("smooth");
+                if (message.type === "image") {
+                    await afterImageSendCallBack(message.id);
+                }
+                else {
+                    // 发送消息后滚动到底部
+                    scrollToBottom("smooth");
+                }
 
                 // 广播消息
                 window.dispatchEvent(new CustomEvent("messageSend", {
@@ -549,6 +573,34 @@
         else {
             message.error("当前为离线状态，发送失败");
         }
+    };
+
+    // 图片发送后回调
+    const afterImageSendCallBack = async (id) => {
+        await nextTick(() => {
+            const elementTag = `#${id} img.image`;
+            let image;
+            try {
+                image = document.querySelector(elementTag);
+            } catch (error) {
+                console.error(error);
+            }
+            console.error(image);
+            if (image) {
+                if (image.complete) {
+                    scrollToBottom("smooth");
+                    return;
+                }
+                image.onload = () => {
+                    scrollToBottom("smooth");
+                };
+            }
+            else {
+                setTimeout(() => {
+                    afterImageSendCallBack(id);
+                }, 300);
+            }
+        });
     };
 
     // 聊天记录
@@ -624,8 +676,25 @@
             chatHistory.value = await getChatHistory(friendId, curLoginUser.value.userId);
         }
 
-        // 发送消息后滚动到底部
-        scrollToBottom("auto");
+        await nextTick(() => {
+            const images = document.querySelectorAll(".image-message img");
+            let loadedCount = 0;
+            const totalImages = images.length;
+
+            if (totalImages === 0) {
+                scrollToBottom("auto");
+            }
+            else {
+                images.forEach(img => {
+                    img.onload = () => {
+                        loadedCount++;
+                        if (loadedCount === totalImages) {
+                            scrollToBottom("auto");
+                        }
+                    };
+                });
+            }
+        });
     };
 
     // 处理文件预览

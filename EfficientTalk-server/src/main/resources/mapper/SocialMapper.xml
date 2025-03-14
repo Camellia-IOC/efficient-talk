@@ -11,7 +11,8 @@
 			   users.dept_id            as deptId,
 			   departments.dept_name    as deptName,
 			   friend_groups.group_id   as groupId,
-			   friend_groups.group_name as groupName
+			   friend_groups.group_name as groupName,
+			   users.online_state       as onlineState
 		FROM friends
 				 LEFT JOIN users ON friends.friend_id = users.id
 				 LEFT JOIN departments ON users.dept_id = departments.dept_id

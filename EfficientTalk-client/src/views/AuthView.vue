@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-view-container">
+  <div class="auth-view-container window-frame-border">
     <div class="container-header draggable">
       <a-button class="window-header-btn no-drag"
                 @click="windowClose"
@@ -28,12 +28,13 @@
         ></a-input>
       </div>
       <div class="license">
-        <a-radio>已阅读并同意服务协议</a-radio>
+        <a-radio v-model:checked="isAcceptLicense">已阅读并同意服务协议</a-radio>
       </div>
       <div class="operation">
         <a-button class="operation-btn"
                   type="primary"
                   @click="handleLogin"
+                  :disabled="!isAcceptLicense"
         >登录
         </a-button>
       </div>
@@ -51,6 +52,7 @@
 
     const accountInput = ref("");
     const passwordInput = ref("");
+    const isAcceptLicense = ref(false);
 
     // 关闭窗口
     const windowClose = () => {

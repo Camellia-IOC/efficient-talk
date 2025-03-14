@@ -9,18 +9,18 @@
       <label class="title">{{ config.title }}</label>
     </div>
     <div class="window-controller">
-      <a-button class="control-btn no-drag"
+      <a-button class="window-header-btn no-drag"
                 @click="windowMinimize"
       >
         <MinusOutlined/>
       </a-button>
-      <a-button class="control-btn no-drag"
+      <a-button class="window-header-btn no-drag"
                 @click="windowMaximize"
       >
         <CompressOutlined v-if="isMaximized"/>
         <ExpandOutlined v-else/>
       </a-button>
-      <a-button class="control-btn no-drag"
+      <a-button class="window-header-btn no-drag"
                 @click="windowClose"
       >
         <CloseOutlined/>
@@ -125,23 +125,6 @@
       height: 100%;
       background-color: global-variable.$background-color;
       padding-right: 10px;
-
-      .control-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 30px;
-        height: 30px;
-        color: black;
-        border-radius: 50%;
-        border: 0;
-        box-shadow: none;
-        background-color: transparent;
-
-        &:hover {
-          background-color: rgba(160, 160, 160, 0.1);
-        }
-      }
     }
   }
 </style>

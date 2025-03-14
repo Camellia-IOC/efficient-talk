@@ -15,14 +15,12 @@ export const getSelectedContent = () => {
  */
 export const copyToClipboard = (content) => {
     MainWindowController.copyToClipboard(content);
-    message.success("复制成功").then();
 };
 
 /** 读取剪贴板中的内容
  *
- * @returns {string} 读取的内容
+ * @returns {Promise} 读取的内容
  */
-export const readFromClipboard = () => {
-    const content = MainWindowController.readFromClipboard();
-    return content;
+export const readFromClipboard = async () => {
+    return await MainWindowController.readFromClipboard();
 };

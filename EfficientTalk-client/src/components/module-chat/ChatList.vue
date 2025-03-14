@@ -208,7 +208,6 @@
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
     import { saveChatRecord } from "../../database/chat-history.js";
-    import { copyToClipboard } from "../../utils/system-utils.js";
 
     const props = defineProps({
         friendInfo: {
@@ -770,7 +769,19 @@
         height: fit-content;
 
         .chat-list-item-top {
+          position: relative;
           background-color: global-variable.$hover-background-color;
+
+          &:after{
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-top: 8px solid global-variable.$theme-color;
+            border-left: 8px solid transparent;
+          }
         }
 
         .chat-list-item-active {

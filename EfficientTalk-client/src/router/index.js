@@ -125,6 +125,12 @@ const router = createRouter({
             path: "/app-window",
             name: "/app-window",
             component: () => import("../views/AppWindowContainerView.vue")
+        },
+        {
+            // 系统通知
+            path: "/system-notice",
+            name: "/system-notice",
+            component: () => import("../views/SystemNoticeView.vue")
         }
     ]
 });

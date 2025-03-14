@@ -9,7 +9,9 @@
     <template #title>
       <div class="dialog-title">
         <div class="logo">
-          <Logo :color="themeColor" :size="30"/>
+          <Logo :color="themeColor"
+                :size="30"
+          />
         </div>
         <label>用户状态</label>
       </div>
@@ -29,10 +31,10 @@
           <label>离线</label>
         </div>
         <div class="cur-state"
-             v-else-if="websocketStore.onlineState==='LEAVE'"
+             v-else-if="websocketStore.onlineState==='HIDE'"
         >
-          <ClockCircleFilled style="color: #E6A23C"/>
-          <label>离开</label>
+          <EyeInvisibleFilled style="color: #C0C4CC"/>
+          <label>隐身</label>
         </div>
       </div>
       <div class="online-state-switcher">
@@ -49,19 +51,19 @@
              :class="{'active-state-item': websocketStore.onlineState==='OUTLINE'}"
              @click="websocketStore.switchOnlineState('OUTLINE')"
         >
-          <FrownFilled style="color:#F56C6C;"
+          <FrownFilled style="color: #F56C6C;"
                        class="state-icon"
           />
           <label>离线</label>
         </div>
         <div class="state-item"
-             :class="{'active-state-item': websocketStore.onlineState==='LEAVE'}"
-             @click="websocketStore.switchOnlineState('LEAVE')"
+             :class="{'active-state-item': websocketStore.onlineState==='HIDE'}"
+             @click="websocketStore.switchOnlineState('HIDE')"
         >
-          <ClockCircleFilled style="color: #E6A23C"
-                             class="state-icon"
+          <EyeInvisibleFilled style="color: #C0C4CC"
+                              class="state-icon"
           />
-          <label>离开</label>
+          <label>隐身</label>
         </div>
       </div>
     </div>
@@ -73,7 +75,7 @@
     import {
         SmileFilled,
         FrownFilled,
-        ClockCircleFilled
+        EyeInvisibleFilled
     } from "@ant-design/icons-vue";
     import { useWebSocketStore } from "../../../../store/WebSocketStore.js";
     import Logo from "../../../logo/Logo.vue";

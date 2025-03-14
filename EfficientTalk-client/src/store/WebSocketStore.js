@@ -2,11 +2,13 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { saveChatRecord } from "../database/chat-history.js";
 import UserApi from "../api/modules/UserApi.js";
+import { message } from "ant-design-vue";
 
 // WebSocket全局配置
 export const useWebSocketStore = defineStore("web-socket-store", () => {
     // 连接基本信息
     const url = ref("ws://localhost:18080/chat/");
+    /** @type {Ref<WebSocket>} */
     const socket = ref(null);
     const curLoginUserId = ref(null);
 
@@ -36,6 +38,7 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
         socket.value.onclose = () => {
             console.log("WebSocket连接已关闭");
             switchOnlineState("OUTLINE");
+            message.error("服务器连接已断开").then();
         };
         socket.value.onerror = (error) => {
             console.error("WebSocket连接发生错误：", error);
@@ -51,14 +54,19 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
         }
     };
 
+    // 发送消息
+    const sendMessage = (message) => {
+        if (socket.value !== null) {
+            socket.value.send(JSON.stringify(message));
+        }
+    };
+
     // 切换在线状态
     const switchOnlineState = (state) => {
-        // 更新用户在线状态
-        onlineState.value = state;
-        UserApi.setUserOnlineState({
-            userId: curLoginUserId.value,
-            onlineState: state
-        });
+        // 如果当前状态与要切换的状态相同，则不执行任何操作
+        if (state === onlineState.value) {
+            return;
+        }
 
         if (state === "OUTLINE") {
             closeSocket();
@@ -66,8 +74,19 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
         else if (state === "ONLINE") {
             if (socket.value === null) {
                 initSocket(curLoginUserId.value);
+
+                if (onlineState.value === "OUTLINE") {
+                    message.success("连接服务器成功").then();
+                }
             }
         }
+
+        // 更新用户在线状态
+        onlineState.value = state;
+        UserApi.setUserOnlineState({
+            userId: curLoginUserId.value,
+            onlineState: state
+        });
     };
 
     return {
@@ -75,6 +94,7 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
         onlineState,
         initSocket,
         closeSocket,
+        sendMessage,
         switchOnlineState,
     };
 });

@@ -66,14 +66,11 @@ export default class MainWindowController {
 
     /**
      * 从剪贴板读取内容
-     * @returns {string} 读取到的内容
+     * @returns {Promise} 读取到的内容
      */
     static readFromClipboard = () => {
-        let content;
-        systemController.readFromClipboard().then((result) => {
-            console.log("读取剪贴板内容：" + result);
-            content = result;
-            return content;
+        return systemController.readFromClipboard().then((result) => {
+            return result;
         }).catch((error) => {
             console.error("读取剪贴板内容失败：" + error);
             return "";

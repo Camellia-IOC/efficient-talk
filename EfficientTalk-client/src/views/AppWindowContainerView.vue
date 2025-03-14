@@ -1,5 +1,5 @@
 <template>
-  <div class="app-window-container-view">
+  <div class="app-window-container-view window-frame-border">
     <div class="app-window-header">
       <AppWindowHeader :app-id="appId"
                        :config="appWindowConfig"

@@ -42,12 +42,12 @@
           <label class="state-label">离线</label>
         </div>
         <div class="state leave"
-             v-else-if="websocketStore.onlineState==='LEAVE'"
+             v-else-if="websocketStore.onlineState==='HIDE'"
         >
           <div class="state-icon">
-            <ClockCircleFilled class="leave"/>
+            <EyeInvisibleFilled class="hide"/>
           </div>
-          <label class="state-label">离开</label>
+          <label class="state-label">隐身</label>
         </div>
       </div>
       <div v-for="(item,index) in navConfig"
@@ -112,7 +112,7 @@
         PoweroffOutlined,
         BarsOutlined,
         FrownFilled,
-        ClockCircleFilled,
+        EyeInvisibleFilled,
         BellOutlined,
         BellFilled
     } from "@ant-design/icons-vue";
@@ -294,8 +294,8 @@
               color: #F56C6C;
             }
 
-            .leave {
-              color: #E6A23C;
+            .hide {
+              color: #C0C4CC;
             }
           }
 

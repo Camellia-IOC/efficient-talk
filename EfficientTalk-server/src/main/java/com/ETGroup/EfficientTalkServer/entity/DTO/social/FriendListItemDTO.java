@@ -11,4 +11,5 @@ public class FriendListItemDTO {
     private String deptName;
     private String groupId;
     private String groupName;
+    private String onlineState;
 }

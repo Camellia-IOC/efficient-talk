@@ -1,5 +1,5 @@
 <template>
-  <div class="index-view-container">
+  <div class="index-view-container window-frame-border">
     <!--标题栏操作区-->
     <div class="app-header">
       <AppHeader/>
@@ -67,6 +67,7 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
+    background-color: transparent;
 
     // 标题栏高度
     $app-header-height: 50px;

@@ -31,18 +31,18 @@
       </div>
     </div>
     <div class="window-controller">
-      <a-button class="control-btn no-drag"
+      <a-button class="control-btn window-header-btn no-drag"
                 @click="windowMinimize"
       >
         <MinusOutlined/>
       </a-button>
-      <a-button class="control-btn no-drag"
+      <a-button class="control-btn window-header-btn no-drag"
                 @click="windowMaximize"
       >
         <CompressOutlined v-if="isMaximized"/>
         <ExpandOutlined v-else/>
       </a-button>
-      <a-button class="control-btn no-drag"
+      <a-button class="control-btn window-header-btn no-drag"
                 @click="windowClose"
       >
         <CloseOutlined/>
@@ -269,10 +269,6 @@
         border: 0;
         box-shadow: none;
         background-color: transparent;
-
-        &:hover {
-          background-color: rgba(160, 160, 160, 0.1);
-        }
       }
     }
   }
