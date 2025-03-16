@@ -24,7 +24,6 @@
     "animate.css": "^4.1.1",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.7.9",
-    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
     "electron-squirrel-startup": "^1.0.1",
