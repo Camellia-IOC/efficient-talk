@@ -16,6 +16,17 @@ export default class ChatApi {
     };
 
     /**
+     * 删除聊天记录
+     * @param data 请求数据
+     */
+    static deleteChatHistory = (data) => {
+        return service.delete({
+            url: this.requestPath + "/deleteChatHistory",
+            data
+        });
+    };
+
+    /**
      * 保存对话列表
      * @param data 请求数据
      */

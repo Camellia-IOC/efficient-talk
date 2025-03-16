@@ -70,4 +70,11 @@ public interface ChatMapper {
     
     // 获取聊天媒体文件路径
     String getChatMediaFilePath(@Param("fileId") String fileId);
+    
+    /**
+     * 删除聊天记录
+     * @param messageId 消息id
+     * @return 删除条数
+     */
+    int deleteChatHistory(@Param("messageId") String messageId);
 }

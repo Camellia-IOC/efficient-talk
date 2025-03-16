@@ -32,4 +32,6 @@ public class ChatRecordDTO {
     private String content;
     // 发送时间
     private LocalDateTime time;
+    // 是否选中(前端用)
+    private Boolean isSelected = false;
 }

@@ -195,4 +195,11 @@
 		INSERT INTO chat_list (user_id, chat_list)
 		VALUES (#{userId}, #{chatList})
 	</insert>
+
+	<!--删除聊天记录-->
+	<delete id="deleteChatHistory">
+		DELETE
+		FROM chat_history
+		WHERE id = #{messageId}
+	</delete>
 </mapper>

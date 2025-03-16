@@ -179,7 +179,7 @@
             path: "/app/notification"
         },
         {
-            name: "工作台",
+            name: "应用中心",
             index: 4,
             icon: AppstoreOutlined,
             iconActive: AppstoreFilled,
@@ -246,7 +246,7 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      height: 50%;
+      height: 60%;
 
       .user-info-container {
         display: flex;
@@ -323,8 +323,9 @@
         width: 40px;
         height: 40px;
         border-radius: 10px;
-        margin: 10px;
+        margin: 8px;
         transition: all 0.3s ease;
+        cursor: pointer;
 
         &:hover {
           background-color: rgba(255, 255, 255, 0.2);
@@ -347,7 +348,7 @@
       justify-content: flex-end;
       align-items: center;
       width: 100%;
-      height: 50%;
+      height: 40%;
 
       .nav-item {
         display: flex;
@@ -358,6 +359,7 @@
         border-radius: 10px;
         margin: 10px;
         transition: all 0.3s ease;
+        cursor: pointer;
 
         &:hover {
           background-color: rgba(255, 255, 255, 0.2);

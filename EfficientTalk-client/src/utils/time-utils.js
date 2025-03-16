@@ -7,6 +7,13 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
 /**
+ * 获取当前时间
+ */
+export const getCurrentTime = () => {
+    return dayjs().format("YYYY-MM-DD HH:mm:ss");
+};
+
+/**
  * 格式化消息时间
  * @param time 时间戳或日期字符串
  * @param position 所属位置
@@ -65,4 +72,4 @@ export const formatMessageTime = (time, position) => {
 export const formatDate = (time) => {
     const formatTime = dayjs(time);
     return formatTime.format("YYYY-MM-DD HH:mm:ss");
-}
+};

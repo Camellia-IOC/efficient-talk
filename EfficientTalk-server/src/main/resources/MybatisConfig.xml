@@ -24,5 +24,6 @@
 		<mapper resource="mapper/ChatMapper.xml"/>
 		<mapper resource="mapper/UserMapper.xml"/>
 		<mapper resource="mapper/CloudDiskMapper.xml"/>
+		<mapper resource="mapper/AiMapper.xml"/>
 	</mappers>
 </configuration>

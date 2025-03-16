@@ -257,4 +257,21 @@ public class ChatServiceImpl implements ChatService {
                                                          LocalDateTime lastTime) {
         return chatMapper.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime);
     }
+    
+    /**
+     * 删除聊天记录
+     *
+     * @param idList 聊天记录ID
+     *
+     * @return 是否删除成功
+     */
+    @Override
+    public boolean deleteChatHistory(ArrayList<String> idList) {
+        for (String id : idList) {
+            if (chatMapper.deleteChatHistory(id) != 1) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

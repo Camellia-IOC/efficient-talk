@@ -30,6 +30,7 @@
         ref
     } from "vue";
     import { getCurUserData } from "../database/cur-user.js";
+    import MainWindowController from "../window-controller/main-window-controller.js";
 
     const websocketStore = useWebSocketStore();
 
@@ -43,10 +44,9 @@
         await updateCurLoginUser();
         if (curLoginUser.value === null) {
             // 如果当前登录用户信息为空则退出到登录页面
-            // TODO 使用electron运行时记得取消相应注释
-            windowController.hide();
-            systemController.logout();
-            windowController.show();
+            MainWindowController.hideMainWindow();
+            MainWindowController.systemLogout();
+            MainWindowController.showMainWindow();
         }
 
         // 打开WebSocket连接

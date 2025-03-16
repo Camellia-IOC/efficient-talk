@@ -559,7 +559,7 @@
                 }
 
                 // 如果在置顶列表中没有找到，再遍历普通列表
-                if (existFlag) {
+                if (!existFlag) {
                     for (let j = 0; j < chatList.value.commonList.length; j++) {
                         if (chatList.value.commonList[j].userId === message.sender) {
                             if (chatList.value.commonList[j].lastMessageTime < message.time) {

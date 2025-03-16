@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Tag(name = "通讯相关接口", description = "通讯相关接口")
 @Slf4j
@@ -69,6 +70,17 @@ public class ChatController {
         ChatHistoryResponseVO response = new ChatHistoryResponseVO();
         response.setChatHistory(chatService.getChatHistoryCache(userId));
         return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "删除聊天记录")
+    @DeleteMapping("/deleteChatHistory")
+    public ResponseData<Void> deleteChatHistory(@RequestParam("idList") ArrayList<String> idList) {
+        if (chatService.deleteChatHistory(idList)) {
+            return ResponseData.success();
+        }
+        else {
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "保存聊天文件")

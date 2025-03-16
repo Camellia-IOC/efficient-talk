@@ -20,7 +20,9 @@ const socialServicePort = "18080";
 /** 聊天服务端口 */
 const chatServicePort = "18080";
 /** 应用商店服务端口 */
-const AppStoreServicePort = "18080";
+const appStoreServicePort = "18080";
+/** AI服务端口 */
+const aiServicePort = "18080";
 
 // 生成并导出axios实例
 /** 认证服务实例 */
@@ -34,4 +36,6 @@ export const socialService = new BaseAxiosInstance(serverIP, socialServicePort, 
 /** 聊天服务实例 */
 export const chatService = new BaseAxiosInstance(serverIP, chatServicePort, 10000);
 /** 应用商店服务实例 */
-export const appStoreService = new BaseAxiosInstance(serverIP, AppStoreServicePort, 10000);
+export const appStoreService = new BaseAxiosInstance(serverIP, appStoreServicePort, 10000);
+/** AI服务实例 */
+export const aiService = new BaseAxiosInstance(serverIP, aiServicePort, 10000);

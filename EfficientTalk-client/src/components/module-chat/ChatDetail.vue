@@ -33,7 +33,12 @@
            v-for="(item,index) in chatHistory"
            :key="index"
            :id="item.id"
+           :class="{'selected-message':item.isSelected}"
       >
+        <a-checkbox v-model:checked="item.isSelected"
+                    v-show="isSelectMessageMode"
+                    @change="checkedValue=>handleMessageSelect(checkedValue.target.checked,item.id)"
+        ></a-checkbox>
         <div v-if="item.sender !== curLoginUser.userId"
              class="others-message"
         >
@@ -48,40 +53,104 @@
               {{ chatInfo.userName }}
             </div>
             <div class="message-content-container">
-              <div class="text-message"
-                   v-if="item.type === 'text'"
+              <a-dropdown :trigger="['contextmenu']"
+                          v-if="item.type === 'text'"
               >
-                <a-dropdown :trigger="['contextmenu']">
+                <div class="text-message">
                   <div>{{ item.content }}</div>
-                  <template #overlay>
-                    <div class="context-menu-container">
-                      <div class="context-menu-item"
-                           @click="copyToClipboard(item.content)"
-                      >
+                </div>
+                <template #overlay>
+                  <div class="context-menu-container">
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.copyToClipboard(item.content)"
+                    >
+                      <div class="icon">
                         <CopyOutlined/>
-                        复制
                       </div>
-                      <div class="context-menu-item">
-                        <ExportOutlined/>
-                        转发
-                      </div>
-                      <div class="context-menu-item">
-                        <DeleteOutlined/>
-                        删除
-                      </div>
+                      复制
                     </div>
-                  </template>
-                </a-dropdown>
-              </div>
-              <div class="image-message"
-                   v-else-if="item.type === 'image'"
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.transmitMessage(item)"
+                    >
+                      <div class="icon">
+                        <ExportOutlined/>
+                      </div>
+                      转发
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.deleteFromChatHistory(item.id)"
+                    >
+                      <div class="icon">
+                        <DeleteOutlined/>
+                      </div>
+                      删除
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.switchSelectMessageMode"
+                    >
+                      <div class="icon">
+                        <CheckSquareOutlined/>
+                      </div>
+                      多选
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.assistantHelperReadText(item.content)"
+                    >
+                      <div class="icon">
+                        <AiAssistantIcon :size="16"/>
+                      </div>
+                      小易帮阅
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.assistantHelperReply(item.content)"
+                    >
+                      <div class="icon">
+                        <AiAssistantIcon :size="16"/>
+                      </div>
+                      快捷回复
+                    </div>
+                  </div>
+                </template>
+              </a-dropdown>
+              <a-dropdown :trigger="['contextmenu']"
+                          v-else-if="item.type === 'image'"
               >
-                <img :src="item.content"
-                     alt="image"
-                     class="image"
-                     @click="handleMediaFilePreview(item.fileId, 'image')"
-                />
-              </div>
+                <div class="image-message">
+                  <img :src="item.content"
+                       alt="image"
+                       class="image"
+                       @click="handleMediaFilePreview(item.fileId, 'image')"
+                  />
+                </div>
+                <template #overlay>
+                  <div class="context-menu-container">
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.transmitMessage(item)"
+                    >
+                      <div class="icon">
+                        <ExportOutlined/>
+                      </div>
+                      转发
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.deleteFromChatHistory(item.id)"
+                    >
+                      <div class="icon">
+                        <DeleteOutlined/>
+                      </div>
+                      删除
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.assistantHelperReadImage(item.content)"
+                    >
+                      <div class="icon">
+                        <AiAssistantIcon :size="16"/>
+                      </div>
+                      小易识图
+                    </div>
+                  </div>
+                </template>
+              </a-dropdown>
               <div class="file-message"
                    v-else-if="item.type === 'file'"
               >
@@ -117,11 +186,49 @@
               {{ curLoginUser.userName }}
             </div>
             <div class="message-content-container">
-              <div class="text-message"
-                   v-if="item.type === 'text'"
+              <a-dropdown :trigger="['contextmenu']"
+                          v-if="item.type === 'text'"
               >
-                <div>{{ item.content }}</div>
-              </div>
+                <div class="text-message disable-context-menu">
+                  <div>{{ item.content }}</div>
+                </div>
+                <template #overlay>
+                  <div class="context-menu-container">
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.copyToClipboard(item.content)"
+                    >
+                      <div class="icon">
+                        <CopyOutlined/>
+                      </div>
+                      复制
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.transmitMessage(item)"
+                    >
+                      <div class="icon">
+                        <ExportOutlined/>
+                      </div>
+                      转发
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.switchSelectMessageMode"
+                    >
+                      <div class="icon">
+                        <CheckSquareOutlined/>
+                      </div>
+                      多选
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.deleteFromChatHistory(item.id)"
+                    >
+                      <div class="icon">
+                        <DeleteOutlined/>
+                      </div>
+                      删除
+                    </div>
+                  </div>
+                </template>
+              </a-dropdown>
               <div class="image-message"
                    v-else-if="item.type === 'image'"
               >
@@ -166,7 +273,39 @@
         </div>
       </div>
     </div>
-    <div class="chat-footer">
+    <div class="chat-footer"
+         v-show="isSelectMessageMode"
+    >
+      <div class="operations-bar"
+           style="justify-content: flex-end"
+      >
+        <a-button class="operation-btn"
+                  style="font-size: 14px"
+                  @click="contextMenuOperations.switchSelectMessageMode()"
+        >
+          <CloseOutlined/>
+        </a-button>
+      </div>
+      <div class="message-operations">
+        <div class="operation-btn">
+          <CopyOutlined/>
+          <label>复制</label>
+        </div>
+        <div class="operation-btn">
+          <ExportOutlined/>
+          <label>转发</label>
+        </div>
+        <div class="operation-btn"
+             @click="contextMenuOperations.deleteFromChatHistory(getSelectedMessageIdListStr())"
+        >
+          <DeleteOutlined/>
+          <label>删除</label>
+        </div>
+      </div>
+    </div>
+    <div class="chat-footer"
+         v-show="!isSelectMessageMode"
+    >
       <div class="operations-bar">
         <div class="left-bar">
           <a-popover title="表情包"
@@ -232,25 +371,25 @@
           <template #overlay>
             <div class="context-menu-container">
               <div class="context-menu-item"
-                   @click="cutChatInput"
+                   @click="contextMenuOperations.cutChatInput"
               >
                 <ScissorOutlined/>
                 剪切
               </div>
               <div class="context-menu-item"
-                   @click="copyToClipboard(getSelectedContent())"
+                   @click="contextMenuOperations.copyToClipboard(getSelectedContent())"
               >
                 <CopyOutlined/>
                 复制
               </div>
               <div class="context-menu-item"
-                   @click="pasteToChatInput"
+                   @click="contextMenuOperations.pasteToChatInput"
               >
                 <ReconciliationOutlined/>
                 粘贴
               </div>
               <div class="context-menu-item"
-                   @click="selectAllInputContent"
+                   @click="contextMenuOperations.selectAllInputContent"
               >
                 <CheckCircleOutlined/>
                 全选
@@ -260,11 +399,66 @@
         </a-dropdown>
         <div class="operation-bar">
           <label class="tip-label">按下<code>Enter</code>键以发送</label>
-          <a-button type="primary"
-                    class="btn-send"
-                    @click="handleSend"
-          >发送
-          </a-button>
+          <div class="btn-container">
+            <label class="tip-label"
+                   v-show="isAiGenerating"
+            >
+              <LoadingOutlined style="margin-right: 10px"/>
+              小易创作中</label>
+            <a-popover v-model:open="writerHelperOpen"
+                       placement="topRight"
+                       trigger="click"
+                       @open-change="aiWriterInput=''"
+            >
+              <template #title>
+                <div style="display: flex;justify-content:space-between;align-items: center">
+                  <div style="display: flex;align-items: center;gap: 5px">
+                  <span>
+                    <AiAssistantIcon :size="20"/>
+                  </span>
+                    小易帮写
+                  </div>
+                  <div>
+                    <a-button style="border: none;box-shadow: none"
+                              shape="circle"
+                              @click="closeWriterHelper"
+                    >
+                      <CloseOutlined/>
+                    </a-button>
+                  </div>
+                </div>
+              </template>
+              <template #content>
+                <div class="ai-writer-container">
+                  <a-textarea v-model:value="aiWriterInput"
+                              placeholder="提出你的需求，让小易帮你解决吧"
+                              :auto-size="{ minRows: 4, maxRows: 4 }"
+                  ></a-textarea>
+                  <div style="display: flex;justify-content: space-between;align-items: center;width: 100%">
+                    <label style="font-size: 12px;color: gray">
+                      <WarningOutlined style="margin-right: 2px;color: orange"/>
+                      内容由AI生成，仅供参考</label>
+                    <a-button type="primary"
+                              @click="writerAssistantWork"
+                    >开始写作
+                    </a-button>
+                  </div>
+                </div>
+              </template>
+              <a-button class="btn-ai-writer gradient-background"
+                        @click="openWriterHelper"
+              >
+                <AiWriterIcon :size="18"
+                              :color="'#FFFFFF'"
+                />
+              </a-button>
+            </a-popover>
+            <a-button type="primary"
+                      class="btn-send"
+                      @click="handleSend"
+            >发送
+            </a-button>
+          </div>
         </div>
       </div>
     </div>
@@ -287,6 +481,11 @@
                       :multi="true"
                       :type="'file'"
                       @send-selected-file="handleSendFileMessage"
+  />
+
+  <!--AI助手对话框-->
+  <AIResponseResultDialog ref="aiResponseResultDialog"
+                          :content="aiResponseResultDialogContent"
   />
 </template>
 
@@ -312,7 +511,11 @@
         DeleteOutlined,
         ScissorOutlined,
         ReconciliationOutlined,
-        CheckCircleOutlined
+        CheckCircleOutlined,
+        CloseOutlined,
+        WarningOutlined,
+        CheckSquareOutlined,
+        LoadingOutlined
     } from "@ant-design/icons-vue";
     import dayjs from "dayjs";
     import { UUID } from "uuidjs";
@@ -339,6 +542,14 @@
         readFromClipboard
     } from "../../utils/system-utils.js";
     import { chatInfoObject } from "../../type/type.js";
+    import AiWriterIcon from "../icon/AiWriterIcon.vue";
+    import AiAssistantIcon from "../icon/AiAssistantIcon.vue";
+    import {
+        replyHelperWork,
+        textReaderHelperWork,
+        writerHelperWork
+    } from "../../utils/ai-assistant.js";
+    import AIResponseResultDialog from "../dialog/ai-assistant/AIResponseResultDialog.vue";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -350,6 +561,12 @@
     const fileSelectorDialog = ref();
     const handleFileSelectorDialogOpen = () => {
         fileSelectorDialog.value.dialogOpen();
+    };
+
+    // AI助手对话框控制
+    const aiResponseResultDialog = ref();
+    const handleAiResponseResultDialogOpen = (title) => {
+        aiResponseResultDialog.value.dialogOpen(title);
     };
 
     // 当前登录的用户信息
@@ -383,24 +600,176 @@
         chatInput.value += emoji.i;
         selectedEmoji.value = "";
     };
-    // 粘贴内容
-    const pasteToChatInput = async () => {
-        const content = await readFromClipboard();
-        chatInput.value += content;
+    const isAiGenerating = ref(false);
+    const aiWriterInput = ref("");
+    const aiResponseResultDialogContent = ref("");
+
+    // 打开小易帮写弹窗
+    const writerHelperOpen = ref(false);
+    const openWriterHelper = () => {
+        writerHelperOpen.value = true;
     };
-    // 剪切内容
-    const cutChatInput = () => {
-        const inputElement = document.querySelector("textarea.input");
-        const startIndex = inputElement.selectionStart;
-        const endIndex = inputElement.selectionEnd;
-        const content = chatInput.value.substring(startIndex, endIndex);
-        copyToClipboard(content);
-        chatInput.value = chatInput.value.substring(0, startIndex) + chatInput.value.substring(endIndex);
+    const closeWriterHelper = () => {
+        writerHelperOpen.value = false;
     };
-    // 全选内容
-    const selectAllInputContent = () => {
-        const inputElement = document.querySelector("textarea.input");
-        inputElement.select();
+
+    // 小易帮写
+    const writerAssistantWork = async () => {
+        isAiGenerating.value = true;
+        writerHelperOpen.value = false;
+        const response = await writerHelperWork(aiWriterInput.value);
+        aiWriterInput.value = "";
+        for await (const data of response) {
+            if (data.choices.length !== 0) {
+                chatInput.value += data.choices[0].delta.content;
+            }
+            else {
+                message.success("内容生成完成");
+                isAiGenerating.value = false;
+            }
+        }
+    };
+
+    // 消息选择
+    const isSelectMessageMode = ref(false);
+    const selectedChatHistoryRecords = ref([]);
+    const getSelectedMessageIdListStr = () => {
+        return selectedChatHistoryRecords.value.join(",");
+    };
+    const handleMessageSelect = (isSelected, recordId) => {
+        if (isSelected) {
+            selectedChatHistoryRecords.value.push(recordId);
+        }
+        else {
+            for (let i = 0; i < selectedChatHistoryRecords.value.length; i++) {
+                if (selectedChatHistoryRecords.value[i] === recordId) {
+                    selectedChatHistoryRecords.value.splice(i, 1);
+                }
+            }
+        }
+    };
+
+    // 右键菜单操作
+    const contextMenuOperations = {
+        // 复制内容
+        copyToClipboard: (content) => {
+            copyToClipboard(content);
+        },
+        // 粘贴内容
+        pasteToChatInput: async () => {
+            const content = await readFromClipboard();
+            chatInput.value += content;
+        },
+        // 剪切内容
+        cutChatInput: () => {
+            const inputElement = document.querySelector("textarea.input");
+            const startIndex = inputElement.selectionStart;
+            const endIndex = inputElement.selectionEnd;
+            const content = chatInput.value.substring(startIndex, endIndex);
+            copyToClipboard(content);
+            chatInput.value = chatInput.value.substring(0, startIndex) + chatInput.value.substring(endIndex);
+        },
+        // 全选内容
+        selectAllInputContent: () => {
+            const inputElement = document.querySelector("textarea.input");
+            inputElement.select();
+        },
+        // 删除选中的消息
+        deleteFromChatHistory: async (idListStr) => {
+            const idList = idListStr.split(",");
+            ChatApi.deleteChatHistory({
+                idList: idListStr
+            }).then((response) => {
+                const res = response.data;
+                if (res.code === 0) {
+                    for (let i = 0; i < chatHistory.value.length; i++) {
+                        if (idList.includes(chatHistory.value[i].id)) {
+                            chatHistory.value.splice(i, 1);
+                            message.success("删除成功");
+                            break;
+                        }
+                    }
+                }
+                else {
+                    message.error("删除失败");
+                }
+            });
+            // 如果当前处于选择消息模式，从选中列表中删除当前消息
+            if (isSelectMessageMode.value && idList.length === 1) {
+                for (let i = 0; i < selectedChatHistoryRecords.value.length; i++) {
+                    if (selectedChatHistoryRecords.value[i] === idListStr) {
+                        selectedChatHistoryRecords.value.splice(i, 1);
+                    }
+                }
+            }
+        },
+        // 转发消息
+        transmitMessage: (originMessage) => {
+            const newMessage = {
+                id: UUID.generate(),
+                sender: curLoginUser.value.userId,
+                receiver: "2",
+                type: originMessage.type,
+                fileId: originMessage.fileId,
+                content: originMessage.content,
+                time: dayjs().format("YYYY-MM-DD HH:mm:ss")
+            };
+
+            websocketStore.sendMessage(newMessage);
+            window.dispatchEvent(new CustomEvent("messageSend", {
+                detail: newMessage
+            }));
+            handleSaveChatHistory(newMessage);
+            message.success("消息已转发");
+
+            if (newMessage.receiver === props.chatInfo.userId) {
+                chatHistory.value.push(newMessage);
+                scrollToBottom("smooth");
+            }
+        },
+        // 小易帮阅
+        assistantHelperReadText: async (originMessage) => {
+            aiResponseResultDialogContent.value = "";
+            handleAiResponseResultDialogOpen("小易帮阅");
+            const response = await textReaderHelperWork(originMessage);
+            for await (const data of response) {
+                if (data.choices.length !== 0) {
+                    aiResponseResultDialogContent.value += data.choices[0].delta.content;
+                }
+            }
+        },
+        // 小易识图
+        assistantHelperReadImage: async (originMessage) => {
+            aiResponseResultDialogContent.value = "";
+            handleAiResponseResultDialogOpen("小易帮阅");
+            const response = await textReaderHelperWork(originMessage);
+            for await (const data of response) {
+                if (data.choices.length !== 0) {
+                    aiResponseResultDialogContent.value += data.choices[0].delta.content;
+                }
+            }
+        },
+        // 快捷回复
+        assistantHelperReply: async (originMessage) => {
+            aiResponseResultDialogContent.value = "";
+            handleAiResponseResultDialogOpen("快捷回复");
+            const response = await replyHelperWork(originMessage);
+            for await (const data of response) {
+                if (data.choices.length !== 0) {
+                    aiResponseResultDialogContent.value += data.choices[0].delta.content;
+                }
+            }
+        },
+        // 切换选择消息模式
+        switchSelectMessageMode: () => {
+            selectedChatHistoryRecords.value = [];
+            for (let i = 0; i < chatHistory.value.length; i++) {
+                if (chatHistory.value[i].isSelected === true) {
+                    chatHistory.value[i].isSelected = false;
+                }
+            }
+            isSelectMessageMode.value = !isSelectMessageMode.value;
+        }
     };
 
     //传入参数
@@ -818,11 +1187,16 @@
 
       $message-item-gap: 15px;
 
+      .selected-message {
+        background-color: rgba(global-variable.$theme-color, 0.1);
+      }
+
       .message-item {
         display: flex;
-        width: 95%;
+        width: 100%;
         height: fit-content;
         margin-top: $message-item-gap;
+        padding: 2%;
 
         $avatar-container-width: 60px;
         $message-user-name-size: 12px;
@@ -1137,8 +1511,43 @@
       width: 100%;
       height: $footer-height;
       background-color: global-variable.$background-color;
+      border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
 
       $operations-bar-height: 40px;
+
+      .message-operations {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        gap: 50px;
+        height: calc(100% - $operations-bar-height);
+
+        .operation-btn {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          gap: 5px;
+          background-color: white;
+          width: 70px;
+          height: 70px;
+          border-radius: 15px;
+          cursor: pointer;
+          font-size: 14px;
+          box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+
+          label {
+            cursor: pointer;
+          }
+
+          &:hover {
+            background-color: global-variable.$theme-color;
+            color: white;
+          }
+        }
+      }
 
       .operations-bar {
         display: flex;
@@ -1147,7 +1556,6 @@
         width: 100%;
         height: $operations-bar-height;
         padding: 0 20px;
-        border-top: global-variable.$border-line-width solid global-variable.$border-line-color;
 
         .left-bar {
           display: flex;
@@ -1202,11 +1610,59 @@
             font-size: 12px;
           }
 
-          .btn-send {
-            background-color: global-variable.$theme-color;
+          .btn-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .btn-ai-writer {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 32px;
+              height: 32px;
+              padding: 0;
+
+              &:hover {
+                border: none;
+              }
+            }
+
+            .btn-send {
+              background-color: global-variable.$theme-color;
+            }
           }
         }
       }
     }
+  }
+
+  .gradient-background {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #14143a, #7b61ff, #5ce6ff, #5ce6c0);
+    background-size: 800% 800%;
+    animation: gradientFlow 5s ease infinite;
+  }
+
+  @keyframes gradientFlow {
+    0% {
+      background-position: 0 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  }
+
+  .ai-writer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 300px;
+    height: 140px;
   }
 </style>

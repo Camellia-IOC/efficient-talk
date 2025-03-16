@@ -143,4 +143,11 @@ public interface ChatService {
                                                   String type,
                                                   String searchKey,
                                                   LocalDateTime lastTime);
+    
+    /**
+     * 删除聊天记录
+     * @param idList 聊天记录ID
+     * @return 是否删除成功
+     */
+    boolean deleteChatHistory(ArrayList<String> idList);
 }

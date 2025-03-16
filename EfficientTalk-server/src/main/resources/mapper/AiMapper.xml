@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ETGroup.EfficientTalkServer.mapper.AiMapper">
+	<!--创建AI会话-->
+	<insert id="createAiSession">
+		INSERT INTO ai_chat_session(session_id, topic, user_id, update_time)
+		VALUES (#{sessionId}, #{topic}, #{userId}, #{updateTime})
+	</insert>
+
+	<!--保存AI对话记录-->
+	<insert id="saveAiChatHistory">
+		INSERT INTO ai_chat_history(id, session, user_id, role, content, time)
+		VALUES (#{id}, #{session}, #{userId}, #{role}, #{content}, #{time})
+	</insert>
+
+	<!--获取AI对话记录-->
+	<select id="getAiChatHistory" resultType="com.ETGroup.EfficientTalkServer.entity.PO.AiChatHistoryRecordPO">
+		SELECT *
+		FROM ai_chat_history
+		WHERE session = #{sessionId}
+		ORDER BY time DESC
+	</select>
+
+	<!--获取用户会话列表-->
+	<select id="getAiSessionList" resultType="com.ETGroup.EfficientTalkServer.entity.PO.AiChatSessionPO">
+		SELECT *
+		FROM ai_chat_session
+		WHERE user_id = #{userId}
+		ORDER BY update_time DESC
+	</select>
+</mapper>

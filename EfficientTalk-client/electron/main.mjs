@@ -331,8 +331,10 @@ const openSystemNoticeWindow = () => {
 
 // 关闭系统通知窗口
 const closeSystemNoticeWindow = () => {
-    systemNoticeWindow.close();
-    systemNoticeWindow = null;
+    if (systemNoticeWindow !== null) {
+        systemNoticeWindow.close();
+        systemNoticeWindow = null;
+    }
 };
 
 // 关闭系统通知
@@ -392,7 +394,7 @@ ipcMain.handle("system-login", (e, param) => {
               .then();
 
     // 打开系统通知窗口
-    openSystemNoticeWindow();
+    // openSystemNoticeWindow();
 });
 
 // 登出

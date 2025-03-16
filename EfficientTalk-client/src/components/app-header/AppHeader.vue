@@ -25,7 +25,9 @@
         <a-button class="toolbar-btn no-drag toolbar-btn-ai"
                   @click="openAiAssistantWindow"
         >
-          <SlackOutlined/>
+          <div>
+            <AiAssistantIcon :color="'#FFFFFF'" :size="20"/>
+          </div>
           <label>小易</label>
         </a-button>
       </div>
@@ -70,6 +72,7 @@
     import { getCurUserData } from "../../database/cur-user.js";
     import { openAiAssistantChildWindow } from "../../window-controller/controller/ChildWindowController.js";
     import MainWindowController from "../../window-controller/main-window-controller.js";
+    import AiAssistantIcon from "../icon/AiAssistantIcon.vue";
 
     // 窗口最大化状态
     const isMaximized = ref(false);
@@ -222,7 +225,7 @@
           align-items: center;
           color: black;
           font-size: 20px;
-          border-radius: 12px;
+          border-radius: 8px;
           border: 0;
           box-shadow: none;
           background-color: transparent;

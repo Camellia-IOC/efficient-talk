@@ -5,14 +5,17 @@
            width="700px"
            :footer="null"
            @cancel="dialogClose"
-  ><template #title>
-    <div class="dialog-title">
-      <div class="logo">
-        <Logo :color="themeColor" :size="30"/>
+  >
+    <template #title>
+      <div class="dialog-title">
+        <div class="logo">
+          <Logo :color="themeColor"
+                :size="30"
+          />
+        </div>
+        <label>{{ dialogTitle }}</label>
       </div>
-      <label>{{ dialogTitle}}</label>
-    </div>
-  </template>
+    </template>
     <div class="file-selector-container">
       <div class="file-selector">
         <a-upload-dragger
@@ -389,7 +392,7 @@
       width: 100%;
       height: 10%;
 
-      .operation-btn{
+      .operation-btn {
         background-color: global-variable.$theme-color;
       }
     }
