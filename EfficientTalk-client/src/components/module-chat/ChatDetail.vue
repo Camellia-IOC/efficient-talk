@@ -361,7 +361,9 @@
         </a-button>
       </div>
       <div class="message-operations">
-        <div class="operation-btn">
+        <div class="operation-btn"
+             @click="contextMenuOperations.copyToClipboard(getSelectedMessageContent())"
+        >
           <CopyOutlined/>
           <label>复制</label>
         </div>
@@ -655,6 +657,10 @@
     // 用户选择对话框
     const userSelectorDialog = ref();
     const handleUserSelectorDialogOpen = (messageList) => {
+        if (messageList.length === 0) {
+            message.error("未选择消息");
+            return;
+        }
         userSelectorDialog.value.dialogOpen(curLoginUser.value.orgId, messageList);
     };
 
@@ -722,6 +728,13 @@
     // 消息选择
     const isSelectMessageMode = ref(false);
     const selectedChatHistoryRecords = ref([]);
+    const getSelectedMessageContent = () => {
+        let content = "";
+        for (let i = 0; i < selectedChatHistoryRecords.value.length; i++) {
+            content += selectedChatHistoryRecords.value[i].content;
+        }
+        return content;
+    };
     const getSelectedMessageIdListStr = () => {
         let idList = [];
         for (let i = 0; i < selectedChatHistoryRecords.value.length; i++) {
@@ -747,6 +760,7 @@
         // 复制内容
         copyToClipboard: (content) => {
             copyToClipboard(content);
+            message.success("复制成功");
         },
         // 粘贴内容
         pasteToChatInput: async () => {
@@ -769,6 +783,11 @@
         },
         // 删除选中的消息
         deleteFromChatHistory: async (idListStr) => {
+            if (idListStr === "") {
+                message.error("未选择消息");
+                return;
+            }
+
             const idList = idListStr.split(",");
             ChatApi.deleteChatHistory({
                 idList: idListStr
@@ -803,8 +822,8 @@
         },
         // 转发消息
         transmitMessage: (userList, messageList) => {
-            for (let i = 0; i < userList.length; i++){
-                for (let j = 0; j < messageList.length; j++){
+            for (let i = 0; i < userList.length; i++) {
+                for (let j = 0; j < messageList.length; j++) {
                     const newMessage = {
                         id: UUID.generate(),
                         sender: curLoginUser.value.userId,
@@ -911,7 +930,7 @@
 
     // 处理转发消息
     const handleTransmitMessage = (userList, messageList) => {
-        contextMenuOperations.transmitMessage(userList, messageList)
+        contextMenuOperations.transmitMessage(userList, messageList);
     };
 
 
@@ -1156,6 +1175,11 @@
 
     // 聊天对象变化
     const handleChatObjectChange = async (event) => {
+        // 如果处于消息选择模式，切换回正常模式
+        if (isSelectMessageMode.value) {
+            contextMenuOperations.switchSelectMessageMode();
+        }
+
         // 重置分页
         historyPageConfig.value.resetPage();
 
