@@ -1,5 +1,6 @@
 package com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,5 +15,6 @@ public class CloudDiskFolderDTO {
     private String creatorId;
     private String creatorName;
     private String creatorAvatar;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }

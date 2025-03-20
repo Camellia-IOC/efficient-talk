@@ -46,6 +46,9 @@ const router = createRouter({
                     // 云盘
                     path: "cloud-disk",
                     name: "cloud-disk",
+                    redirect: {
+                        name: "recent-files"
+                    },
                     component: () => import("../views/CloudDiskView.vue"),
                     children: [
                         {

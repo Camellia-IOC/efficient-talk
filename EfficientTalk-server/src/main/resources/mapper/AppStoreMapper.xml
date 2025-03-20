@@ -5,8 +5,7 @@
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.AppStoreMapper">
 	<!--获取应用商店应用列表-->
 	<select id="getAppList" resultType="com.ETGroup.EfficientTalkServer.entity.PO.ApplicationPO">
-		SELECT id          as id,
-			   app_id      as appId,
+		SELECT app_id      as appId,
 			   app_name    as appName,
 			   app_url     as appUrl,
 			   icon_url    as iconUrl,

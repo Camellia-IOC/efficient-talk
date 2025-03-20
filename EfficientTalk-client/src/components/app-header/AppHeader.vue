@@ -26,7 +26,9 @@
                   @click="openAiAssistantWindow"
         >
           <div>
-            <AiAssistantIcon :color="'#FFFFFF'" :size="20"/>
+            <AiAssistantIcon :color="'#FFFFFF'"
+                             :size="20"
+            />
           </div>
           <label>小易</label>
         </a-button>
@@ -125,14 +127,16 @@
         diskId: null
     });
     const getOrgInfo = async () => {
-        const response = await SocialApi.getOrganizationInfo({
-            orgId: curLoginUser.value.orgId
-        });
+        if (curLoginUser.value.orgId !== null) {
+            const response = await SocialApi.getOrganizationInfo({
+                orgId: curLoginUser.value.orgId
+            });
 
-        const res = response.data;
-        if (res.code === 0) {
-            if (res.data != null) {
-                orgInfo.value = res.data.orgInfo;
+            const res = response.data;
+            if (res.code === 0) {
+                if (res.data != null) {
+                    orgInfo.value = res.data.orgInfo;
+                }
             }
         }
     };

@@ -134,19 +134,21 @@
     // 获取组织信息
     const orgInfo = ref({});
     const getOrganizationInfo = async () => {
-        const response = await SocialApi.getOrganizationInfo({
-            orgId: curLoginUser.value.orgId
-        });
+        if (curLoginUser.value.orgId !== null) {
+            const response = await SocialApi.getOrganizationInfo({
+                orgId: curLoginUser.value.orgId
+            });
 
-        const res = response.data;
-        if (res.code === 0) {
-            if (res.data != null) {
-                orgInfo.value = res.data.orgInfo;
+            const res = response.data;
+            if (res.code === 0) {
+                if (res.data != null) {
+                    orgInfo.value = res.data.orgInfo;
+                }
             }
-        }
-        else {
-            message.error("获取组织数据失败");
-            orgInfo.value = {};
+            else {
+                message.error("获取组织数据失败");
+                orgInfo.value = {};
+            }
         }
     };
 

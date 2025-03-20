@@ -47,4 +47,48 @@ export default class CloudDiskApi {
             data
         });
     };
+
+    /**
+     * 删除组织云盘文件夹
+     * @param data 请求数据
+     */
+    static deleteOrgCloudDiskFolder = (data) => {
+        return cloudDiskService.delete({
+            url: this.requestPath + "/deleteOrgCloudDiskFolder",
+            data
+        });
+    };
+
+    /**
+     * 删除组织云盘文件
+     * @param data 请求数据
+     */
+    static deleteOrgCloudDiskFile = (data) => {
+        return cloudDiskService.delete({
+            url: this.requestPath + "/deleteOrgCloudDiskFile",
+            data
+        });
+    };
+
+    /**
+     * 重命名组织云盘文件
+     * @param data 请求数据
+     */
+    static renameOrgCloudDiskFile = (data) => {
+        return cloudDiskService.put({
+            url: this.requestPath + "/renameOrgCloudDiskFile",
+            data
+        });
+    };
+
+    /**
+     * 重命名组织云盘文件夹
+     * @param data
+     */
+    static renameOrgCloudDiskFolder = (data) => {
+        return cloudDiskService.put({
+            url: this.requestPath + "/renameOrgCloudDiskFolder",
+            data
+        });
+    };
 }

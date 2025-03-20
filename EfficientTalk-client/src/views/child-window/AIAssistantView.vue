@@ -1,8 +1,10 @@
 <template>
   <div class="ai-assistant-view-container">
-    <div class="ai-chat-container">
+    <div class="ai-chat-container"
+         ref="aiChatHistoryElement"
+    >
       <div class="empty-list-container"
-           v-if="chatMessageHistory.length === 0"
+           v-if="chatMessageHistory.length === 1"
       >
         <div>
           <svg class="icon"
@@ -102,6 +104,7 @@
 
 <script setup>
     import {
+        nextTick,
         onBeforeMount,
         onMounted,
         ref
@@ -121,9 +124,24 @@
         curLoginUser.value = await getCurUserData();
     };
 
+    // 对话历史容器
+    const aiChatHistoryElement = ref();
+
     const questionInput = ref("");
     const chatMessageHistory = ref([]);
     const curSessionId = ref("1");
+
+    // 对话框滚动到底部
+    const scrollToBottom = (animation) => {
+        nextTick(() => {
+            if (aiChatHistoryElement.value) {
+                aiChatHistoryElement.value.scrollTo({
+                    top: aiChatHistoryElement.value.scrollHeight,
+                    behavior: animation,
+                });
+            }
+        });
+    };
 
     // 获取对话历史
     const getChatMessageHistory = async () => {
@@ -134,7 +152,13 @@
         const res = response.data;
         if (res.code === 0) {
             chatMessageHistory.value = res.data.recordList;
+            chatMessageHistory.value.unshift({
+                role: "system",
+                content: "你的名字是小易，请你以后都以小易自称"
+            });
         }
+
+        scrollToBottom("auto");
     };
 
     // 保存对话记录
@@ -170,6 +194,7 @@
         for await (const data of response) {
             if (data.choices.length !== 0) {
                 chatMessageHistory.value[chatMessageHistory.value.length - 1].content += data.choices[0].delta.content;
+                scrollToBottom("smooth");
             }
         }
         saveChatMessageHistory(answer);
@@ -177,6 +202,7 @@
 
     onBeforeMount(async () => {
         await updateCurLoginUser();
+        curSessionId.value = curLoginUser.value.userId;
         await getChatMessageHistory();
     });
 

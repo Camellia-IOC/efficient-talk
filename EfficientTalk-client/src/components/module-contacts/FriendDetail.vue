@@ -3,7 +3,9 @@
     <div class="default-content"
          v-if="friendId === null"
     >
-      <Logo :color="themeColor" :size="256"/>
+      <Logo :color="themeColor"
+            :size="256"
+      />
     </div>
     <div class="user-detail-container"
          v-else
@@ -55,7 +57,6 @@
         <a-button type="primary"
                   @click="handleGoChat"
                   class="operation-btn"
-                  v-if="friendInfo.isFriend === true"
         > 发送消息
         </a-button>
       </div>

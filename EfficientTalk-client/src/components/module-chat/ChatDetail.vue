@@ -5,10 +5,16 @@
     <div class="chat-header">
       <div class="user-info">
         <div class="user-avatar">
-          <img class="avatar"
+          <img v-if="chatInfo.userAvatar!==null"
                :src="chatInfo.userAvatar"
-               alt=""
-          >
+               class="avatar"
+               alt="avatar"
+          />
+          <a-avatar v-else
+                    class="avatar"
+                    style="display:flex;justify-content:center;align-items:center;font-size: 24px"
+          >{{ chatInfo.userName.substring(0, 2) }}
+          </a-avatar>
         </div>
         <div class="user-name">
           {{ chatInfo.userName }}
@@ -37,7 +43,7 @@
       >
         <a-checkbox v-model:checked="item.isSelected"
                     v-show="isSelectMessageMode"
-                    @change="checkedValue=>handleMessageSelect(checkedValue.target.checked,item.id)"
+                    @change="checkedValue=>handleMessageSelect(checkedValue.target.checked,item)"
         ></a-checkbox>
         <div v-if="item.sender !== curLoginUser.userId"
              class="others-message"
@@ -70,7 +76,7 @@
                       复制
                     </div>
                     <div class="context-menu-item"
-                         @click="contextMenuOperations.transmitMessage(item)"
+                         @click="handleUserSelectorDialogOpen([item])"
                     >
                       <div class="icon">
                         <ExportOutlined/>
@@ -109,6 +115,14 @@
                       </div>
                       快捷回复
                     </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.assistantHelperTranslate(item.content)"
+                    >
+                      <div class="icon">
+                        <AiAssistantIcon :size="16"/>
+                      </div>
+                      小易快译
+                    </div>
                   </div>
                 </template>
               </a-dropdown>
@@ -125,7 +139,7 @@
                 <template #overlay>
                   <div class="context-menu-container">
                     <div class="context-menu-item"
-                         @click="contextMenuOperations.transmitMessage(item)"
+                         @click="handleUserSelectorDialogOpen([item])"
                     >
                       <div class="icon">
                         <ExportOutlined/>
@@ -203,7 +217,7 @@
                       复制
                     </div>
                     <div class="context-menu-item"
-                         @click="contextMenuOperations.transmitMessage(item)"
+                         @click="handleUserSelectorDialogOpen([item])"
                     >
                       <div class="icon">
                         <ExportOutlined/>
@@ -229,36 +243,96 @@
                   </div>
                 </template>
               </a-dropdown>
-              <div class="image-message"
-                   v-else-if="item.type === 'image'"
+              <a-dropdown :trigger="['contextmenu']"
+                          v-else-if="item.type === 'image'"
               >
-                <img :src="item.content"
-                     alt="image"
-                     class="image"
-                     @click="handleMediaFilePreview(item.fileId, 'image')"
-                />
-              </div>
-              <div class="file-message"
-                   v-else-if="item.type === 'file'"
-              >
-                <div class="file-detail">
-                  <img :src="getFileIcon(item.fileType)"
+                <div class="image-message">
+                  <img :src="item.content"
                        alt="image"
-                       class="file-icon"
-                  >
-                  <label class="file-name">{{ item.fileName + "." + item.fileType }}</label>
+                       class="image"
+                       @click="handleMediaFilePreview(item.fileId, 'image')"
+                  />
                 </div>
-                <div class="file-info">
-                  <label class="file-size">{{ translateFileSize(item.fileSize) }}</label>
-                  <div class="operations-bar">
-                    <a-button class="operation-btn">下载</a-button>
-                    <a-button class="operation-btn"
-                              @click="handleFilePreview(item.fileId, item.fileType)"
-                    >预览
-                    </a-button>
+                <template #overlay>
+                  <div class="context-menu-container">
+                    <div class="context-menu-item"
+                         @click="handleUserSelectorDialogOpen([item])"
+                    >
+                      <div class="icon">
+                        <ExportOutlined/>
+                      </div>
+                      转发
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.deleteFromChatHistory(item.id)"
+                    >
+                      <div class="icon">
+                        <DeleteOutlined/>
+                      </div>
+                      删除
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.assistantHelperReadImage(item.content)"
+                    >
+                      <div class="icon">
+                        <AiAssistantIcon :size="16"/>
+                      </div>
+                      小易识图
+                    </div>
+                  </div>
+                </template>
+              </a-dropdown>
+              <a-dropdown :trigger="['contextmenu']"
+                          v-else-if="item.type === 'file'"
+              >
+                <div class="file-message">
+                  <div class="file-detail">
+                    <img :src="getFileIcon(item.fileType)"
+                         alt="image"
+                         class="file-icon"
+                    >
+                    <label class="file-name">{{ item.fileName + "." + item.fileType }}</label>
+                  </div>
+                  <div class="file-info">
+                    <label class="file-size">{{ translateFileSize(item.fileSize) }}</label>
+                    <div class="operations-bar">
+                      <a-button class="operation-btn">下载</a-button>
+                      <a-button class="operation-btn"
+                                @click="handleFilePreview(item.fileId, item.fileType)"
+                      >预览
+                      </a-button>
+                    </div>
                   </div>
                 </div>
-              </div>
+                <template #overlay>
+                  <div class="context-menu-container">
+                    <div class="context-menu-item"
+                         @click="handleUserSelectorDialogOpen([item])"
+                    >
+                      <div class="icon">
+                        <ExportOutlined/>
+                      </div>
+                      转发
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.deleteFromChatHistory(item.id)"
+                    >
+                      <div class="icon">
+                        <DeleteOutlined/>
+                      </div>
+                      删除
+                    </div>
+                    <div class="context-menu-item"
+                         @click="contextMenuOperations.assistantHelperReadImage(item.content)"
+                    >
+                      <div class="icon">
+                        <AiAssistantIcon :size="16"/>
+                      </div>
+                      小易总结
+                    </div>
+                  </div>
+                </template>
+              </a-dropdown>
             </div>
             <div class="message-time">
               {{ formatMessageTime(item.time, "chat-detail") }}
@@ -291,7 +365,9 @@
           <CopyOutlined/>
           <label>复制</label>
         </div>
-        <div class="operation-btn">
+        <div class="operation-btn"
+             @click="handleUserSelectorDialogOpen(selectedChatHistoryRecords)"
+        >
           <ExportOutlined/>
           <label>转发</label>
         </div>
@@ -487,6 +563,11 @@
   <AIResponseResultDialog ref="aiResponseResultDialog"
                           :content="aiResponseResultDialogContent"
   />
+
+  <!--用户选择对话框-->
+  <UserSelectorDialog ref="userSelectorDialog"
+                      @handle-user-select="handleTransmitMessage"
+  />
 </template>
 
 <script setup>
@@ -541,15 +622,17 @@
         getSelectedContent,
         readFromClipboard
     } from "../../utils/system-utils.js";
-    import { chatInfoObject } from "../../type/type.js";
+    import { ChatInfoObject } from "../../type/type.js";
     import AiWriterIcon from "../icon/AiWriterIcon.vue";
     import AiAssistantIcon from "../icon/AiAssistantIcon.vue";
     import {
         replyHelperWork,
         textReaderHelperWork,
+        translateHelperWork,
         writerHelperWork
     } from "../../utils/ai-assistant.js";
     import AIResponseResultDialog from "../dialog/ai-assistant/AIResponseResultDialog.vue";
+    import UserSelectorDialog from "../dialog/module-chat/user-selector/UserSelectorDialog.vue";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -569,6 +652,12 @@
         aiResponseResultDialog.value.dialogOpen(title);
     };
 
+    // 用户选择对话框
+    const userSelectorDialog = ref();
+    const handleUserSelectorDialogOpen = (messageList) => {
+        userSelectorDialog.value.dialogOpen(curLoginUser.value.orgId, messageList);
+    };
+
     // 当前登录的用户信息
     const curLoginUser = ref({});
     const updateCurLoginUser = async () => {
@@ -579,7 +668,7 @@
     const websocketStore = useWebSocketStore();
 
     // 消息记录对话框元素
-    const chatHistoryElement = ref(null);
+    const chatHistoryElement = ref();
 
     // 聊天记录分页配置
     const historyPageConfig = ref({
@@ -634,15 +723,19 @@
     const isSelectMessageMode = ref(false);
     const selectedChatHistoryRecords = ref([]);
     const getSelectedMessageIdListStr = () => {
-        return selectedChatHistoryRecords.value.join(",");
+        let idList = [];
+        for (let i = 0; i < selectedChatHistoryRecords.value.length; i++) {
+            idList.push(selectedChatHistoryRecords.value[i].id);
+        }
+        return idList.join(",");
     };
-    const handleMessageSelect = (isSelected, recordId) => {
+    const handleMessageSelect = (isSelected, record) => {
         if (isSelected) {
-            selectedChatHistoryRecords.value.push(recordId);
+            selectedChatHistoryRecords.value.push(record);
         }
         else {
             for (let i = 0; i < selectedChatHistoryRecords.value.length; i++) {
-                if (selectedChatHistoryRecords.value[i] === recordId) {
+                if (selectedChatHistoryRecords.value[i] === record) {
                     selectedChatHistoryRecords.value.splice(i, 1);
                 }
             }
@@ -682,13 +775,18 @@
             }).then((response) => {
                 const res = response.data;
                 if (res.code === 0) {
+                    let count = 0;
                     for (let i = 0; i < chatHistory.value.length; i++) {
                         if (idList.includes(chatHistory.value[i].id)) {
                             chatHistory.value.splice(i, 1);
-                            message.success("删除成功");
-                            break;
+                            i--;
+                            count++;
+                            if (count === idList.length) {
+                                break;
+                            }
                         }
                     }
+                    message.success("删除成功");
                 }
                 else {
                     message.error("删除失败");
@@ -697,35 +795,39 @@
             // 如果当前处于选择消息模式，从选中列表中删除当前消息
             if (isSelectMessageMode.value && idList.length === 1) {
                 for (let i = 0; i < selectedChatHistoryRecords.value.length; i++) {
-                    if (selectedChatHistoryRecords.value[i] === idListStr) {
+                    if (selectedChatHistoryRecords.value[i].id === idListStr) {
                         selectedChatHistoryRecords.value.splice(i, 1);
                     }
                 }
             }
         },
         // 转发消息
-        transmitMessage: (originMessage) => {
-            const newMessage = {
-                id: UUID.generate(),
-                sender: curLoginUser.value.userId,
-                receiver: "2",
-                type: originMessage.type,
-                fileId: originMessage.fileId,
-                content: originMessage.content,
-                time: dayjs().format("YYYY-MM-DD HH:mm:ss")
-            };
+        transmitMessage: (userList, messageList) => {
+            for (let i = 0; i < userList.length; i++){
+                for (let j = 0; j < messageList.length; j++){
+                    const newMessage = {
+                        id: UUID.generate(),
+                        sender: curLoginUser.value.userId,
+                        receiver: userList[i],
+                        type: messageList[j].type,
+                        fileId: messageList[j].fileId,
+                        content: messageList[j].content,
+                        time: dayjs().format("YYYY-MM-DD HH:mm:ss")
+                    };
 
-            websocketStore.sendMessage(newMessage);
-            window.dispatchEvent(new CustomEvent("messageSend", {
-                detail: newMessage
-            }));
-            handleSaveChatHistory(newMessage);
-            message.success("消息已转发");
+                    websocketStore.sendMessage(newMessage);
+                    window.dispatchEvent(new CustomEvent("messageSend", {
+                        detail: newMessage
+                    }));
+                    handleSaveChatHistory(newMessage);
 
-            if (newMessage.receiver === props.chatInfo.userId) {
-                chatHistory.value.push(newMessage);
-                scrollToBottom("smooth");
+                    if (newMessage.receiver === props.chatInfo.userId) {
+                        chatHistory.value.push(newMessage);
+                        scrollToBottom("smooth");
+                    }
+                }
             }
+            message.success("消息已转发");
         },
         // 小易帮阅
         assistantHelperReadText: async (originMessage) => {
@@ -741,7 +843,7 @@
         // 小易识图
         assistantHelperReadImage: async (originMessage) => {
             aiResponseResultDialogContent.value = "";
-            handleAiResponseResultDialogOpen("小易帮阅");
+            handleAiResponseResultDialogOpen("小易识图");
             const response = await textReaderHelperWork(originMessage);
             for await (const data of response) {
                 if (data.choices.length !== 0) {
@@ -754,6 +856,17 @@
             aiResponseResultDialogContent.value = "";
             handleAiResponseResultDialogOpen("快捷回复");
             const response = await replyHelperWork(originMessage);
+            for await (const data of response) {
+                if (data.choices.length !== 0) {
+                    aiResponseResultDialogContent.value += data.choices[0].delta.content;
+                }
+            }
+        },
+        // 小易快译
+        assistantHelperTranslate: async (originMessage) => {
+            aiResponseResultDialogContent.value = "";
+            handleAiResponseResultDialogOpen("小易快译");
+            const response = await translateHelperWork(originMessage);
             for await (const data of response) {
                 if (data.choices.length !== 0) {
                     aiResponseResultDialogContent.value += data.choices[0].delta.content;
@@ -775,7 +888,7 @@
     //传入参数
     const props = defineProps({
         chatInfo: {
-            type: chatInfoObject
+            type: ChatInfoObject
         }
     });
 
@@ -795,6 +908,12 @@
     const handleSaveChatHistory = (record) => {
         saveChatRecord(record);
     };
+
+    // 处理转发消息
+    const handleTransmitMessage = (userList, messageList) => {
+        contextMenuOperations.transmitMessage(userList, messageList)
+    };
+
 
     // 接收消息
     const handleMessageReceive = (message) => {
@@ -911,6 +1030,9 @@
                     receiver: props.chatInfo.userId,
                     type: messageItem.type,
                     fileId: messageItem.fileId,
+                    fileName: messageItem.fileName,
+                    fileType: messageItem.fileType,
+                    fileSize: messageItem.fileSize,
                     content: filePath,
                     time: dayjs().format("YYYY-MM-DD HH:mm:ss")
                 };
@@ -946,30 +1068,31 @@
 
     // 图片发送后回调
     const afterImageSendCallBack = async (id) => {
-        await nextTick(() => {
-            const elementTag = `#${id} img.image`;
-            let image;
-            try {
-                image = document.querySelector(elementTag);
-            } catch (error) {
-                console.error(error);
-            }
-            console.error(image);
-            if (image) {
-                if (image.complete) {
-                    scrollToBottom("smooth");
-                    return;
-                }
-                image.onload = () => {
-                    scrollToBottom("smooth");
-                };
-            }
-            else {
-                setTimeout(() => {
-                    afterImageSendCallBack(id);
-                }, 300);
-            }
-        });
+        scrollToBottom("smooth");
+        // await nextTick(() => {
+        //     const elementTag = `#${id} img.image`;
+        //     let image;
+        //     try {
+        //         image = document.querySelector(elementTag);
+        //     } catch (error) {
+        //         console.error(error);
+        //     }
+        //     console.error(image);
+        //     if (image) {
+        //         if (image.complete) {
+        //             scrollToBottom("smooth");
+        //             return;
+        //         }
+        //         image.onload = () => {
+        //             scrollToBottom("smooth");
+        //         };
+        //     }
+        //     else {
+        //         setTimeout(() => {
+        //             afterImageSendCallBack(id);
+        //         }, 300);
+        //     }
+        // });
     };
 
     // 聊天记录
@@ -1141,6 +1264,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
+            cursor: pointer;
           }
         }
 
@@ -1185,8 +1309,6 @@
         }
       }
 
-      $message-item-gap: 15px;
-
       .selected-message {
         background-color: rgba(global-variable.$theme-color, 0.1);
       }
@@ -1195,7 +1317,6 @@
         display: flex;
         width: 100%;
         height: fit-content;
-        margin-top: $message-item-gap;
         padding: 2%;
 
         $avatar-container-width: 60px;

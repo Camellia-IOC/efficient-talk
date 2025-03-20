@@ -7,11 +7,6 @@ import lombok.Data;
 @Data
 public class ApplicationPO {
     /**
-     * 唯一标识ID
-     */
-    private String id;
-    
-    /**
      * 应用ID
      */
     private String appId;

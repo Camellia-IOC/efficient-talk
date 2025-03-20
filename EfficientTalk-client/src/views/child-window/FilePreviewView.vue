@@ -121,9 +121,7 @@
         }
         fileData.value = await response.data.arrayBuffer();
 
-        if (imageAccept.includes(fileType.value)) {
-            isLoading.value = false;
-        }
+        isLoading.value = false;
     };
 
     onBeforeMount(() => {

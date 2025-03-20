@@ -1,6 +1,8 @@
 package com.ETGroup.EfficientTalkServer.controller;
 
 import com.ETGroup.EfficientTalkServer.entity.request.cloud_disk.CreateCloudDiskFolderRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.request.cloud_disk.RenameFileRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.request.cloud_disk.RenameFolderRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasicInfoResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskLevelContentResponseVO;
@@ -95,8 +97,8 @@ public class CloudDiskController {
     
     @Operation(summary = "重命名组织云盘文件夹")
     @PutMapping("/renameOrgCloudDiskFolder")
-    public ResponseData<Void> renameOrgCloudDiskFolder(@RequestParam String folderId, @RequestParam String newFolderName) {
-        boolean result = cloudDiskService.renameOrgCloudDiskFolder(folderId, newFolderName);
+    public ResponseData<Void> renameOrgCloudDiskFolder(@RequestBody RenameFolderRequestParam param) {
+        boolean result = cloudDiskService.renameOrgCloudDiskFolder(param.getFolderId(), param.getNewFolderName());
         if (result) {
             return ResponseData.success();
         }
@@ -119,8 +121,8 @@ public class CloudDiskController {
     
     @Operation(summary = "重命名组织云盘文件")
     @PutMapping("/renameOrgCloudDiskFile")
-    public ResponseData<Void> renameOrgCloudDisFile(@RequestParam String fileId, @RequestParam String newFileName) {
-        boolean result = cloudDiskService.renameOrgCloudDiskFile(fileId, newFileName);
+    public ResponseData<Void> renameOrgCloudDisFile(@RequestBody RenameFileRequestParam param) {
+        boolean result = cloudDiskService.renameOrgCloudDiskFile(param.getFileId(), param.getNewFileName());
         if (result) {
             return ResponseData.success();
         }
@@ -130,8 +132,8 @@ public class CloudDiskController {
     }
     
     @Operation(summary = "在组织云盘删除文件")
-    @DeleteMapping("/deleteCloudDiskFile")
-    public ResponseData<Void> deleteCloudDiskFile(@RequestParam String fileId) {
+    @DeleteMapping("/deleteOrgCloudDiskFile")
+    public ResponseData<Void> deleteOrgCloudDiskFile(@RequestParam String fileId) {
         boolean result = cloudDiskService.deleteCloudDiskFile(fileId);
         if (result) {
             return ResponseData.success();

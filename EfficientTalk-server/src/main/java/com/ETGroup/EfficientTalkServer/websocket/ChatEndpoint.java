@@ -12,7 +12,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/chat/{userId}")
 @Component
 public class ChatEndpoint {
+    // 引入聊天服务
     private ChatService chatService;
-    
     private static AutowireCapableBeanFactory beanFactory;
     
     @Resource
@@ -41,25 +41,9 @@ public class ChatEndpoint {
         
         // 获取ChatService实例
         this.chatService = beanFactory.getBean(ChatService.class);
+        
+        // TODO 从消息缓存队列中获取聊天记录，并发送给用户
     }
-    
-    //    private void broadcastAllUsers(String message) {
-    //        try {
-    //            Set<Map.Entry<String, Session>> entries = sessionStorage.entrySet();
-    //
-    //            for (Map.Entry<String, Session> entry : entries) {
-    //                // 获取到所有用户对应的 session 对象
-    //                Session session = entry.getValue();
-    //
-    //                // 使用 getBasicRemote() 方法发送同步消息
-    //                session.getBasicRemote()
-    //                       .sendText(message);
-    //            }
-    //        }
-    //        catch (Exception exception) {
-    //            log.error(exception.toString());
-    //        }
-    //    }
     
     @OnMessage
     public void onMessage(String message) {
@@ -91,15 +75,24 @@ public class ChatEndpoint {
     }
     
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(Session session) throws IOException {
         // 从会话存储中移除当前会话
-        for (Map.Entry<String, Session> entry : sessionStorage.entrySet()) {
+        Iterator<Map.Entry<String, Session>> iterator = sessionStorage.entrySet()
+                                                                      .iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Session> entry = iterator.next();
             if (entry.getValue()
                      .equals(session)) {
-                sessionStorage.remove(entry.getKey());
+                // 在删除之前关闭 Session
+                Session sessionToClose = entry.getValue();
+                if (sessionToClose.isOpen()) {
+                    sessionToClose.close();
+                }
+                iterator.remove();
                 break;
             }
         }
+        
         log.info("连接关闭:{}", session);
     }
 }

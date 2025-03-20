@@ -118,3 +118,29 @@ export const replyHelperWork = async (message) => {
     });
 };
 
+/**
+ * 小易翻译
+ * @param message
+ * @returns {Promise}
+ */
+export const translateHelperWork = async (message) => {
+    const messages = [
+        {
+            role: "system",
+            content: "你是一个翻译高手，精通各国语言，请你根据我之后提供的内容，将其翻译为中文，语言表达要流畅且通俗易懂，并且直接给出翻译后的内容，不需要再询问或回答多余的内容"
+        },
+        {
+            role: "user",
+            content: message
+        }
+    ];
+    return AI.chat.completions.create({
+        model: config.model,
+        messages: messages,
+        stream: config.stream,
+        stream_options: {
+            include_usage: true
+        }
+    });
+};
+

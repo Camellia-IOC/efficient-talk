@@ -21,10 +21,17 @@
           <label style="color: gray;margin-left: 10px">ID: {{ userInfo.userId }}</label>
         </div>
         <div class="role">
-          <label class="role-item">
+          <label class="role-item"
+                 v-if="userInfo.deptName === null"
+          >无归属组织</label>
+          <label class="role-item"
+                 v-else
+          >
             <CrownTwoTone/>
             {{ userInfo.deptName }}</label>
-          <label class="role-item">{{ userInfo.jobName }}</label>
+          <label class="role-item"
+                 v-if="userInfo.jobName !== null"
+          >{{ userInfo.jobName }}</label>
         </div>
       </div>
     </div>

@@ -70,7 +70,7 @@
     };
 
     // 应用列表
-    const isAppListLoading = ref(true);
+    const isAppListLoading = ref(false);
     const appList = ref({
         systemApp: [],
         orgApp: []
@@ -88,17 +88,19 @@
 
     // 获取应用商店列表
     const getAppList = async () => {
-        isAppListLoading.value = true;
-        const response = await AppStoreApi.getAppList({
-            orgId: curLoginUser.value.orgId,
-        });
+        if (curLoginUser.value.orgId !== null) {
+            isAppListLoading.value = true;
+            const response = await AppStoreApi.getAppList({
+                orgId: curLoginUser.value.orgId,
+            });
 
-        const res = response.data;
-        if (res.code === 0) {
-            appList.value.systemApp = res.data.systemAppList;
-            appList.value.orgApp = res.data.orgAppList;
+            const res = response.data;
+            if (res.code === 0) {
+                appList.value.systemApp = res.data.systemAppList;
+                appList.value.orgApp = res.data.orgAppList;
+            }
+            isAppListLoading.value = false;
         }
-        isAppListLoading.value = false;
     };
 
     onBeforeMount(async () => {

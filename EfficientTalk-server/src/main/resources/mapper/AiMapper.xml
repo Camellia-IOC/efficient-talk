@@ -20,7 +20,7 @@
 		SELECT *
 		FROM ai_chat_history
 		WHERE session = #{sessionId}
-		ORDER BY time DESC
+		ORDER BY time
 	</select>
 
 	<!--获取用户会话列表-->

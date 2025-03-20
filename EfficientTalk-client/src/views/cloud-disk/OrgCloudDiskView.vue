@@ -43,7 +43,7 @@
         </a-button>
       </div>
       <div class="operation-bar-right">
-        <a-select></a-select>
+        <!--<a-select></a-select>-->
       </div>
     </div>
     <div class="result-table-container">
@@ -120,20 +120,12 @@
           </template>
           <template v-else-if="column.dataIndex === 'operation'">
             <div style="display: flex;justify-content: center;align-items: center">
-              <a-button @click.stop="handleDownloadFile(record.fileId)"
+              <a-button @click.stop="handleCloudDiskItemEditorDialogOpen(record)"
                         shape="circle"
                         style="display:flex;justify-content:center;align-items:center;font-size: 18px;"
-                        v-if="record.type==='file'"
+                        v-show="record.creatorId===curLoginUser.userId"
               >
-                <EllipsisOutlined />
-              </a-button>
-              <a-button @click.stop="openFolder(record.folderId, record.name, null)"
-                        shape="circle"
-                        style="display:flex;justify-content:center;align-items:center;font-size: 18px;"
-                        v-else-if="record.type==='folder'"
-                        :disabled="record.creatorId!==curLoginUser.userId"
-              >
-                <EllipsisOutlined />
+                <FormOutlined/>
               </a-button>
             </div>
           </template>
@@ -152,6 +144,11 @@
                       :multi="true"
                       @upload-selected-file="uploadFileToCloudDisk"
   />
+
+  <!--编辑文件/文件夹信息-->
+  <CloudDiskItemEditorDialog ref="cloudDiskItemEditorDialogRef"
+                             @refresh="refreshCurrentFolder"
+  />
 </template>
 
 <script setup>
@@ -169,7 +166,7 @@
     } from "../../utils/time-utils.js";
     import { translateFileSize } from "../../utils/unit-utils.js";
     import {
-        EllipsisOutlined,
+        FormOutlined,
         ReloadOutlined,
         RightOutlined,
         UploadOutlined,
@@ -181,6 +178,8 @@
     import FileUploaderDialog from "../../components/dialog/module-cloud-disk/file-uploader/FileUploaderDialog.vue";
     import { getCurUserData } from "../../database/cur-user.js";
     import FolderCreatorDialog from "../../components/dialog/module-cloud-disk/folder-creator/FolderCreatorDialog.vue";
+    import CloudDiskItemEditorDialog
+        from "../../components/dialog/module-cloud-disk/cloud-disk-item-editor/CloudDiskItemEditorDialog.vue";
 
     const route = useRoute();
 
@@ -200,6 +199,12 @@
     const fileUploaderDialogRef = ref();
     const handleFileUploaderDialogOpen = () => {
         fileUploaderDialogRef.value.dialogOpen(openedFolder.value[openedFolder.value.length - 1].folderId, curLoginUser.value.userId, route.query.orgId, route.query.diskId);
+    };
+
+    // 编辑对话框
+    const cloudDiskItemEditorDialogRef = ref();
+    const handleCloudDiskItemEditorDialogOpen = (file) => {
+        cloudDiskItemEditorDialogRef.value.dialogOpen(file);
     };
 
     // 加载标志

@@ -717,7 +717,6 @@
     align-items: center;
     width: 100%;
     height: 100%;
-    overflow-y: auto;
 
     $search-area-height: 60px;
 
@@ -763,6 +762,7 @@
       flex-direction: column;
       width: 100%;
       height: calc(100% - $search-area-height);
+      overflow-y: auto;
 
       .chat-list-item-container {
         width: 100%;
