@@ -50,7 +50,7 @@
       <a-table :data-source="tableData"
                :columns="tableColumns"
                class="result-table"
-               :scroll="{scrollToFirstRowOnChange: true, x: 0, y: tableHeight}"
+               :scroll="{scrollToFirstRowOnChange: true, y: tableHeight}"
                :loading="isLoading"
                :pagination="{
                    current: paginationConfig.pageIndex,
@@ -180,6 +180,7 @@
     import FolderCreatorDialog from "../../components/dialog/module-cloud-disk/folder-creator/FolderCreatorDialog.vue";
     import CloudDiskItemEditorDialog
         from "../../components/dialog/module-cloud-disk/cloud-disk-item-editor/CloudDiskItemEditorDialog.vue";
+    import { openFilePreviewChildWindow } from "../../window-controller/controller/ChildWindowController.js";
 
     const route = useRoute();
 
@@ -226,6 +227,16 @@
         }
     });
 
+    // 文件预览
+    const handleFilePreview = (fileId, fileType) => {
+        const data = {
+            fileId: fileId,
+            fileType: fileType,
+            module: "CLOUD_DISK"
+        };
+        openFilePreviewChildWindow(data);
+    };
+
     // 表格行类名
     const tableRowClassName = (record, index) => {
         return "cloud-disk-table-row";
@@ -238,6 +249,9 @@
                 console.error(record);
                 if (record.type === "folder") {
                     openFolder(record.folderId, record.name, null);
+                }
+                else if (record.type === "file") {
+                    handleFilePreview(record.fileId, record.fileType);
                 }
             }
         };

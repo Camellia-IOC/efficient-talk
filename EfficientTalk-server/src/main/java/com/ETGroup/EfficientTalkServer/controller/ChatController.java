@@ -9,6 +9,7 @@ import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.service.chat.ChatService;
+import com.ETGroup.EfficientTalkServer.utils.FileUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -17,11 +18,6 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -161,31 +157,6 @@ public class ChatController {
             filePath = null;
         }
         
-        if (filePath == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        else {
-            File file = new File(filePath);
-            byte[] fileContent = new byte[(int) file.length()];
-            
-            // 读取文件内容
-            try {
-                FileInputStream fileInputStream = new FileInputStream(file);
-                fileInputStream.read(fileContent);
-                fileInputStream.close();
-            }
-            catch (IOException e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            
-            // 设置响应头
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition.builder("attachment")
-                                                            .filename(URLEncoder.encode(file.getName(), StandardCharsets.UTF_8))
-                                                            .build());
-            headers.setContentType(MediaType.parseMediaType("application/octet-stream;charset=UTF-8"));
-            
-            return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
-        }
+        return FileUtils.getFileBlob(filePath);
     }
 }

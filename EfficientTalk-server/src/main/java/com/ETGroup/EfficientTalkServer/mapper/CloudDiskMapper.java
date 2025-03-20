@@ -72,4 +72,11 @@ public interface CloudDiskMapper {
     
     // 重命名组织云盘文件
     Integer renameOrgCloudDiskFile(@Param("fileId") String fileId, @Param("newFileName") String newFileName);
+    
+    /**
+     * 根据文件ID获取文件路径
+     * @param fileId 文件ID
+     * @return 文件路径
+     */
+    String getFilePath(@Param("fileId") String fileId);
 }

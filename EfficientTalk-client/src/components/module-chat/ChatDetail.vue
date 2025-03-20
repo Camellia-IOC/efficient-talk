@@ -1217,7 +1217,8 @@
     const handleFilePreview = (fileId, fileType) => {
         const data = {
             fileId: fileId,
-            fileType: fileType
+            fileType: fileType,
+            module: "CHAT"
         };
         openFilePreviewChildWindow(data);
     };

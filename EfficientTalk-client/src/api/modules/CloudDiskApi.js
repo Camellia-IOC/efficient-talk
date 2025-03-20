@@ -1,4 +1,4 @@
-import { cloudDiskService } from "../AxiosRequestManager.js";
+import { cloudDiskService as service } from "../AxiosRequestManager.js";
 
 export default class CloudDiskApi {
     // 请求前置路径
@@ -9,7 +9,7 @@ export default class CloudDiskApi {
      * @param data
      */
     static getCloudDiskBasicInfo = (data) => {
-        return cloudDiskService.get({
+        return service.get({
             url: this.requestPath + "/getCloudDiskBasicInfo",
             data
         });
@@ -20,7 +20,7 @@ export default class CloudDiskApi {
      * @param data
      */
     static getCloudDiskLevelContent = (data) => {
-        return cloudDiskService.get({
+        return service.get({
             url: this.requestPath + "/getCloudDiskLevelContent",
             data
         });
@@ -31,7 +31,7 @@ export default class CloudDiskApi {
      * @param data
      */
     static uploadOrgCloudDiskFile = (data) => {
-        return cloudDiskService.upload({
+        return service.upload({
             url: this.requestPath + "/uploadOrgCloudDiskFile",
             data
         });
@@ -42,7 +42,7 @@ export default class CloudDiskApi {
      * @param data
      */
     static createOrgCloudDiskFolder = (data) => {
-        return cloudDiskService.post({
+        return service.post({
             url: this.requestPath + "/createOrgCloudDiskFolder",
             data
         });
@@ -53,7 +53,7 @@ export default class CloudDiskApi {
      * @param data 请求数据
      */
     static deleteOrgCloudDiskFolder = (data) => {
-        return cloudDiskService.delete({
+        return service.delete({
             url: this.requestPath + "/deleteOrgCloudDiskFolder",
             data
         });
@@ -64,7 +64,7 @@ export default class CloudDiskApi {
      * @param data 请求数据
      */
     static deleteOrgCloudDiskFile = (data) => {
-        return cloudDiskService.delete({
+        return service.delete({
             url: this.requestPath + "/deleteOrgCloudDiskFile",
             data
         });
@@ -75,7 +75,7 @@ export default class CloudDiskApi {
      * @param data 请求数据
      */
     static renameOrgCloudDiskFile = (data) => {
-        return cloudDiskService.put({
+        return service.put({
             url: this.requestPath + "/renameOrgCloudDiskFile",
             data
         });
@@ -86,8 +86,19 @@ export default class CloudDiskApi {
      * @param data
      */
     static renameOrgCloudDiskFolder = (data) => {
-        return cloudDiskService.put({
+        return service.put({
             url: this.requestPath + "/renameOrgCloudDiskFolder",
+            data
+        });
+    };
+
+    /**
+     * 获取云盘文件
+     * @param data
+     */
+    static getCloudDiskFileBlob = (data) => {
+        return service.download({
+            url: this.requestPath + "/getCloudDiskFileBlob",
             data
         });
     };

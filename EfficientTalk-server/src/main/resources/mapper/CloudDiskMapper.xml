@@ -168,4 +168,11 @@
 			update_time = now()
 		WHERE file_id = #{fileId}
 	</update>
+
+	<!--获取文件路径-->
+	<select id="getFilePath" resultType="java.lang.String">
+		SELECT cloud_disk_files.file_path
+		FROM cloud_disk_files
+		WHERE cloud_disk_files.file_id = #{fileId}
+	</select>
 </mapper>

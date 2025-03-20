@@ -9,7 +9,7 @@
       <a-table :data-source="tableData"
                :columns="tableColumns"
                class="result-table"
-               :scroll="{scrollToFirstRowOnChange: true, x: 0, y: tableHeight}"
+               :scroll="{scrollToFirstRowOnChange: true, y: tableHeight}"
                :loading="isLoading"
                :pagination="{
                    current: paginationConfig.pageIndex,
@@ -21,6 +21,8 @@
                    onChange: paginationConfig.pageChange,
                    position: ['bottomCenter']
                }"
+               :custom-row="handleRowOperation"
+               :row-class-name="tableRowClassName"
       >
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'fileName'">
@@ -87,6 +89,7 @@
     import { formatMessageTime } from "../../utils/time-utils.js";
     import { DownloadOutlined } from "@ant-design/icons-vue";
     import { getFileIcon } from "../../utils/file-utils.js";
+    import { openFilePreviewChildWindow } from "../../window-controller/controller/ChildWindowController.js";
 
     // 分页器配置
     const paginationConfig = ref({
@@ -112,6 +115,31 @@
 
     // 加载标志
     const isLoading = ref(true);
+
+    // 文件预览
+    const handleFilePreview = (fileId, fileType) => {
+        const data = {
+            fileId: fileId,
+            fileType: fileType,
+            module: "CHAT"
+        };
+        openFilePreviewChildWindow(data);
+    };
+
+    // 表格行类名
+    const tableRowClassName = (record, index) => {
+        return "cloud-disk-table-row";
+    };
+
+    // 处理表格行点击事件
+    const handleRowOperation = (record) => {
+        return {
+            onClick: () => {
+                console.error(record);
+                handleFilePreview(record.fileId, record.fileType);
+            }
+        };
+    };
 
     // 计算表格高度
     let observer = null;
@@ -277,5 +305,16 @@
 
   :deep(.ant-pagination) {
     margin-bottom: 0 !important;
+  }
+
+  // 表格行
+  :deep(.cloud-disk-table-row) {
+    td {
+      cursor: pointer;
+
+      label {
+        cursor: pointer;
+      }
+    }
   }
 </style>

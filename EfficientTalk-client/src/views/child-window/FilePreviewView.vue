@@ -16,7 +16,7 @@
                     @error="errorHandler"
     ></vue-office-pdf>
     <!--Excel预览-->
-    <vue-office-excel v-else-if="fileType === 'xls' || fileType === 'xlsx'"
+    <vue-office-excel v-else-if="fileType === 'xlsx'"
                       style="width: 100%;height: 100vh;overflow-y: auto"
                       :src="fileData"
                       @rendered="renderHandler"
@@ -69,8 +69,12 @@
     } from "vue";
     import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
+    import CloudDiskApi from "../../api/modules/CloudDiskApi.js";
 
     const route = useRoute();
+
+    // 当前模块
+    const module = ref(null);
 
     // 文件属性
     const isLoading = ref(true);
@@ -109,10 +113,19 @@
 
     // 获取文件流
     const getFileBlob = async () => {
-        const response = await ChatApi.getChatFileBlob({
-            fileId: fileId.value,
-            type: "file"
-        });
+        let response;
+        if (module.value === "CHAT") {
+            response = await ChatApi.getChatFileBlob({
+                fileId: fileId.value,
+                type: "file"
+            });
+        }
+        else if (module.value === "CLOUD_DISK") {
+            response = await CloudDiskApi.getCloudDiskFileBlob({
+                fileId: fileId.value
+            });
+        }
+        console.error(response)
 
         // 获取文件Blob并转换为ArrayBuffer
         fileBlob.value = new Blob([response.data]);
@@ -125,9 +138,11 @@
     };
 
     onBeforeMount(() => {
+        debugger
         const data = JSON.parse(route.query.data);
         fileId.value = data.fileId;
         fileType.value = data.fileType;
+        module.value = data.module;
     });
 
     onMounted(() => {

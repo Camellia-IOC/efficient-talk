@@ -11,10 +11,12 @@ import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.mapper.CloudDiskMapper;
 import com.ETGroup.EfficientTalkServer.service.cloud_disk.CloudDiskService;
+import com.ETGroup.EfficientTalkServer.utils.FileUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -151,5 +153,12 @@ public class CloudDiskController {
                                                                              @RequestParam Integer pageSize) {
         CloudDiskFileListResponseVO response = cloudDiskService.getRecentCloudDiskFiles(orgId, diskId, pageIndex, pageSize);
         return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取云盘文件Blob")
+    @GetMapping("/getCloudDiskFileBlob")
+    public ResponseEntity<byte[]> getCloudDiskFileBlob(@RequestParam String fileId) {
+        String filePath = cloudDiskMapper.getFilePath(fileId);
+        return FileUtils.getFileBlob(filePath);
     }
 }
