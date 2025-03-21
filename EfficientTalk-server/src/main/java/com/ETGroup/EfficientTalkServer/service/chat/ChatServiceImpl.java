@@ -143,6 +143,7 @@ public class ChatServiceImpl implements ChatService {
      * @param sender   发送人
      * @param receiver 接收人
      * @param file     文件
+     * @param isGroup  是否为群聊
      *
      * @return 文件路径
      */
@@ -153,9 +154,16 @@ public class ChatServiceImpl implements ChatService {
                                  Long fileSize,
                                  String sender,
                                  String receiver,
-                                 MultipartFile file) {
+                                 MultipartFile file,
+                                 Boolean isGroup) {
         try {
-            String savePath = System.getProperty("user.dir") + "\\resources\\chat_files\\";
+            String savePath;
+            if (isGroup) {
+                savePath = System.getProperty("user.dir") + "\\resources\\chat_group_files\\";
+            }
+            else {
+                savePath = System.getProperty("user.dir") + "\\resources\\chat_files\\";
+            }
             File saveFile = new File(savePath + file.getOriginalFilename());
             file.transferTo(saveFile);
             String filePath = savePath + file.getOriginalFilename();
@@ -171,8 +179,15 @@ public class ChatServiceImpl implements ChatService {
             chatFile.setReceiver(receiver);
             chatFile.setCreateTime(createTime.toString());
             
-            if (chatMapper.uploadChatFile(chatFile) == 1) {
-                return filePath;
+            if (isGroup) {
+                if (chatMapper.uploadGroupChatFile(chatFile) == 1) {
+                    return filePath;
+                }
+            }
+            else {
+                if (chatMapper.uploadChatFile(chatFile) == 1) {
+                    return filePath;
+                }
             }
             return null;
         }
@@ -192,6 +207,7 @@ public class ChatServiceImpl implements ChatService {
      * @param sender    发送人
      * @param receiver  接收人
      * @param image     图片
+     * @param isGroup   是否为群聊
      *
      * @return 图片路径
      */
@@ -202,9 +218,16 @@ public class ChatServiceImpl implements ChatService {
                                   Long imageSize,
                                   String sender,
                                   String receiver,
-                                  MultipartFile image) {
+                                  MultipartFile image,
+                                  Boolean isGroup) {
         try {
-            String savePath = System.getProperty("user.dir") + "\\resources\\chat_images\\";
+            String savePath;
+            if (isGroup) {
+                savePath = System.getProperty("user.dir") + "\\resources\\chat_group_images\\";
+            }
+            else {
+                savePath = System.getProperty("user.dir") + "\\resources\\chat_images\\";
+            }
             File saveFile = new File(savePath + image.getOriginalFilename());
             image.transferTo(saveFile);
             String filePath = savePath + image.getOriginalFilename();
@@ -220,8 +243,15 @@ public class ChatServiceImpl implements ChatService {
             chatImage.setReceiver(receiver);
             chatImage.setCreateTime(createTime.toString());
             
-            if (chatMapper.uploadChatImage(chatImage) == 1) {
-                return filePath;
+            if (isGroup) {
+                if (chatMapper.uploadGroupChatImage(chatImage) == 1) {
+                    return filePath;
+                }
+            }
+            else {
+                if (chatMapper.uploadChatImage(chatImage) == 1) {
+                    return filePath;
+                }
             }
             return null;
         }
@@ -260,6 +290,7 @@ public class ChatServiceImpl implements ChatService {
      * @param type      消息类型
      * @param searchKey 搜索关键词
      * @param lastTime  最早一条记录的时间
+     * @param isGroup   是否为群聊
      *
      * @return 聊天记录
      */
@@ -270,8 +301,14 @@ public class ChatServiceImpl implements ChatService {
                                                          Integer pageSize,
                                                          String type,
                                                          String searchKey,
-                                                         LocalDateTime lastTime) {
-        return chatMapper.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime);
+                                                         LocalDateTime lastTime,
+                                                         Boolean isGroup) {
+        if (isGroup) {
+            return chatMapper.getGroupChatHistoryByType(userId, pageIndex, pageSize, type, searchKey, lastTime);
+        }
+        else {
+            return chatMapper.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime);
+        }
     }
     
     /**

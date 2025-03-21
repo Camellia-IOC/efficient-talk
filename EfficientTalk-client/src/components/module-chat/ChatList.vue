@@ -531,7 +531,6 @@
 
     // 选择聊天
     const handleSelectChat = async (item) => {
-        console.error(item);
         if (curChatId.value !== item.userId) {
             curChatId.value = item.userId;
             const chatInfo = {

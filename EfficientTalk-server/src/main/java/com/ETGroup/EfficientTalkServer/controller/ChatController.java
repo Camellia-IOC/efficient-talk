@@ -96,7 +96,7 @@ public class ChatController {
                                                                  @RequestParam String receiver,
                                                                  @RequestParam MultipartFile file,
                                                                  @RequestParam(defaultValue = "false") boolean isGroup) {
-        String filePath = chatService.uploadChatFile(fileId, fileName, fileType, fileSize, sender, receiver, file);
+        String filePath = chatService.uploadChatFile(fileId, fileName, fileType, fileSize, sender, receiver, file, isGroup);
         if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
             response.setFilePath(filePath);
@@ -117,7 +117,7 @@ public class ChatController {
                                                                   @RequestParam String receiver,
                                                                   @RequestParam MultipartFile image,
                                                                   @RequestParam(defaultValue = "false") boolean isGroup) {
-        String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image);
+        String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image, isGroup);
         if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
             response.setFilePath(filePath);
@@ -140,15 +140,15 @@ public class ChatController {
     @Operation(summary = "分类获取聊天记录")
     @GetMapping("/getChatHistoryByType")
     public ResponseData<ChatHistoryResponseVO> getChatHistoryByType(@RequestParam String userId,
-                                                                    @RequestParam String friendId,
+                                                                    @RequestParam(required = false) String friendId,
                                                                     @RequestParam(required = false) Integer pageIndex,
                                                                     @RequestParam Integer pageSize,
                                                                     @RequestParam String type,
                                                                     @RequestParam(required = false) String searchKey,
-                                                                    @RequestParam(required = false) LocalDateTime lastTime
-    ) {
+                                                                    @RequestParam(required = false) LocalDateTime lastTime,
+                                                                    @RequestParam(defaultValue = "false") boolean isGroup) {
         ChatHistoryResponseVO response = new ChatHistoryResponseVO();
-        response.setChatHistory(chatService.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime));
+        response.setChatHistory(chatService.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime, isGroup));
         return ResponseData.success(response);
     }
     
@@ -159,10 +159,10 @@ public class ChatController {
                                                   @RequestParam(defaultValue = "false") boolean isGroup) {
         String filePath;
         if (type.equals("media")) {
-            filePath = chatMapper.getChatMediaFilePath(fileId);
+            filePath = isGroup ? chatMapper.getGroupChatMediaFilePath(fileId) : chatMapper.getChatMediaFilePath(fileId);
         }
         else if (type.equals("file")) {
-            filePath = chatMapper.getChatFilePath(fileId);
+            filePath = isGroup ? chatMapper.getGroupChatFilePath(fileId) : chatMapper.getChatFilePath(fileId);
         }
         else {
             filePath = null;

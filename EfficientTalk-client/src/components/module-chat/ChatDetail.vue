@@ -1179,6 +1179,7 @@
         formData.append("file", file.origin);
         formData.append("sender", curLoginUser.value.userId);
         formData.append("receiver", props.chatInfo.userId);
+        formData.append("isGroup", props.chatInfo.isGroup)
 
         const response = await ChatApi.uploadChatFile(formData);
         const res = response.data;
@@ -1198,6 +1199,7 @@
         formData.append("image", image.origin);
         formData.append("sender", curLoginUser.value.userId);
         formData.append("receiver", props.chatInfo.userId);
+        formData.append("isGroup", props.chatInfo.isGroup)
 
         const response = await ChatApi.uploadChatImage(formData);
         const res = response.data;
@@ -1406,7 +1408,8 @@
         const data = {
             fileId: fileId,
             fileType: fileType,
-            module: "CHAT"
+            module: "CHAT",
+            isGroup: props.chatInfo.isGroup
         };
         openFilePreviewChildWindow(data);
     };
@@ -1415,7 +1418,8 @@
     const handleMediaFilePreview = (fileId, fileType) => {
         const data = {
             fileId: fileId,
-            fileType: fileType
+            fileType: fileType,
+            isGroup: props.chatInfo.isGroup
         };
         openMediaFilePreviewChildWindow(data);
     };

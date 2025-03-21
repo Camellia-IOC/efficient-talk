@@ -61,8 +61,26 @@ public interface ChatMapper {
     // 保存聊天文件
     Integer uploadChatFile(ChatFilePO chatFile);
     
+    /**
+     * 上传群聊聊天文件
+     *
+     * @param chatFile 聊天文件
+     *
+     * @return 上传成功数量
+     */
+    Integer uploadGroupChatFile(ChatFilePO chatFile);
+    
     // 保存聊天图片
     Integer uploadChatImage(ChatImagePO chatImage);
+    
+    /**
+     * 上传群聊聊天图片
+     *
+     * @param chatImage 聊天图片
+     *
+     * @return 上传成功数量
+     */
+    Integer uploadGroupChatImage(ChatImagePO chatImage);
     
     // 获取聊天文件列表
     ArrayList<ChatFileListItemDTO> getChatFileList(@Param("userId") String userId,
@@ -72,7 +90,19 @@ public interface ChatMapper {
     // 获取聊天文件总数
     Integer getChatFileTotal(@Param("userId") String userId);
     
-    // 分类获取聊天记录
+    /**
+     * 分类获取聊天记录
+     *
+     * @param userId    用户ID
+     * @param friendId  好友ID
+     * @param pageIndex 页码
+     * @param pageSize  页面大小
+     * @param type      消息类型
+     * @param searchKey 搜索关键字
+     * @param lastTime  最后时间
+     *
+     * @return 聊天记录
+     */
     ArrayList<ChatRecordDTO> getChatHistoryByType(@Param("userId") String userId,
                                                   @Param("friendId") String friendId,
                                                   @Param("pageIndex") Integer pageIndex,
@@ -81,11 +111,60 @@ public interface ChatMapper {
                                                   @Param("searchKey") String searchKey,
                                                   @Param("lastTime") LocalDateTime lastTime);
     
-    // 获取聊天文件路径
+    /**
+     * 分类获取群聊聊天记录
+     *
+     * @param groupId   用户ID
+     * @param pageIndex 页码
+     * @param pageSize  页面大小
+     * @param type      消息类型
+     * @param searchKey 搜索关键字
+     * @param lastTime  最后时间
+     *
+     * @return 聊天记录
+     */
+    ArrayList<ChatRecordDTO> getGroupChatHistoryByType(@Param("groupId") String groupId,
+                                                       @Param("pageIndex") Integer pageIndex,
+                                                       @Param("pageSize") Integer pageSize,
+                                                       @Param("type") String type,
+                                                       @Param("searchKey") String searchKey,
+                                                       @Param("lastTime") LocalDateTime lastTime);
+    
+    /**
+     * 获取聊天文件路径
+     *
+     * @param fileId 文件id
+     *
+     * @return 文件路径
+     */
     String getChatFilePath(@Param("fileId") String fileId);
     
-    // 获取聊天媒体文件路径
+    /**
+     * 获取群聊聊天文件路径
+     *
+     * @param fileId 文件id
+     *
+     * @return 文件路径
+     */
+    String getGroupChatFilePath(@Param("fileId") String fileId);
+    
+    /**
+     * 获取聊天媒体文件路径
+     *
+     * @param fileId 文件id
+     *
+     * @return 文件路径
+     */
     String getChatMediaFilePath(@Param("fileId") String fileId);
+    
+    /**
+     * 获取群聊聊天媒体文件路径
+     *
+     * @param fileId 文件id
+     *
+     * @return 文件路径
+     */
+    String getGroupChatMediaFilePath(@Param("fileId") String fileId);
     
     /**
      * 删除聊天记录

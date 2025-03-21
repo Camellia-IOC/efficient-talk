@@ -102,6 +102,7 @@ public interface ChatService {
      * @param sender   发送人
      * @param receiver 接收人
      * @param file     文件
+     * @param isGroup  是否为群聊
      *
      * @return 文件路径
      */
@@ -111,7 +112,8 @@ public interface ChatService {
                           Long fileSize,
                           String sender,
                           String receiver,
-                          MultipartFile file);
+                          MultipartFile file,
+                          Boolean isGroup);
     
     /**
      * 保存聊天图片
@@ -123,6 +125,7 @@ public interface ChatService {
      * @param sender    发送人
      * @param receiver  接收人
      * @param image     图片
+     * @param isGroup   是否为群聊
      *
      * @return 图片路径
      */
@@ -132,7 +135,8 @@ public interface ChatService {
                            Long imageSize,
                            String sender,
                            String receiver,
-                           MultipartFile image);
+                           MultipartFile image,
+                           Boolean isGroup);
     
     /**
      * 获取聊天文件列表
@@ -155,6 +159,7 @@ public interface ChatService {
      * @param type      消息类型
      * @param searchKey 搜索关键词
      * @param lastTime  最早一条记录的时间
+     * @param isGroup   是否为群聊
      *
      * @return 聊天记录
      */
@@ -164,7 +169,8 @@ public interface ChatService {
                                                   Integer pageSize,
                                                   String type,
                                                   String searchKey,
-                                                  LocalDateTime lastTime);
+                                                  LocalDateTime lastTime,
+                                                  Boolean isGroup);
     
     /**
      * 删除聊天记录

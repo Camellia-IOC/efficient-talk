@@ -35,6 +35,8 @@
 
     const route = useRoute();
 
+    const isGroup = ref(false);
+
     // 文件属性
     const isLoading = ref(true);
     const fileId = ref();
@@ -54,7 +56,8 @@
     const getFileBlob = async () => {
         const response = await ChatApi.getChatFileBlob({
             fileId: fileId.value,
-            type: "media"
+            type: "media",
+            isGroup: isGroup.value
         });
 
         // 获取文件Blob并转换为ArrayBuffer
@@ -68,6 +71,7 @@
         const data = JSON.parse(route.query.data);
         fileId.value = data.fileId;
         fileType.value = data.fileType;
+        isGroup.value = data.isGroup;
         await getFileBlob();
     });
 </script>

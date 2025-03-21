@@ -122,10 +122,25 @@
 		VALUES (#{fileId}, #{fileName}, #{filePath}, #{fileType}, #{fileSize}, #{sender}, #{receiver}, #{createTime})
 	</insert>
 
+	<!--保存群聊聊天文件-->
+	<insert id="uploadGroupChatFile" parameterType="com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO">
+		INSERT INTO chat_group_files (file_id, file_name, file_path, file_type, file_size, sender, receiver,
+									  create_time)
+		VALUES (#{fileId}, #{fileName}, #{filePath}, #{fileType}, #{fileSize}, #{sender}, #{receiver}, #{createTime})
+	</insert>
+
 	<!--保存聊天图片-->
 	<insert id="uploadChatImage" parameterType="com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO">
 		INSERT INTO chat_images (image_id, image_name, image_path, image_type, image_size, sender, receiver,
 								 create_time)
+		VALUES (#{imageId}, #{imageName}, #{imagePath}, #{imageType}, #{imageSize}, #{sender}, #{receiver},
+				#{createTime})
+	</insert>
+
+	<!--保存群聊聊天图片-->
+	<insert id="uploadGroupChatImage" parameterType="com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO">
+		INSERT INTO chat_group_images (image_id, image_name, image_path, image_type, image_size, sender, receiver,
+									   create_time)
 		VALUES (#{imageId}, #{imageName}, #{imagePath}, #{imageType}, #{imageSize}, #{sender}, #{receiver},
 				#{createTime})
 	</insert>
@@ -209,6 +224,57 @@
 		LIMIT #{pageSize}
 	</select>
 
+	<!--分类获取群聊聊天记录-->
+	<select id="getGroupChatHistoryByType" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		SELECT chat_group_history.id       as id,
+			   chat_group_history.sender   as sender,
+			   chat_group_history.receiver as receiver,
+			   chat_group_history.type     as type,
+			   chat_group_history.file_id  as fileId,
+		<if test="type == 'image/video' or type == 'all'">
+			chat_group_images.image_name as imageName,
+			chat_group_images.image_type as imageType,
+			chat_group_images.image_size as imageSize,
+		</if>
+		<if test="type == 'file' or type == 'all'">
+			chat_group_files.file_name as fileName,
+			chat_group_files.file_type as fileType,
+			chat_group_files.file_size as fileSize,
+		</if>
+		chat_group_history.content   as content,
+		chat_group_history.send_time as time
+		FROM chat_group_history
+		<if test="type == 'image/video' or type == 'all'">
+			LEFT JOIN chat_group_images ON chat_group_history.file_id = chat_group_images.image_id
+		</if>
+		<if test="type == 'file' or type == 'all'">
+			LEFT JOIN chat_group_files ON chat_group_history.file_id = chat_group_files.file_id
+		</if>
+		<where>
+			chat_group_history.receiver = #{groupId}
+			<if test="type == 'all' and (searchKey != null and searchKey != '')">
+				AND chat_group_history.content LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+			<if test="type == 'image/video'">
+				AND (chat_group_history.type = 'image' OR chat_group_history.type = 'video')
+				<if test="searchKey != null and searchKey != ''">
+					AND chat_group_images.image_name LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+			</if>
+			<if test="type == 'file'">
+				AND chat_group_history.type = 'file'
+				<if test="searchKey != null and searchKey != ''">
+					AND chat_group_files.file_name LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+			</if>
+			<if test="lastTime != null">
+				AND send_time &lt; #{lastTime}
+			</if>
+		</where>
+		ORDER BY send_time DESC
+		LIMIT #{pageSize}
+	</select>
+
 	<!--获取聊天文件路径-->
 	<select id="getChatFilePath" resultType="java.lang.String">
 		SELECT file_path
@@ -216,10 +282,24 @@
 		WHERE file_id = #{fileId}
 	</select>
 
+	<!--获取群聊聊天文件路径-->
+	<select id="getGroupChatFilePath" resultType="java.lang.String">
+		SELECT file_path
+		FROM chat_group_files
+		WHERE file_id = #{fileId}
+	</select>
+
 	<!--获取聊天媒体文件路径-->
 	<select id="getChatMediaFilePath" resultType="java.lang.String">
 		SELECT image_path
 		FROM chat_images
+		WHERE image_id = #{fileId}
+	</select>
+
+	<!--获取群聊聊天媒体文件路径-->
+	<select id="getGroupChatMediaFilePath" resultType="java.lang.String">
+		SELECT image_path
+		FROM chat_group_images
 		WHERE image_id = #{fileId}
 	</select>
 

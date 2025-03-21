@@ -75,6 +75,7 @@
 
     // 当前模块
     const module = ref(null);
+    const isGroup = ref(false);
 
     // 文件属性
     const isLoading = ref(true);
@@ -117,7 +118,8 @@
         if (module.value === "CHAT") {
             response = await ChatApi.getChatFileBlob({
                 fileId: fileId.value,
-                type: "file"
+                type: "file",
+                isGroup: isGroup.value
             });
         }
         else if (module.value === "CLOUD_DISK") {
@@ -138,11 +140,11 @@
     };
 
     onBeforeMount(() => {
-        debugger
         const data = JSON.parse(route.query.data);
         fileId.value = data.fileId;
         fileType.value = data.fileType;
         module.value = data.module;
+        isGroup.value = data.isGroup;
     });
 
     onMounted(() => {
