@@ -127,7 +127,8 @@
                         deptName: data.deptName,
                         jobId: data.jobId,
                         jobName: data.jobName,
-                        isFriend: data.isFriend
+                        isFriend: data.isFriend,
+                        isGroup: false
                     };
                 }
             }

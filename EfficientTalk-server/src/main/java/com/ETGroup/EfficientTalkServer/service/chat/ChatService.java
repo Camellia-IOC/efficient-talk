@@ -22,6 +22,15 @@ public interface ChatService {
     Integer saveChatHistory(ChatRecordDTO record);
     
     /**
+     * 保存群聊聊天记录
+     *
+     * @param record 聊天记录
+     *
+     * @return 保存成功条数
+     */
+    Integer saveGroupChatHistory(ChatRecordDTO record);
+    
+    /**
      * 缓存聊天记录
      *
      * @param record 聊天记录
@@ -69,6 +78,19 @@ public interface ChatService {
      * @return 聊天记录
      */
     ArrayList<ChatRecordDTO> getChatHistory(String userId, String friendId, Integer pageIndex, Integer pageSize, LocalDateTime lastTime);
+    
+    /**
+     * 获取群聊聊天记录
+     *
+     * @param userId    用户ID
+     * @param groupId   群聊ID
+     * @param pageIndex 页码
+     * @param pageSize  每页大小
+     * @param lastTime  最早一条记录的时间
+     *
+     * @return 聊天记录
+     */
+    ArrayList<ChatRecordDTO> getGroupChatHistory(String userId, String groupId, Integer pageIndex, Integer pageSize, LocalDateTime lastTime);
     
     /**
      * 保存聊天文件
@@ -146,7 +168,9 @@ public interface ChatService {
     
     /**
      * 删除聊天记录
+     *
      * @param idList 聊天记录ID
+     *
      * @return 是否删除成功
      */
     boolean deleteChatHistory(ArrayList<String> idList);

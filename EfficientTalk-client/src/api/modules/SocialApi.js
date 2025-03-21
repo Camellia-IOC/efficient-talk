@@ -57,7 +57,7 @@ export default class SocialApi {
             url: this.requestPath + "/handleFriendInvite",
             data
         });
-    }
+    };
 
     /**
      * 获取好友分组
@@ -68,7 +68,7 @@ export default class SocialApi {
             url: this.requestPath + "/getUserFriendGroups",
             data
         });
-    }
+    };
 
     /**
      * 搜索新朋友
@@ -79,7 +79,7 @@ export default class SocialApi {
             url: this.requestPath + "/searchNewFriend",
             data
         });
-    }
+    };
 
     /**
      * 获取组织架构树
@@ -90,7 +90,7 @@ export default class SocialApi {
             url: this.requestPath + "/getOrganizationTree",
             data
         });
-    }
+    };
 
     /**
      * 获取组织信息
@@ -101,5 +101,49 @@ export default class SocialApi {
             url: this.requestPath + "/getOrganizationInfo",
             data
         });
-    }
+    };
+
+    /**
+     * 获取群聊列表
+     * @param data
+     */
+    static getChatGroupList = (data) => {
+        return service.get({
+            url: this.requestPath + "/getChatGroupList",
+            data
+        });
+    };
+
+    /**
+     * 获取群聊基本信息
+     * @param data
+     */
+    static getChatGroupBasicInfo = (data) => {
+        return service.get({
+            url: this.requestPath + "/getChatGroupBasicInfo",
+            data
+        });
+    };
+
+    /**
+     * 获取群聊成员列表
+     * @param data
+     */
+    static getChatGroupMemberList = (data) => {
+        return service.get({
+            url: this.requestPath + "/getChatGroupMemberList",
+            data
+        });
+    };
+
+    /**
+     * 退出群聊
+     * @param data
+     */
+    static quitChatGroup = (data) => {
+        return service.delete({
+            url: this.requestPath + "/quitChatGroup",
+            data
+        });
+    };
 }

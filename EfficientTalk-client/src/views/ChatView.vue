@@ -38,7 +38,8 @@
                 selectedChat.value = {
                     userId: friendInfo.value.userId,
                     userName: friendInfo.value.userName,
-                    userAvatar: friendInfo.value.userAvatar
+                    userAvatar: friendInfo.value.userAvatar,
+                    isGroup: friendInfo.value.isGroup
                 };
             }
         }

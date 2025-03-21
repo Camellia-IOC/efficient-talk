@@ -11,7 +11,7 @@
       </a-button>
     </div>
     <div class="notification-item"
-         @click="handleInvitationDialogOpen"
+         @click="handleFriendInvitationDialogOpen"
     >
       <div class="item-content">
         <span>好友通知</span>
@@ -30,7 +30,7 @@
            v-if="activeType === 'FRIEND'"
       >
         <div class="friend-manager-container">
-          <a-button class="friend-manager-btn">好友管理器</a-button>
+          <a-button class="friend-manager-btn">通讯录管理器</a-button>
         </div>
         <a-spin :wrapper-class-name="'friend-group-list'"
                 :spinning="isFriendListLoading"
@@ -45,12 +45,39 @@
                       class="group-list"
                       v-else
           >
+            <a-collapse-panel key="CHAT_GROUP"
+                              header="群聊"
+                              class="group-list-item"
+            >
+              <template #extra>
+                <label style="color: gray;font-size: 12px">{{ chatGroupList.length }}</label>
+              </template>
+              <div class="friend-list">
+                <div v-for="(group,index) in chatGroupList"
+                     :key="index"
+                     class="friend-list-item"
+                     @click="handleSelectGroup(group)"
+                >
+                  <div class="user-avatar">
+                    <div class="group-avatar">
+                      <ChatGroupIcon :size="32"
+                                     :color="'#FFFFFF'"
+                      />
+                    </div>
+                  </div>
+                  <div class="user-info">
+                    <div class="user-name">{{ group.groupName }}</div>
+                  </div>
+                </div>
+              </div>
+            </a-collapse-panel>
             <a-collapse-panel v-for="(group,index) in friendList.groupList"
                               :key="index"
                               :header="group.groupName"
                               class="group-list-item"
             >
-              <template #extra><label style="color: gray;font-size: 12px">{{ group.friendList.length }}</label>
+              <template #extra>
+                <label style="color: gray;font-size: 12px">{{ group.friendList.length }}</label>
               </template>
               <div class="friend-list">
                 <div v-for="(friend,index) in group.friendList"
@@ -208,12 +235,16 @@
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import AddNewFriendDialog from "../dialog/module-social/add-friend/AddNewFriendDialog.vue";
     import { message } from "ant-design-vue";
+    import ChatGroupIcon from "../icon/ChatGroupIcon.vue";
+    import { useRouter } from "vue-router";
+
+    const router = useRouter();
 
     const emits = defineEmits(["setSelectedFriend"]);
 
     // 好友邀请对话框控制
     const friendInvitationDialog = ref();
-    const handleInvitationDialogOpen = () => {
+    const handleFriendInvitationDialogOpen = () => {
         friendInvitationDialog.value.dialogOpen();
     };
 
@@ -238,7 +269,7 @@
 
     // 类型集合
     const typeSets = [{
-        label: "好友",
+        label: "通讯录",
         value: "FRIEND"
     }, {
         label: "组织",
@@ -260,6 +291,27 @@
         total: 0
     });
 
+    // 群聊列表
+    const chatGroupList = ref([]);
+    const handleSelectGroup = (group) => {
+        window.dispatchEvent(new CustomEvent("navForceChange", {
+            detail: "chat"
+        }));
+        const data = {
+            userId: group.groupId,
+            userName: group.groupName,
+            userAvatar: null,
+            isGroup: true,
+            creator: group.creator,
+        };
+        router.push({
+            name: "chat",
+            query: {
+                friendInfo: JSON.stringify(data)
+            }
+        });
+    };
+
     // 组织列表
     const openedNodeStack = ref([]);
     const curOrgNodeInfo = ref(null);
@@ -279,6 +331,21 @@
             }
         });
         isFriendListLoading.value = false;
+    };
+
+    // 获取群聊列表
+    const getChatGroupList = () => {
+        SocialApi.getChatGroupList({
+            userId: curLoginUser.value.userId,
+        }).then((response) => {
+            const res = response.data;
+            if (res.code === 0) {
+                const data = res.data;
+                if (data != null) {
+                    chatGroupList.value = data;
+                }
+            }
+        });
     };
 
     // 更新好友列表
@@ -334,6 +401,9 @@
 
         // 获取好友列表
         await getFriendList();
+
+        // 获取群聊列表
+        getChatGroupList();
 
         if (curLoginUser.value.orgId != null) {
             // 获取组织树
@@ -395,6 +465,7 @@
     }
 
     $notification-item-height: 50px;
+    $notification-item-count: 1;
 
     .notification-item {
       display: flex;
@@ -436,7 +507,7 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      height: calc(100% - #{$type-select-bar-height} - $notification-item-height - $search-area-height);
+      height: calc(100% - #{$type-select-bar-height} - $notification-item-height * $notification-item-count - $search-area-height);
 
       .type-friend-list {
         display: flex;
@@ -524,6 +595,16 @@
                       width: 50px;
                       height: 50px;
                       border-radius: 50%;
+                    }
+
+                    .group-avatar {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      width: 50px;
+                      height: 50px;
+                      border-radius: 50%;
+                      background-color: global-variable.$theme-color;
                     }
                   }
 

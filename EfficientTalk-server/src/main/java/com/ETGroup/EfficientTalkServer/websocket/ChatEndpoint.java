@@ -1,6 +1,7 @@
 package com.ETGroup.EfficientTalkServer.websocket;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
+import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
 import com.ETGroup.EfficientTalkServer.service.chat.ChatService;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
@@ -8,10 +9,12 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +26,7 @@ public class ChatEndpoint {
     // 引入聊天服务
     private ChatService chatService;
     private static AutowireCapableBeanFactory beanFactory;
+    private SocialMapper socialMapper;
     
     @Resource
     public void setBeanFactory(AutowireCapableBeanFactory beanFactory) {
@@ -39,8 +43,9 @@ public class ChatEndpoint {
         // 保存当前用户的会话
         sessionStorage.put(userId, session);
         
-        // 获取ChatService实例
+        // 获取服务实例
         this.chatService = beanFactory.getBean(ChatService.class);
+        this.socialMapper = beanFactory.getBean(SocialMapper.class);
         
         // TODO 从消息缓存队列中获取聊天记录，并发送给用户
     }
@@ -51,21 +56,48 @@ public class ChatEndpoint {
         try {
             // 提取消息
             ChatRecordDTO msg = JSON.parseObject(message, ChatRecordDTO.class);
-            if (chatService.saveChatHistory(msg) == 1) {
-                log.info("保存聊天记录成功");
-            }
-            // 如果接收者不是发送者，则转发消息
-            if (!msg.getReceiver()
-                    .equals(msg.getSender())) {
-                Session session = sessionStorage.get(msg.getReceiver());
-                if (session == null) {
-                    if (chatService.cacheChatHistory(msg) == 1) {
-                        log.info("缓存聊天记录成功");
+            
+            // 如果是群聊消息
+            if (msg.getIsGroup()) {
+                if (chatService.saveGroupChatHistory(msg) == 1) {
+                    log.info("保存群聊聊天记录成功");
+                }
+                
+                ArrayList<String> groupMemberIdList = socialMapper.getChatGroupMemberIdList(msg.getReceiver());
+                for (String memberId : groupMemberIdList) {
+                    // 如果当前成员是发送者，则跳过
+                    if (memberId.equals(msg.getSender())) {
+                        continue;
+                    }
+                    
+                    Session session = sessionStorage.get(memberId);
+                    if (session == null) {
+                        log.info("未找到用户");
+                    }
+                    else {
+                        session.getBasicRemote()
+                               .sendText(message);
                     }
                 }
-                else {
-                    session.getBasicRemote()
-                           .sendText(message);
+            }
+            else {
+                if (chatService.saveChatHistory(msg) == 1) {
+                    log.info("保存聊天记录成功");
+                }
+                
+                // 如果接收者不是发送者，则转发消息
+                if (!msg.getReceiver()
+                        .equals(msg.getSender())) {
+                    Session session = sessionStorage.get(msg.getReceiver());
+                    if (session == null) {
+                        if (chatService.cacheChatHistory(msg) == 1) {
+                            log.info("缓存聊天记录成功");
+                        }
+                    }
+                    else {
+                        session.getBasicRemote()
+                               .sendText(message);
+                    }
                 }
             }
         }

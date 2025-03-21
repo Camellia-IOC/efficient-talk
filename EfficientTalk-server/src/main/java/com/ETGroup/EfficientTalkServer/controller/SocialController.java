@@ -1,5 +1,8 @@
 package com.ETGroup.EfficientTalkServer.controller;
 
+import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupListItemDTO;
+import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupMemberListItemDTO;
+import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
@@ -12,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 @Tag(name = "社交相关接口", description = "社交相关接口")
 @Slf4j
@@ -97,5 +102,35 @@ public class SocialController {
         OrganizationInfoResponseVO response = new OrganizationInfoResponseVO();
         response.setOrgInfo(socialMapper.getOrganizationInfo(orgId));
         return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取群聊列表")
+    @GetMapping("/getChatGroupList")
+    public ResponseData<ArrayList<ChatGroupListItemDTO>> getChatGroupList(@RequestParam String userId) {
+        ArrayList<ChatGroupListItemDTO> response = socialMapper.getChatGroupList(userId);
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取群聊基本信息")
+    @GetMapping("/getChatGroupBasicInfo")
+    public ResponseData<ChatGroupPO> getChatGroupBasicInfo(@RequestParam String groupId) {
+        ChatGroupPO response = socialMapper.getChatGroupBasicInfo(groupId);
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取群聊成员列表")
+    @GetMapping("/getChatGroupMemberList")
+    public ResponseData<ArrayList<ChatGroupMemberListItemDTO>> getChatGroupMemberList(@RequestParam String groupId) {
+        ArrayList<ChatGroupMemberListItemDTO> response = socialMapper.getChatGroupMemberList(groupId);
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "退出群聊")
+    @DeleteMapping("/quitChatGroup")
+    public ResponseData<Boolean> quitChatGroup(@RequestParam String userId, @RequestParam String groupId) {
+        if (socialMapper.quitChatGroup(userId, groupId) == 1) {
+            return ResponseData.success(true);
+        }
+        return ResponseData.error(ResponseConfig.ERROR);
     }
 }

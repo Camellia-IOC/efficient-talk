@@ -49,7 +49,8 @@
 		INSERT INTO friends (record_id, user_id, friend_id, group_id, create_time)
 		VALUES (#{userRecordId}, #{userId}, #{friendId}, #{userGroupId}, #{createTime})
 		<if test="!userId.equals(friendId)">
-			, (#{friendRecordId}, #{friendId}, #{userId}, #{friendGroupId}, #{createTime})
+			,
+				(#{friendRecordId}, #{friendId}, #{userId}, #{friendGroupId}, #{createTime})
 		</if>
 	</insert>
 
@@ -204,4 +205,56 @@
 		FROM organizations
 		WHERE organizations.org_id = #{orgId}
 	</select>
+
+	<!--获取群聊列表-->
+	<select id="getChatGroupList" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupListItemDTO">
+		SELECT chat_group.group_id   as groupId,
+			   chat_group.group_name as groupName,
+			   chat_group.creator    as creator
+		FROM chat_group_member
+				 LEFT JOIN chat_group ON chat_group.group_id = chat_group_member.group_id
+		WHERE chat_group_member.user_id = #{userId}
+	</select>
+
+	<!--获取群聊成员ID列表-->
+	<select id="getChatGroupMemberIdList" resultType="java.lang.String">
+		SELECT user_id
+		FROM chat_group_member
+		WHERE group_id = #{groupId}
+	</select>
+
+	<!--获取群聊基本信息-->
+	<select id="getChatGroupBasicInfo" resultType="com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO">
+		SELECT *
+		FROM chat_group
+		WHERE group_id = #{groupId}
+	</select>
+
+	<!--获取群聊成员列表-->
+	<select id="getChatGroupMemberList"
+			resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupMemberListItemDTO">
+		SELECT users.id               as userId,
+			   users.username         as userName,
+			   users.avatar           as userAvatar,
+			   organizations.org_id   as orgId,
+			   organizations.org_name as orgName,
+			   departments.dept_id    as deptId,
+			   departments.dept_name  as deptName,
+			   jobs.job_id            as jobId,
+			   jobs.job_name          as jobName
+		FROM chat_group_member
+				 LEFT JOIN users ON users.id = chat_group_member.user_id
+				 LEFT JOIN organizations ON organizations.org_id = users.org_id
+				 LEFT JOIN departments ON departments.dept_id = users.dept_id
+				 LEFT JOIN jobs ON jobs.job_id = users.job_id
+		WHERE group_id = #{groupId}
+	</select>
+
+	<!--退出群聊-->
+	<delete id="quitChatGroup">
+		DELETE
+		FROM chat_group_member
+		WHERE user_id = #{userId}
+		  AND group_id = #{groupId}
+	</delete>
 </mapper>

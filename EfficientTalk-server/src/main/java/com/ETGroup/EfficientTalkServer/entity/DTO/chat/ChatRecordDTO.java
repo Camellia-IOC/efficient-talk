@@ -10,6 +10,10 @@ public class ChatRecordDTO {
     private String id;
     // 发送者ID
     private String sender;
+    // 发送者头像(群聊用)
+    private String senderAvatar = null;
+    // 发送者名称(群聊用)
+    private String senderName = null;
     // 接收者ID
     private String receiver;
     // 消息类型
@@ -32,6 +36,8 @@ public class ChatRecordDTO {
     private String content;
     // 发送时间
     private LocalDateTime time;
+    // 是否为群聊消息
+    private Boolean isGroup;
     // 是否选中(前端用)
     private Boolean isSelected = false;
 }

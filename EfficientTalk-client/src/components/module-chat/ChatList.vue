@@ -7,7 +7,7 @@
                allow-clear
       ></a-input>
       <a-button class="search-btn">
-        <SearchOutlined/>
+        <PlusOutlined/>
       </a-button>
     </div>
     <a-spin :wrapper-class-name="'chat-list-area'"
@@ -27,16 +27,27 @@
                :class="{'chat-list-item-active': curChatId === item.userId}"
                @click="handleSelectChat(item)"
           >
-            <div class="item-avatar">
+            <div class="item-avatar"
+                 v-if="!item.isGroup"
+            >
               <img class="avatar"
                    v-if="item.userAvatar!==null"
                    :src="item.userAvatar"
-                   alt=""
+                   alt="avatar"
               />
               <a-avatar class="avatar"
                         v-else
               >{{ item.userName.substring(0, 2) }}
               </a-avatar>
+            </div>
+            <div class="item-avatar"
+                 v-else
+            >
+              <div class="group-avatar">
+                <ChatGroupIcon :size="32"
+                               :color="'#FFFFFF'"
+                />
+              </div>
             </div>
             <div class="item-detail">
               <div class="detail-header">
@@ -109,16 +120,27 @@
                :class="{'chat-list-item-active': curChatId === item.userId}"
                @click="handleSelectChat(item)"
           >
-            <div class="item-avatar">
+            <div class="item-avatar"
+                 v-if="!item.isGroup"
+            >
               <img class="avatar"
                    v-if="item.userAvatar!==null"
                    :src="item.userAvatar"
-                   alt=""
+                   alt="avatar"
               />
               <a-avatar class="avatar"
                         v-else
               >{{ item.userName.substring(0, 2) }}
               </a-avatar>
+            </div>
+            <div class="item-avatar"
+                 v-else
+            >
+              <div class="group-avatar">
+                <ChatGroupIcon :size="32"
+                               :color="'#FFFFFF'"
+                />
+              </div>
             </div>
             <div class="item-detail">
               <div class="detail-header">
@@ -200,7 +222,7 @@
         EyeOutlined,
         EyeInvisibleOutlined,
         DeleteOutlined,
-        SearchOutlined,
+        PlusOutlined,
         CloseCircleOutlined
     } from "@ant-design/icons-vue";
     import { formatMessageTime } from "../../utils/time-utils.js";
@@ -208,6 +230,8 @@
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
     import { saveChatRecord } from "../../database/chat-history.js";
+    import ChatGroupIcon from "../icon/ChatGroupIcon.vue";
+    import SocialApi from "../../api/modules/SocialApi.js";
 
     const props = defineProps({
         friendInfo: {
@@ -336,37 +360,75 @@
         let existFlag = false;
 
         // 遍历消息列表，修改相应的元素内容
-        for (let i = 0; i < chatList.value.vipList.length; i++) {
-            if (chatList.value.vipList[i].userId === message.sender) {
-                chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
-                chatList.value.vipList[i].lastMessageTime = message.time;
-
-                // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                if (curChatId.value !== message.sender) {
-                    chatList.value.vipList[i].unreadCount++;
-                }
-
-                // 将对应元素提到数组第一个
-                chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
-                existFlag = true;
-                break;
-            }
-        }
-        if (!existFlag) {
-            for (let i = 0; i < chatList.value.commonList.length; i++) {
-                if (chatList.value.commonList[i].userId === message.sender) {
-                    chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
-                    chatList.value.commonList[i].lastMessageTime = message.time;
+        if (message.isGroup) {
+            for (let i = 0; i < chatList.value.vipList.length; i++) {
+                if (chatList.value.vipList[i].userId === message.receiver) {
+                    chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
+                    chatList.value.vipList[i].lastMessageTime = message.time;
 
                     // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                    if (curChatId.value !== message.sender) {
-                        chatList.value.commonList[i].unreadCount++;
+                    if (curChatId.value !== message.receiver) {
+                        chatList.value.vipList[i].unreadCount++;
                     }
 
                     // 将对应元素提到数组第一个
-                    chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
+                    chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
                     existFlag = true;
                     break;
+                }
+            }
+            if (!existFlag) {
+                for (let i = 0; i < chatList.value.commonList.length; i++) {
+                    if (chatList.value.commonList[i].userId === message.receiver) {
+                        chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
+                        chatList.value.commonList[i].lastMessageTime = message.time;
+
+                        // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
+                        if (curChatId.value !== message.receiver) {
+                            chatList.value.commonList[i].unreadCount++;
+                        }
+
+                        // 将对应元素提到数组第一个
+                        chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
+                        existFlag = true;
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < chatList.value.vipList.length; i++) {
+                if (chatList.value.vipList[i].userId === message.sender) {
+                    chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
+                    chatList.value.vipList[i].lastMessageTime = message.time;
+
+                    // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
+                    if (curChatId.value !== message.sender) {
+                        chatList.value.vipList[i].unreadCount++;
+                    }
+
+                    // 将对应元素提到数组第一个
+                    chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
+                    existFlag = true;
+                    break;
+                }
+            }
+            if (!existFlag) {
+                for (let i = 0; i < chatList.value.commonList.length; i++) {
+                    if (chatList.value.commonList[i].userId === message.sender) {
+                        chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
+                        chatList.value.commonList[i].lastMessageTime = message.time;
+
+                        // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
+                        if (curChatId.value !== message.sender) {
+                            chatList.value.commonList[i].unreadCount++;
+                        }
+
+                        // 将对应元素提到数组第一个
+                        chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
+                        existFlag = true;
+                        break;
+                    }
                 }
             }
         }
@@ -379,27 +441,44 @@
                 userAvatar: null,
                 lastMessage: message.content,
                 lastMessageTime: message.time,
-                unreadCount: 1
+                unreadCount: 1,
+                isGroup: message.isGroup,
+                creator: null
             };
 
-            // 获取用户基本信息
-            await UserApi.getUserBasicInfo({
-                userId: message.sender
-            }).then((response) => {
+            if (message.isGroup) {
+                newMessage.userId = message.receiver;
+
+                const response = await SocialApi.getChatGroupBasicInfo({
+                    groupId: message.receiver
+                });
+
                 const res = response.data;
                 if (res.code === 0) {
-                    const data = res.data;
-                    if (data != null) {
-                        newMessage.userName = data.userName;
-                        newMessage.userAvatar = data.userAvatar;
-                    }
+                    newMessage.userName = res.data.groupName;
+                    newMessage.creator = res.data.creator;
                 }
-            }).catch(() => {
-                console.error("获取用户基本信息失败");
-                newMessage.userName = "未知用户";
-                // TODO 默认头像需要替换
-                newMessage.userAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png";
-            });
+            }
+            else {
+                // 获取用户基本信息
+                await UserApi.getUserBasicInfo({
+                    userId: message.sender
+                }).then((response) => {
+                    const res = response.data;
+                    if (res.code === 0) {
+                        const data = res.data;
+                        if (data != null) {
+                            newMessage.userName = data.userName;
+                            newMessage.userAvatar = data.userAvatar;
+                        }
+                    }
+                }).catch(() => {
+                    console.error("获取用户基本信息失败");
+                    newMessage.userName = "未知用户";
+                    // TODO 默认头像需要替换
+                    newMessage.userAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png";
+                });
+            }
 
             chatList.value.commonList.unshift(newMessage);
         }
@@ -440,6 +519,10 @@
             }
         }
 
+        if (!existFlag) {
+            // TODO 转发消息后需要更新聊天列表
+        }
+
         // 保存聊天列表至本地和云端
         await handleSaveChatList(chatList.value);
     };
@@ -448,18 +531,24 @@
 
     // 选择聊天
     const handleSelectChat = async (item) => {
+        console.error(item);
         if (curChatId.value !== item.userId) {
             curChatId.value = item.userId;
             const chatInfo = {
                 userId: item.userId,
                 userName: item.userName,
-                userAvatar: item.userAvatar
+                userAvatar: item.userAvatar,
+                creator: item.creator,
+                isGroup: item.isGroup
             };
             emits("setSelectedChat", chatInfo);
 
             // 广播聊天对象变化事件
             window.dispatchEvent(new CustomEvent("chatObjectChange", {
-                detail: curChatId.value,
+                detail: {
+                    userId: curChatId.value,
+                    isGroup: item.isGroup
+                },
                 bubbles: false
             }));
 
@@ -670,15 +759,20 @@
             }
 
             if (!flag) {
-                // 在聊天列表的头部添加该好友
-                chatList.value.commonList.unshift({
+                const chatInfo = {
                     userId: props.friendInfo.userId,
                     userName: props.friendInfo.userName,
                     userAvatar: props.friendInfo.userAvatar,
                     lastMessage: "",
                     lastMessageTime: "",
-                    unreadCount: 0
-                });
+                    unreadCount: 0,
+                    isGroup: props.friendInfo.isGroup
+                };
+                if (chatInfo.isGroup) {
+                    chatInfo.creator = props.friendInfo.creator;
+                }
+                // 在聊天列表的头部添加该好友
+                chatList.value.commonList.unshift(chatInfo);
             }
 
             // 保存对话列表
@@ -688,12 +782,19 @@
             const chatInfo = {
                 userId: props.friendInfo.userId,
                 userName: props.friendInfo.userName,
-                userAvatar: props.friendInfo.userAvatar
+                userAvatar: props.friendInfo.userAvatar,
+                isGroup: props.friendInfo.isGroup
             };
+            if (chatInfo.isGroup) {
+                chatInfo.creator = props.friendInfo.creator;
+            }
             emits("setSelectedChat", chatInfo);
             // 广播聊天对象变化事件
             window.dispatchEvent(new CustomEvent("chatObjectChange", {
-                detail: curChatId.value,
+                detail: {
+                    userId: curChatId.value,
+                    isGroup: props.friendInfo.isGroup
+                },
                 bubbles: false
             }));
         }
@@ -772,7 +873,7 @@
           position: relative;
           background-color: global-variable.$hover-background-color;
 
-          &:after{
+          &:after {
             content: '';
             position: absolute;
             top: 0;
@@ -816,6 +917,16 @@
               width: 100%;
               height: 100%;
               border-radius: 50%;
+            }
+
+            .group-avatar {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 100%;
+              height: 100%;
+              border-radius: 50%;
+              background-color: global-variable.$theme-color;
             }
           }
 

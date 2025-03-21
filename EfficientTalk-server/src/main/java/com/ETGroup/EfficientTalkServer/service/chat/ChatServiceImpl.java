@@ -92,7 +92,7 @@ public class ChatServiceImpl implements ChatService {
         if (result == null) {
             ChatListPO chatList = new ChatListPO();
             chatList.setUserId(userId);
-            chatList.setChatList("{\"vipList\":[ ],\"commonList\":[ ]}");
+            chatList.setChatList("{\"vipList\":[],\"commonList\":[]}");
             if (chatMapper.createChatList(chatList) != 1) {
                 log.error("创建对话列表失败");
             }
@@ -115,6 +115,22 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ArrayList<ChatRecordDTO> getChatHistory(String userId, String friendId, Integer pageIndex, Integer pageSize, LocalDateTime lastTime) {
         return chatMapper.getChatHistory(userId, friendId, pageIndex, pageSize, lastTime);
+    }
+    
+    /**
+     * 获取群聊聊天记录
+     *
+     * @param userId    用户ID
+     * @param groupId   群聊ID
+     * @param pageIndex 页码
+     * @param pageSize  每页大小
+     * @param lastTime  最早一条记录的时间
+     *
+     * @return 聊天记录
+     */
+    @Override
+    public ArrayList<ChatRecordDTO> getGroupChatHistory(String userId, String groupId, Integer pageIndex, Integer pageSize, LocalDateTime lastTime) {
+        return chatMapper.getGroupChatHistory(userId, groupId, pageIndex, pageSize, lastTime);
     }
     
     /**
@@ -273,5 +289,17 @@ public class ChatServiceImpl implements ChatService {
             }
         }
         return true;
+    }
+    
+    /**
+     * 保存群聊聊天记录
+     *
+     * @param record 聊天记录
+     *
+     * @return 保存成功条数
+     */
+    @Override
+    public Integer saveGroupChatHistory(ChatRecordDTO record) {
+        return chatMapper.saveGroupChatHistory(record);
     }
 }

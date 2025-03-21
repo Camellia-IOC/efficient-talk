@@ -54,9 +54,15 @@ public class ChatController {
                                                               @RequestParam String friendId,
                                                               @RequestParam(required = false) Integer pageIndex,
                                                               @RequestParam Integer pageSize,
-                                                              @RequestParam(required = false) LocalDateTime lastTime) {
+                                                              @RequestParam(required = false) LocalDateTime lastTime,
+                                                              @RequestParam(defaultValue = "false") boolean isGroup) {
         ChatHistoryResponseVO response = new ChatHistoryResponseVO();
-        response.setChatHistory(chatService.getChatHistory(userId, friendId, pageIndex, pageSize, lastTime));
+        if (isGroup) {
+            response.setChatHistory(chatService.getGroupChatHistory(userId, friendId, pageIndex, pageSize, lastTime));
+        }
+        else {
+            response.setChatHistory(chatService.getChatHistory(userId, friendId, pageIndex, pageSize, lastTime));
+        }
         return ResponseData.success(response);
     }
     
@@ -70,7 +76,8 @@ public class ChatController {
     
     @Operation(summary = "删除聊天记录")
     @DeleteMapping("/deleteChatHistory")
-    public ResponseData<Void> deleteChatHistory(@RequestParam("idList") ArrayList<String> idList) {
+    public ResponseData<Void> deleteChatHistory(@RequestParam("idList") ArrayList<String> idList,
+                                                @RequestParam(defaultValue = "false") boolean isGroup) {
         if (chatService.deleteChatHistory(idList)) {
             return ResponseData.success();
         }
@@ -87,7 +94,8 @@ public class ChatController {
                                                                  @RequestParam Long fileSize,
                                                                  @RequestParam String sender,
                                                                  @RequestParam String receiver,
-                                                                 @RequestParam MultipartFile file) {
+                                                                 @RequestParam MultipartFile file,
+                                                                 @RequestParam(defaultValue = "false") boolean isGroup) {
         String filePath = chatService.uploadChatFile(fileId, fileName, fileType, fileSize, sender, receiver, file);
         if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
@@ -107,7 +115,8 @@ public class ChatController {
                                                                   @RequestParam Long imageSize,
                                                                   @RequestParam String sender,
                                                                   @RequestParam String receiver,
-                                                                  @RequestParam MultipartFile image) {
+                                                                  @RequestParam MultipartFile image,
+                                                                  @RequestParam(defaultValue = "false") boolean isGroup) {
         String filePath = chatService.uploadChatImage(imageId, imageName, imageType, imageSize, sender, receiver, image);
         if (filePath != null) {
             UploadChatFileResponseVO response = new UploadChatFileResponseVO();
@@ -145,7 +154,9 @@ public class ChatController {
     
     @Operation(summary = "获取聊天文件Blob")
     @GetMapping("/getChatFileBlob")
-    public ResponseEntity<byte[]> getChatFileBlob(@RequestParam String fileId, @RequestParam String type) {
+    public ResponseEntity<byte[]> getChatFileBlob(@RequestParam String fileId,
+                                                  @RequestParam String type,
+                                                  @RequestParam(defaultValue = "false") boolean isGroup) {
         String filePath;
         if (type.equals("media")) {
             filePath = chatMapper.getChatMediaFilePath(fileId);

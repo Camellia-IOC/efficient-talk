@@ -17,6 +17,15 @@ public interface ChatMapper {
     // 保存聊天记录
     Integer saveChatHistory(ChatRecordDTO record);
     
+    /**
+     * 保存群聊聊天记录
+     *
+     * @param record 聊天记录
+     *
+     * @return 保存成功条数
+     */
+    Integer saveGroupChatHistory(ChatRecordDTO record);
+    
     // 缓存聊天记录
     Integer cacheChatHistory(ChatRecordDTO record);
     
@@ -32,6 +41,13 @@ public interface ChatMapper {
                                             @Param("pageIndex") Integer pageIndex,
                                             @Param("pageSize") Integer pageSize,
                                             @Param("lastTime") LocalDateTime lastTime);
+    
+    // 获取群聊聊天记录
+    ArrayList<ChatRecordDTO> getGroupChatHistory(@Param("userId") String userId,
+                                                 @Param("groupId") String groupId,
+                                                 @Param("pageIndex") Integer pageIndex,
+                                                 @Param("pageSize") Integer pageSize,
+                                                 @Param("lastTime") LocalDateTime lastTime);
     
     // 保存对话列表
     Integer saveChatList(SaveChatListRequestParam param);
@@ -73,7 +89,9 @@ public interface ChatMapper {
     
     /**
      * 删除聊天记录
+     *
      * @param messageId 消息id
+     *
      * @return 删除条数
      */
     int deleteChatHistory(@Param("messageId") String messageId);

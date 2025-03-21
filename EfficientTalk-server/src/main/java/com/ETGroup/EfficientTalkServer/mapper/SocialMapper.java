@@ -1,6 +1,7 @@
 package com.ETGroup.EfficientTalkServer.mapper;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.*;
+import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendInvitationPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
@@ -53,11 +54,57 @@ public interface SocialMapper {
     Integer checkIsFriend(@Param("userId") String userId, @Param("friendId") String friendId);
     
     // 获取组织树中的部门节点
-    ArrayList<OrgTreeDeptNodeDTO> getOrgTreeDeptNodeList(@Param("orgId") String orgId,@Param("parentId") String parentId);
+    ArrayList<OrgTreeDeptNodeDTO> getOrgTreeDeptNodeList(@Param("orgId") String orgId, @Param("parentId") String parentId);
     
     // 获取组织树中的用户节点
-    ArrayList<OrgTreeUserNodeDTO> getOrgTreeUserNodeList(@Param("orgId") String orgId,@Param("parentId") String parentId);
+    ArrayList<OrgTreeUserNodeDTO> getOrgTreeUserNodeList(@Param("orgId") String orgId, @Param("parentId") String parentId);
     
     // 获取组织信息
     OrganizationPO getOrganizationInfo(@Param("orgId") String orgId);
+    
+    /**
+     * 获取群聊列表
+     *
+     * @param userId 用户ID
+     *
+     * @return 群聊列表
+     */
+    ArrayList<ChatGroupListItemDTO> getChatGroupList(@Param("userId") String userId);
+    
+    /**
+     * 获取群聊成员ID列表
+     *
+     * @param groupId 群聊ID
+     *
+     * @return 成员ID列表
+     */
+    ArrayList<String> getChatGroupMemberIdList(@Param("groupId") String groupId);
+    
+    /**
+     * 获取群聊基本信息
+     *
+     * @param groupId 群聊ID
+     *
+     * @return 群聊基本信息
+     */
+    ChatGroupPO getChatGroupBasicInfo(@Param("groupId") String groupId);
+    
+    /**
+     * 获取群聊成员列表
+     *
+     * @param groupId 群聊ID
+     *
+     * @return 成员列表
+     */
+    ArrayList<ChatGroupMemberListItemDTO> getChatGroupMemberList(@Param("groupId") String groupId);
+    
+    /**
+     * 退出群聊
+     *
+     * @param userId  用户ID
+     * @param groupId 群聊ID
+     *
+     * @return 退出结果
+     */
+    Integer quitChatGroup(@Param("userId") String userId, @Param("groupId") String groupId);
 }

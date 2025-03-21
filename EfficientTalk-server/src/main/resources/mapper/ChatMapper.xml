@@ -9,6 +9,12 @@
 		VALUES (#{id}, #{sender}, #{receiver}, #{type}, #{fileId}, #{content}, #{time})
 	</insert>
 
+	<!--保存群聊聊天记录-->
+	<insert id="saveGroupChatHistory" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		INSERT INTO chat_group_history (id, sender, receiver, type, file_id, content, send_time)
+		VALUES (#{id}, #{sender}, #{receiver}, #{type}, #{fileId}, #{content}, #{time})
+	</insert>
+
 	<!--缓存聊天记录-->
 	<insert id="cacheChatHistory" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
 		INSERT INTO chat_history_cache (id, sender, receiver, type, file_id, content, send_time)
@@ -57,6 +63,33 @@
 		<where>
 			((chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
 				OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId}))
+			<if test="lastTime != null">
+				AND send_time &lt; #{lastTime}
+			</if>
+		</where>
+		ORDER BY send_time DESC
+		LIMIT #{pageSize}
+	</select>
+
+	<!--获取群聊聊天记录-->
+	<select id="getGroupChatHistory" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		SELECT chat_group_history.id        as id,
+			   chat_group_history.sender    as sender,
+			   users.avatar                 as senderAvatar,
+			   users.username               as senderName,
+			   chat_group_history.receiver  as receiver,
+			   chat_group_history.type      as type,
+			   chat_group_history.file_id   as fileId,
+			   chat_group_files.file_name   as fileName,
+			   chat_group_files.file_type   as fileType,
+			   chat_group_files.file_size   as fileSize,
+			   chat_group_history.content   as content,
+			   chat_group_history.send_time as time
+		FROM chat_group_history
+				 LEFT JOIN chat_group_files ON chat_group_history.file_id = chat_group_files.file_id
+				 LEFT JOIN users ON chat_group_history.sender = users.id
+		<where>
+			chat_group_history.receiver = #{groupId}
 			<if test="lastTime != null">
 				AND send_time &lt; #{lastTime}
 			</if>
