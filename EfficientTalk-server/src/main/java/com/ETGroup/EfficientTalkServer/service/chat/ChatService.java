@@ -2,6 +2,7 @@ package com.ETGroup.EfficientTalkServer.service.chat;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
+import com.ETGroup.EfficientTalkServer.entity.request.chat.CreateChatGroupRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import org.springframework.stereotype.Service;
@@ -180,4 +181,13 @@ public interface ChatService {
      * @return 是否删除成功
      */
     boolean deleteChatHistory(ArrayList<String> idList);
+    
+    /**
+     * 创建群聊
+     *
+     * @param param 创建群聊参数
+     *
+     * @return 是否创建成功
+     */
+    Boolean createChatGroup(CreateChatGroupRequestParam param);
 }

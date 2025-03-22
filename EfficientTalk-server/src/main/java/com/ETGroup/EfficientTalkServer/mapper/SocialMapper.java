@@ -1,10 +1,7 @@
 package com.ETGroup.EfficientTalkServer.mapper;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.*;
-import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO;
-import com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO;
-import com.ETGroup.EfficientTalkServer.entity.PO.FriendInvitationPO;
-import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
+import com.ETGroup.EfficientTalkServer.entity.PO.*;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import org.apache.ibatis.annotations.MapKey;
@@ -117,4 +114,18 @@ public interface SocialMapper {
      * @return 组织成员列表
      */
     ArrayList<OrgTreeUserNodeDTO> getOrgMemberListByName(@Param("orgId") String orgId, @Param("searchKey") String searchKey);
+    
+    /**
+     * 创建群聊
+     * @param chatGroup 群聊对象
+     * @return 创建结果
+     */
+    Integer createChatGroup(ChatGroupPO chatGroup);
+    
+    /**
+     * 添加群聊成员
+     * @param chatGroupMember 群聊成员对象
+     * @return 添加结果
+     */
+    Integer addChatGroupMember(ChatGroupMemberPO chatGroupMember);
 }

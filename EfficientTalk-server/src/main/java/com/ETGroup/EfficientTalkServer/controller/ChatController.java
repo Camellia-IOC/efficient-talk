@@ -1,6 +1,7 @@
 package com.ETGroup.EfficientTalkServer.controller;
 
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
+import com.ETGroup.EfficientTalkServer.entity.request.chat.CreateChatGroupRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatHistoryResponseVO;
@@ -169,5 +170,12 @@ public class ChatController {
         }
         
         return FileUtils.getFileBlob(filePath);
+    }
+    
+    @Operation(summary = "创建群聊")
+    @PostMapping("/createChatGroup")
+    public ResponseData<Boolean> createChatGroup(@RequestBody CreateChatGroupRequestParam param) {
+        Boolean response = chatService.createChatGroup(param);
+        return ResponseData.success(response);
     }
 }

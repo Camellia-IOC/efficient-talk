@@ -6,7 +6,9 @@
                v-model:value="searchInput"
                allow-clear
       ></a-input>
-      <a-button class="search-btn">
+      <a-button class="search-btn"
+                @click="handleOpenGroupCreatorDialog"
+      >
         <PlusOutlined/>
       </a-button>
     </div>
@@ -204,6 +206,9 @@
       </div>
     </a-spin>
   </div>
+
+  <!--创建群聊对话框-->
+  <GroupCreatorDialog ref="groupCreatorDialogRef"/>
 </template>
 
 <script setup>
@@ -232,6 +237,7 @@
     import { saveChatRecord } from "../../database/chat-history.js";
     import ChatGroupIcon from "../icon/ChatGroupIcon.vue";
     import SocialApi from "../../api/modules/SocialApi.js";
+    import GroupCreatorDialog from "../dialog/module-chat/group-creator/GroupCreatorDialog.vue";
 
     const props = defineProps({
         friendInfo: {
@@ -239,6 +245,12 @@
             default: null
         }
     });
+
+    // 创建群聊对话框控制
+    const groupCreatorDialogRef = ref();
+    const handleOpenGroupCreatorDialog = () => {
+        groupCreatorDialogRef.value.dialogOpen(curLoginUser.value.orgId, curLoginUser.value.userId);
+    };
 
     // 当前登录的用户信息
     const curLoginUser = ref({});

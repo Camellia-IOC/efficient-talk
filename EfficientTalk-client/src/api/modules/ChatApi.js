@@ -113,4 +113,15 @@ export default class ChatApi {
             data
         });
     };
+
+    /**
+     * 创建群聊
+     * @param data
+     */
+    static createChatGroup = (data) => {
+        return service.post({
+            url: this.requestPath + "/createChatGroup",
+            data
+        });
+    };
 }

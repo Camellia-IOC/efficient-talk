@@ -17,6 +17,11 @@ public class ChatGroupPO {
     private String groupName;
     
     /**
+     * 所属组织ID
+     */
+    private String orgId;
+    
+    /**
      * 创建人ID
      */
     private String creator;

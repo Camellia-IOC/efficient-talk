@@ -274,4 +274,16 @@
 		WHERE username LIKE CONCAT('%', #{searchKey}, '%')
 		  AND users.org_id = #{orgId}
 	</select>
+
+	<!--创建群聊-->
+	<insert id="createChatGroup">
+		INSERT INTO chat_group (group_id, group_name, org_id, creator, create_time)
+		VALUES (#{groupId}, #{groupName}, #{orgId}, #{creator}, #{createTime})
+	</insert>
+
+	<!--添加群聊成员-->
+	<insert id="addChatGroupMember">
+		INSERT INTO chat_group_member (id, group_id, user_id, create_time)
+		VALUES (#{id}, #{groupId}, #{userId}, #{createTime})
+	</insert>
 </mapper>

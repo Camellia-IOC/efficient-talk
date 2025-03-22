@@ -2,13 +2,13 @@ package com.ETGroup.EfficientTalkServer.service.chat;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
-import com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO;
-import com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO;
-import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
+import com.ETGroup.EfficientTalkServer.entity.PO.*;
+import com.ETGroup.EfficientTalkServer.entity.request.chat.CreateChatGroupRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
+import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -325,6 +325,36 @@ public class ChatServiceImpl implements ChatService {
                 return false;
             }
         }
+        return true;
+    }
+    
+    /**
+     * 创建群聊
+     *
+     * @param param 创建群聊参数
+     *
+     * @return 是否创建成功
+     */
+    @Override
+    public Boolean createChatGroup(CreateChatGroupRequestParam param) {
+        ChatGroupPO chatGroup = new ChatGroupPO();
+        chatGroup.setGroupId(UUIDUtils.generateUUID());
+        chatGroup.setGroupName(param.getGroupName());
+        chatGroup.setOrgId(param.getOrgId());
+        chatGroup.setCreator(param.getCreator());
+        chatGroup.setCreateTime(LocalDateTime.now());
+        
+        if (socialMapper.createChatGroup(chatGroup) == 1) {
+            for (String memberId : param.getMemberList()) {
+                ChatGroupMemberPO chatGroupMember = new ChatGroupMemberPO();
+                chatGroupMember.setId(UUIDUtils.generateUUID());
+                chatGroupMember.setGroupId(chatGroup.getGroupId());
+                chatGroupMember.setUserId(memberId);
+                chatGroupMember.setCreateTime(LocalDateTime.now());
+                socialMapper.addChatGroupMember(chatGroupMember);
+            }
+        }
+        
         return true;
     }
     
