@@ -146,4 +146,15 @@ export default class SocialApi {
             data
         });
     };
+
+    /**
+     * 根据名称获取组织成员
+     * @param data
+     */
+    static getOrgMemberListByName = (data) => {
+        return service.get({
+            url: this.requestPath + "/getOrgMemberListByName",
+            data
+        });
+    };
 }

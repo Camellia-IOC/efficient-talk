@@ -107,4 +107,14 @@ public interface SocialMapper {
      * @return 退出结果
      */
     Integer quitChatGroup(@Param("userId") String userId, @Param("groupId") String groupId);
+    
+    /**
+     * 根据名称获取组织成员列表
+     *
+     * @param orgId     组织ID
+     * @param searchKey 搜索关键词
+     *
+     * @return 组织成员列表
+     */
+    ArrayList<OrgTreeUserNodeDTO> getOrgMemberListByName(@Param("orgId") String orgId, @Param("searchKey") String searchKey);
 }

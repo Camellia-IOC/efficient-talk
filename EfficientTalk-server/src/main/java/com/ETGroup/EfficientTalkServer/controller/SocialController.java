@@ -2,6 +2,7 @@ package com.ETGroup.EfficientTalkServer.controller;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupMemberListItemDTO;
+import com.ETGroup.EfficientTalkServer.entity.DTO.social.OrgTreeUserNodeDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
@@ -132,5 +133,12 @@ public class SocialController {
             return ResponseData.success(true);
         }
         return ResponseData.error(ResponseConfig.ERROR);
+    }
+    
+    @Operation(summary = "根据名称获取组织成员列表")
+    @GetMapping("/getOrgMemberListByName")
+    public ResponseData<ArrayList<OrgTreeUserNodeDTO>> getOrgMemberListByName(@RequestParam String orgId, @RequestParam String searchKey) {
+        ArrayList<OrgTreeUserNodeDTO> response = socialMapper.getOrgMemberListByName(orgId, searchKey);
+        return ResponseData.success(response);
     }
 }

@@ -257,4 +257,21 @@
 		WHERE user_id = #{userId}
 		  AND group_id = #{groupId}
 	</delete>
+
+	<!--根据名称获取组织成员列表-->
+	<select id="getOrgMemberListByName"
+			resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.OrgTreeUserNodeDTO">
+		SELECT users.id              as userId,
+			   users.username        as userName,
+			   users.avatar          as userAvatar,
+			   users.dept_id         as deptId,
+			   departments.dept_name as deptName,
+			   users.job_id          as jobId,
+			   jobs.job_name         as jobName
+		FROM users
+				 LEFT JOIN departments ON departments.dept_id = users.dept_id
+				 LEFT JOIN jobs ON jobs.job_id = users.job_id
+		WHERE username LIKE CONCAT('%', #{searchKey}, '%')
+		  AND users.org_id = #{orgId}
+	</select>
 </mapper>

@@ -116,7 +116,9 @@
                     orgTree.value.deptList[index].children.deptList[i].isLoaded = false;
                 }
                 for (let i = 0; i < orgTree.value.deptList[index].children.userList.length; i++) {
-                    orgTree.value.deptList[index].children.userList[i].isSelected = false;
+                    for (let j = 0; j < selectedUserList.value.length; j++) {
+                        orgTree.value.deptList[index].children.userList[i].isSelected = orgTree.value.deptList[index].children.userList[i].userId === selectedUserList.value[j].userId;
+                    }
                 }
             }
             orgTree.value.deptList[index].isLoading = false;
@@ -132,7 +134,7 @@
     const resetOrgTree = () => {
         activeKey.value = [];
         if (orgTreeNodeRef.value !== null) {
-            for (let i = 0; i < orgTreeNodeRef.value.length; i++){
+            for (let i = 0; i < orgTreeNodeRef.value.length; i++) {
                 orgTreeNodeRef.value[i].resetOrgTree();
             }
         }
