@@ -180,24 +180,29 @@
     const searchKey = ref("");
     const searchResultList = ref([]);
     const handleSearch = async () => {
-        isLoading.value = true;
-        const response = await SocialApi.getOrgMemberListByName({
-            orgId: curOrgId.value,
-            searchKey: searchKey.value
-        });
+        if (searchKey.value !== "") {
+            isLoading.value = true;
+            const response = await SocialApi.getOrgMemberListByName({
+                orgId: curOrgId.value,
+                searchKey: searchKey.value
+            });
 
-        const res = response.data;
-        if (res.code === 0) {
-            searchResultList.value = res.data;
-            let idList = [];
-            for (let i = 0; i < selectedUserList.value.length; i++) {
-                idList.push(selectedUserList.value[i].userId);
+            const res = response.data;
+            if (res.code === 0) {
+                searchResultList.value = res.data;
+                let idList = [];
+                for (let i = 0; i < selectedUserList.value.length; i++) {
+                    idList.push(selectedUserList.value[i].userId);
+                }
+                for (let i = 0; i < searchResultList.value.length; i++) {
+                    searchResultList.value[i].isSelected = idList.includes(searchResultList.value[i].userId);
+                }
             }
-            for (let i = 0; i < searchResultList.value.length; i++) {
-                searchResultList.value[i].isSelected = idList.includes(searchResultList.value[i].userId);
-            }
+            isLoading.value = false;
         }
-        isLoading.value = false;
+        else {
+            searchResultList.value = [];
+        }
     };
     const handleSelectUser = (item) => {
         item.isSelected = !item.isSelected;
