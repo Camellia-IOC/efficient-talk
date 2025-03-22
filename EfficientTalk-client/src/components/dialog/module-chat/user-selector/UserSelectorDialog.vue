@@ -284,6 +284,7 @@
         curOrgId.value = null;
         curMessageList.value = [];
         selectedUserList.value = [];
+        searchKey.value = "";
         orgTreeData.value = {
             deptList: [],
             userList: []
