@@ -1356,6 +1356,7 @@
         const data = {
             userId: curLoginUser.value.userId,
             friendId: props.chatInfo.userId,
+            isGroup: props.chatInfo.isGroup
         };
         openChatHistoryChildWindow(data);
     };

@@ -25,13 +25,13 @@
               <div class="message-item">
                 <div class="message-avatar">
                   <img class="avatar"
-                       :src="getUserAvatar(item.sender)"
+                       :src="item.senderAvatar"
                        alt="avatar"
                   >
                 </div>
                 <div class="message-info">
                   <div class="user-name">
-                    {{ getUserName(item.sender) }}
+                    {{ item.senderName }}
                   </div>
                   <div class="message-content-container">
                     <div class="text-message"
@@ -128,11 +128,11 @@
                 <div class="file-detail">
                   <div class="file-name">{{ item.fileName + "." + item.fileType }}</div>
                   <div class="user-info">
-                    <img :src="getUserAvatar(item.sender)"
+                    <img :src="item.senderAvatar"
                          alt="avatar"
                          class="user-avatar"
                     />
-                    <label class="user-name">{{ getUserName(item.sender) }}</label>
+                    <label class="user-name">{{ item.senderName }}</label>
                     <label class="time">{{ formatDate(item.time) }}</label>
                   </div>
                 </div>
@@ -165,7 +165,6 @@
     } from "vue";
     import { useRoute } from "vue-router";
     import ChatApi from "../../api/modules/ChatApi.js";
-    import UserApi from "../../api/modules/UserApi.js";
     import {
         formatMessageTime
     } from "../../utils/time-utils.js";
@@ -181,6 +180,7 @@
     const route = useRoute();
 
     // 检索参数配置
+    const isGroup = ref(false);
     const user = ref({
         userId: null,
         userName: null,
@@ -202,23 +202,6 @@
     const allLastCount = ref(0);
     const imageLastCount = ref(0);
     const fileLastCount = ref(0);
-
-    const getUserAvatar = (userId) => {
-        if (userId === user.value.userId) {
-            return user.value.userAvatar;
-        }
-        else {
-            return friend.value.friendAvatar;
-        }
-    };
-    const getUserName = (userId) => {
-        if (userId === user.value.userId) {
-            return user.value.userName;
-        }
-        else {
-            return friend.value.friendName;
-        }
-    };
 
     const handleActiveKeyChange = (key) => {
         activeKey.value = key;
@@ -258,7 +241,8 @@
             pageSize: pageSize,
             type: activeKey.value,
             searchKey: searchKey.value === "" ? null : searchKey.value,
-            lastTime: lastTime
+            lastTime: lastTime,
+            isGroup: isGroup.value
         });
 
         const res = response.data;
@@ -289,35 +273,6 @@
         }
     };
 
-    // 更新相关用户信息
-    const updateUserInfo = async (dataJson) => {
-        const data = JSON.parse(dataJson);
-        user.value.userId = data.userId;
-        friend.value.friendId = data.friendId;
-
-        let response;
-        response = await UserApi.getUserBasicInfo({
-            userId: user.value.userId
-        });
-        if (response.data.code === 0) {
-            const data = response.data.data;
-            if (data != null) {
-                user.value.userName = data.userName;
-                user.value.userAvatar = data.userAvatar;
-            }
-        }
-        response = await UserApi.getUserBasicInfo({
-            userId: friend.value.friendId
-        });
-        if (response.data.code === 0) {
-            const data = response.data.data;
-            if (data != null) {
-                friend.value.friendName = data.userName;
-                friend.value.friendAvatar = data.userAvatar;
-            }
-        }
-    };
-
     watch(() => searchKey.value, () => {
         if (activeKey.value === "all") {
             chatHistoryAllList.value = [];
@@ -333,7 +288,10 @@
     });
 
     onBeforeMount(() => {
-        updateUserInfo(route.query.data);
+        const data = JSON.parse(route.query.data);
+        user.value.userId = data.userId;
+        friend.value.friendId = data.friendId;
+        isGroup.value = data.isGroup;
 
         // 获取历史记录
         getChatHistory();
@@ -619,6 +577,7 @@
                 height: 30px;
                 border-radius: 50%;
                 border: none;
+                box-shadow: none;
               }
             }
           }

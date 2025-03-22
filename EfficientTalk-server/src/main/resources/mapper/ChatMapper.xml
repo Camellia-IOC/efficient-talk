@@ -176,6 +176,8 @@
 	<select id="getChatHistoryByType" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
 		SELECT chat_history.id       as id,
 			   chat_history.sender   as sender,
+			   users.username        as senderName,
+			   users.avatar          as senderAvatar,
 			   chat_history.receiver as receiver,
 			   chat_history.type     as type,
 			   chat_history.file_id  as fileId,
@@ -192,6 +194,7 @@
 		chat_history.content   as content,
 		chat_history.send_time as time
 		FROM chat_history
+			LEFT JOIN users ON chat_history.sender = users.id
 		<if test="type == 'image/video' or type == 'all'">
 			LEFT JOIN chat_images ON chat_history.file_id = chat_images.image_id
 		</if>
@@ -228,6 +231,8 @@
 	<select id="getGroupChatHistoryByType" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
 		SELECT chat_group_history.id       as id,
 			   chat_group_history.sender   as sender,
+			   users.username              as senderName,
+			   users.avatar                as senderAvatar,
 			   chat_group_history.receiver as receiver,
 			   chat_group_history.type     as type,
 			   chat_group_history.file_id  as fileId,
@@ -244,6 +249,7 @@
 		chat_group_history.content   as content,
 		chat_group_history.send_time as time
 		FROM chat_group_history
+			LEFT JOIN users ON chat_group_history.sender = users.id
 		<if test="type == 'image/video' or type == 'all'">
 			LEFT JOIN chat_group_images ON chat_group_history.file_id = chat_group_images.image_id
 		</if>

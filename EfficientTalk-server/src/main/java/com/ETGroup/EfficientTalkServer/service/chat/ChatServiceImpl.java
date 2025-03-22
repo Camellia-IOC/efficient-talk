@@ -304,7 +304,7 @@ public class ChatServiceImpl implements ChatService {
                                                          LocalDateTime lastTime,
                                                          Boolean isGroup) {
         if (isGroup) {
-            return chatMapper.getGroupChatHistoryByType(userId, pageIndex, pageSize, type, searchKey, lastTime);
+            return chatMapper.getGroupChatHistoryByType(friendId, pageIndex, pageSize, type, searchKey, lastTime);
         }
         else {
             return chatMapper.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime);
