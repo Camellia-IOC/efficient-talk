@@ -138,6 +138,19 @@
     const dialogTitle = ref("通知详情");
     const noticeItem = ref(null);
     const noticeReaderList = ref([]);
+    // 已读通知
+    const readNotice = (notice) => {
+        NoticeApi.readOrgNotice({
+            userId: curLoginUser.userId,
+            noticeId: notice.id
+        }).then((response) => {
+            const res = response.data;
+            if (res.code === 0) {
+                notice.hasRead = true;
+                loadNoticeReaderList();
+            }
+        });
+    };
     const loadNoticeReaderList = () => {
         NoticeApi.getOrgNoticeReadHistory({
             noticeId: noticeItem.value.id
@@ -160,7 +173,12 @@
     const dialogOpen = (notice) => {
         noticeItem.value = notice;
         noticeItem.value.paragraphs = notice.content.split("\n");
-        loadNoticeReaderList();
+        if (!noticeItem.value.hasRead) {
+            readNotice(noticeItem.value);
+        }
+        else {
+            loadNoticeReaderList();
+        }
         dialogOpenFlag.value = true;
         nextTick(() => {
             dialogBodyContainerRef.value.scrollTop = 0;

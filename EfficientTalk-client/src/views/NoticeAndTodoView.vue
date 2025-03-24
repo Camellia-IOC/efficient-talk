@@ -123,26 +123,10 @@
         }
     };
 
-    // 已读通知
-    const readNotice = (notice) => {
-        NoticeApi.readOrgNotice({
-            userId: curLoginUserStore.curLoginUser.userId,
-            noticeId: notice.id
-        }).then((response) => {
-            const res = response.data;
-            if (res.code === 0) {
-                notice.hasRead = true;
-            }
-        });
-    };
-
     // 通知内容浏览器控制
     const noticeExplorerDialogRef = ref();
     const handleNoticeExplorerDialogOpen = (notice) => {
         noticeExplorerDialogRef.value.dialogOpen(notice);
-        if (!notice.hasRead) {
-            readNotice(notice);
-        }
     };
 
     // 通知发布对话框控制
