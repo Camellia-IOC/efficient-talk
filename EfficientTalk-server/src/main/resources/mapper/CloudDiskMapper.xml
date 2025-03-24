@@ -206,4 +206,11 @@
 		  AND cloud_disk_files.disk_id = #{diskId}
 		  AND cloud_disk_files.creator = #{userId}
 	</select>
+
+	<!--计算组织云盘已使用容量-->
+	<select id="getCloudDiskUsedCapacity" resultType="java.lang.Long">
+		SELECT SUM(cloud_disk_files.size)
+		FROM cloud_disk_files
+		WHERE cloud_disk_files.disk_id = #{diskId}
+	</select>
 </mapper>

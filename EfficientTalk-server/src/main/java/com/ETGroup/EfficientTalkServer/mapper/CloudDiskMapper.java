@@ -108,4 +108,13 @@ public interface CloudDiskMapper {
      * @return 文件数量
      */
     Integer getMyCloudDiskFilesCount(@Param("orgId") String orgId, @Param("diskId") String diskId, @Param("userId") String userId);
+    
+    /**
+     * 获取组织云盘已使用容量
+     *
+     * @param diskId 云盘ID
+     *
+     * @return 已使用容量
+     */
+    Long getCloudDiskUsedCapacity(@Param("diskId") String diskId);
 }

@@ -35,7 +35,10 @@ public class CloudDiskServiceImpl implements CloudDiskService {
      */
     @Override
     public CloudDiskBasicInfoResponseVO getCloudDiskBasicInfo(String diskId) {
-        return cloudDiskMapper.getCloudDiskBasicInfo(diskId);
+        Long usedCapacity = cloudDiskMapper.getCloudDiskUsedCapacity(diskId);
+        CloudDiskBasicInfoResponseVO result = cloudDiskMapper.getCloudDiskBasicInfo(diskId);
+        result.setDiskSize(usedCapacity);
+        return result;
     }
     
     /**
