@@ -102,4 +102,26 @@ export default class CloudDiskApi {
             data
         });
     };
+
+    /**
+     * 获取最近云盘文件
+     * @param data
+     */
+    static getRecentCloudDiskFiles = (data) => {
+        return service.get({
+            url: this.requestPath + "/getRecentCloudDiskFiles",
+            data
+        });
+    };
+
+    /**
+     * 获取我的云盘文件
+     * @param data
+     */
+    static getMyCloudDiskFiles = (data) => {
+        return service.get({
+            url: this.requestPath + "/getMyCloudDiskFiles",
+            data
+        });
+    };
 }

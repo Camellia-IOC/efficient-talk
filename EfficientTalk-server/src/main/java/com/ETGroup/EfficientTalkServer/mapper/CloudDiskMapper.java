@@ -61,7 +61,6 @@ public interface CloudDiskMapper {
     // 获取组织云盘最近文件
     ArrayList<CloudDiskFileDTO> getRecentCloudDiskFiles(@Param("orgId") String orgId,
                                                         @Param("diskId") String diskId,
-                                                        @Param("pageIndex") Integer pageIndex,
                                                         @Param("pageSize") Integer pageSize);
     
     // 删除云盘文件夹
@@ -75,8 +74,38 @@ public interface CloudDiskMapper {
     
     /**
      * 根据文件ID获取文件路径
+     *
      * @param fileId 文件ID
+     *
      * @return 文件路径
      */
     String getFilePath(@Param("fileId") String fileId);
+    
+    /**
+     * 获取组织云盘我的文件
+     *
+     * @param orgId     组织ID
+     * @param diskId    云盘ID
+     * @param userId    用户ID
+     * @param pageIndex 页码
+     * @param pageSize  每页数量
+     *
+     * @return 文件列表
+     */
+    ArrayList<CloudDiskFileDTO> getMyCloudDiskFiles(@Param("orgId") String orgId,
+                                                    @Param("diskId") String diskId,
+                                                    @Param("userId") String userId,
+                                                    @Param("pageIndex") Integer pageIndex,
+                                                    @Param("pageSize") Integer pageSize);
+    
+    /**
+     * 获取组织云盘我的文件数量
+     *
+     * @param orgId  组织ID
+     * @param diskId 云盘ID
+     * @param userId 用户ID
+     *
+     * @return 文件数量
+     */
+    Integer getMyCloudDiskFilesCount(@Param("orgId") String orgId, @Param("diskId") String diskId, @Param("userId") String userId);
 }

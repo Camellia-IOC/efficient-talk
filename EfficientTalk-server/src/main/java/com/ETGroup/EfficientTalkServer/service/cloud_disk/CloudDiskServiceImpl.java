@@ -199,17 +199,16 @@ public class CloudDiskServiceImpl implements CloudDiskService {
     /**
      * 获取组织云盘最近文件
      *
-     * @param orgId     组织ID
-     * @param diskId    云盘ID
-     * @param pageIndex 页码
-     * @param pageSize  页面大小
+     * @param orgId    组织ID
+     * @param diskId   云盘ID
+     * @param pageSize 页面大小
      *
      * @return 最近文件列表
      */
     @Override
-    public CloudDiskFileListResponseVO getRecentCloudDiskFiles(String orgId, String diskId, Integer pageIndex, Integer pageSize) {
+    public CloudDiskFileListResponseVO getRecentCloudDiskFiles(String orgId, String diskId, Integer pageSize) {
         CloudDiskFileListResponseVO response = new CloudDiskFileListResponseVO();
-        ArrayList<CloudDiskFileDTO> fileList = cloudDiskMapper.getRecentCloudDiskFiles(orgId, diskId, pageIndex, pageSize);
+        ArrayList<CloudDiskFileDTO> fileList = cloudDiskMapper.getRecentCloudDiskFiles(orgId, diskId, pageSize);
         response.setFileList(fileList);
         return response;
     }
@@ -250,5 +249,26 @@ public class CloudDiskServiceImpl implements CloudDiskService {
     @Override
     public boolean renameOrgCloudDiskFile(String fileId, String newFileName) {
         return cloudDiskMapper.renameOrgCloudDiskFile(fileId, newFileName) == 1;
+    }
+    
+    /**
+     * 获取组织云盘我的文件
+     *
+     * @param orgId     组织ID
+     * @param diskId    云盘ID
+     * @param userId    用户ID
+     * @param pageIndex 页面索引
+     * @param pageSize  页面大小
+     *
+     * @return 文件列表
+     */
+    @Override
+    public CloudDiskFileListResponseVO getMyCloudDiskFiles(String orgId, String diskId, String userId, Integer pageIndex, Integer pageSize) {
+        CloudDiskFileListResponseVO response = new CloudDiskFileListResponseVO();
+        Integer total = cloudDiskMapper.getMyCloudDiskFilesCount(orgId, diskId, userId);
+        ArrayList<CloudDiskFileDTO> fileList = cloudDiskMapper.getMyCloudDiskFiles(orgId, diskId, userId, pageIndex, pageSize);
+        response.setTotal(total);
+        response.setFileList(fileList);
+        return response;
     }
 }

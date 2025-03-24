@@ -149,9 +149,19 @@ public class CloudDiskController {
     @GetMapping("/getRecentCloudDiskFiles")
     public ResponseData<CloudDiskFileListResponseVO> getRecentCloudDiskFiles(@RequestParam String orgId,
                                                                              @RequestParam String diskId,
-                                                                             @RequestParam Integer pageIndex,
                                                                              @RequestParam Integer pageSize) {
-        CloudDiskFileListResponseVO response = cloudDiskService.getRecentCloudDiskFiles(orgId, diskId, pageIndex, pageSize);
+        CloudDiskFileListResponseVO response = cloudDiskService.getRecentCloudDiskFiles(orgId, diskId, pageSize);
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取组织云盘我的文件")
+    @GetMapping("/getMyCloudDiskFiles")
+    public ResponseData<CloudDiskFileListResponseVO> getMyCloudDiskFiles(@RequestParam String orgId,
+                                                                         @RequestParam String diskId,
+                                                                         @RequestParam String userId,
+                                                                         @RequestParam Integer pageIndex,
+                                                                         @RequestParam Integer pageSize) {
+        CloudDiskFileListResponseVO response = cloudDiskService.getMyCloudDiskFiles(orgId, diskId, userId, pageIndex, pageSize);
         return ResponseData.success(response);
     }
     

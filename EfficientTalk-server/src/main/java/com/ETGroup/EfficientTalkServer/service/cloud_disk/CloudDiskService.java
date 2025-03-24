@@ -84,12 +84,11 @@ public interface CloudDiskService {
      *
      * @param orgId     组织ID
      * @param diskId    云盘ID
-     * @param pageIndex 页码
      * @param pageSize  页面大小
      *
      * @return 最近文件列表
      */
-    CloudDiskFileListResponseVO getRecentCloudDiskFiles(String orgId, String diskId, Integer pageIndex, Integer pageSize);
+    CloudDiskFileListResponseVO getRecentCloudDiskFiles(String orgId, String diskId, Integer pageSize);
     
     /**
      * 删除组织云盘文件夹
@@ -113,4 +112,15 @@ public interface CloudDiskService {
      * @return 是否成功
      */
     boolean renameOrgCloudDiskFile(String fileId, String newFileName);
+    
+    /**
+     * 获取组织云盘我的文件
+     * @param orgId 组织ID
+     * @param diskId 云盘ID
+     * @param userId 用户ID
+     * @param pageIndex 页面索引
+     * @param pageSize 页面大小
+     * @return 文件列表
+     */
+    CloudDiskFileListResponseVO getMyCloudDiskFiles(String orgId, String diskId, String userId, Integer pageIndex, Integer pageSize);
 }

@@ -7,5 +7,6 @@ import java.util.ArrayList;
 
 @Data
 public class CloudDiskFileListResponseVO {
+    Integer total;
     ArrayList<CloudDiskFileDTO> fileList;
 }

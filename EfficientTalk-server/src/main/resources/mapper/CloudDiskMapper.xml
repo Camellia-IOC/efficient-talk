@@ -142,8 +142,6 @@
 		  AND cloud_disk_files.disk_id = #{diskId}
 		ORDER BY cloud_disk_files.update_time DESC
 		LIMIT #{pageSize}
-		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
-		OFFSET #{pageOffset}
 	</select>
 
 	<!--删除云盘文件夹-->
@@ -164,7 +162,7 @@
 	<!--重命名组织云盘文件-->
 	<update id="renameOrgCloudDiskFile">
 		UPDATE cloud_disk_files
-		SET file_name = #{newFileName},
+		SET file_name   = #{newFileName},
 			update_time = now()
 		WHERE file_id = #{fileId}
 	</update>
@@ -174,5 +172,38 @@
 		SELECT cloud_disk_files.file_path
 		FROM cloud_disk_files
 		WHERE cloud_disk_files.file_id = #{fileId}
+	</select>
+
+	<!--获取组织云盘我的文件-->
+	<select id="getMyCloudDiskFiles"
+			resultType="com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFileDTO">
+		SELECT cloud_disk_files.file_id     as fileId,
+			   cloud_disk_files.file_name   as fileName,
+			   cloud_disk_files.folder_id   as folderId,
+			   cloud_disk_files.org_id      as orgId,
+			   cloud_disk_files.disk_id     as diskId,
+			   cloud_disk_files.type        as fileType,
+			   cloud_disk_files.size        as fileSize,
+			   cloud_disk_files.creator     as creatorId,
+			   users.username               as creatorName,
+			   users.avatar                 as creatorAvatar,
+			   cloud_disk_files.update_time as updateTime
+		FROM cloud_disk_files
+				 LEFT JOIN users ON users.id = cloud_disk_files.creator
+		WHERE cloud_disk_files.org_id = #{orgId}
+		  AND cloud_disk_files.disk_id = #{diskId}
+		ORDER BY cloud_disk_files.update_time DESC
+		LIMIT #{pageSize}
+		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
+		OFFSET #{pageOffset}
+	</select>
+
+	<!--获取我的云盘文件数量-->
+	<select id="getMyCloudDiskFilesCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM cloud_disk_files
+		WHERE cloud_disk_files.org_id = #{orgId}
+		  AND cloud_disk_files.disk_id = #{diskId}
+		  AND cloud_disk_files.creator = #{userId}
 	</select>
 </mapper>
