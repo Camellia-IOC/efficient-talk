@@ -98,7 +98,6 @@
 
     // 加载标志
     const isLoading = ref(true);
-    const cloudDiskId = ref();
 
     // 文件预览
     const handleFilePreview = (fileId, fileType) => {
@@ -187,7 +186,7 @@
     const getTableData = async () => {
         const response = await CloudDiskApi.getRecentCloudDiskFiles({
             orgId: curLoginUser.value.orgId,
-            diskId: cloudDiskId.value,
+            diskId: route.query.diskId,
             pageSize: paginationConfig.value.pageSize
         });
 
@@ -209,8 +208,6 @@
     };
 
     onBeforeMount(async () => {
-        cloudDiskId.value = route.query.diskId;
-
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
 

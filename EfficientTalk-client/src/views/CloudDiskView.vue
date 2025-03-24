@@ -55,6 +55,7 @@
 <script setup>
     import {
         onBeforeMount,
+        onMounted,
         ref
     } from "vue";
     import { useRouter } from "vue-router";
@@ -118,19 +119,6 @@
         }
     ];
 
-    // 选择导航
-    const curSelectedNavIndex = ref(1);
-    const handleSelectNavItem = (index, path) => {
-        curSelectedNavIndex.value = index;
-        router.push({
-            path: path,
-            query: {
-                orgId: orgInfo.value.orgId,
-                diskId: orgInfo.value.diskId
-            }
-        });
-    };
-
     // 获取组织信息
     const orgInfo = ref({});
     const getOrganizationInfo = async () => {
@@ -143,6 +131,7 @@
             if (res.code === 0) {
                 if (res.data != null) {
                     orgInfo.value = res.data.orgInfo;
+                    handleSelectNavItem();
                 }
             }
             else {
@@ -150,6 +139,19 @@
                 orgInfo.value = {};
             }
         }
+    };
+
+    // 选择导航
+    const curSelectedNavIndex = ref(navItemList[0].index);
+    const handleSelectNavItem = (index = navItemList[0].index, path = navItemList[0].path) => {
+        curSelectedNavIndex.value = index;
+        router.push({
+            path: path,
+            query: {
+                orgId: orgInfo.value.orgId,
+                diskId: orgInfo.value.diskId
+            }
+        });
     };
 
     //获取云盘信息
@@ -180,6 +182,8 @@
 
         await getCloudDiskBasicInfo();
     });
+
+    onMounted(() => {});
 </script>
 
 <style scoped
