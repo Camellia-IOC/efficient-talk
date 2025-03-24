@@ -47,9 +47,10 @@
 
 /*单行文本截断*/
 .single-line-ellipsis {
-	white-space: nowrap; /* 防止文本换行 */
-	overflow: hidden; /* 隐藏溢出的文本 */
-	text-overflow: ellipsis; /* 显示省略号 */
+	overflow:hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	-o-text-overflow:ellipsis;
 }
 
 /*主题背景色*/

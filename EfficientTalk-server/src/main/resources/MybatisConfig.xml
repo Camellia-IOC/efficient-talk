@@ -25,5 +25,6 @@
 		<mapper resource="mapper/UserMapper.xml"/>
 		<mapper resource="mapper/CloudDiskMapper.xml"/>
 		<mapper resource="mapper/AiMapper.xml"/>
+		<mapper resource="mapper/NoticeMapper.xml"/>
 	</mappers>
 </configuration>

@@ -31,8 +31,10 @@
     } from "vue";
     import { getCurUserData } from "../database/cur-user.js";
     import MainWindowController from "../window-controller/main-window-controller.js";
+    import { useCurLoginUserStore } from "../store/CurLoginUserStore.js";
 
     const websocketStore = useWebSocketStore();
+    const curLoginUserStore = useCurLoginUserStore();
 
     // 当前登录的用户信息
     const curLoginUser = ref({});
@@ -42,6 +44,7 @@
 
     onBeforeMount(async () => {
         await updateCurLoginUser();
+        curLoginUserStore.initUserData(curLoginUser.value);
         if (curLoginUser.value === null) {
             // 如果当前登录用户信息为空则退出到登录页面
             MainWindowController.hideMainWindow();

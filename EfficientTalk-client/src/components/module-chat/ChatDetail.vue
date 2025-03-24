@@ -1284,11 +1284,23 @@
         //     console.error(image);
         //     if (image) {
         //         if (image.complete) {
-        //             scrollToBottom("smooth");
+        //             // scrollToBottom("smooth");
+        //             if (chatHistoryElement.value) {
+        //                 chatHistoryElement.value.scrollTo({
+        //                     top: chatHistoryElement.value.scrollHeight,
+        //                     behavior: "smooth",
+        //                 });
+        //             }
         //             return;
         //         }
         //         image.onload = () => {
-        //             scrollToBottom("smooth");
+        //             // scrollToBottom("smooth");
+        //             if (chatHistoryElement.value) {
+        //                 chatHistoryElement.value.scrollTo({
+        //                     top: chatHistoryElement.value.scrollHeight,
+        //                     behavior: "smooth",
+        //                 });
+        //             }
         //         };
         //     }
         //     else {
@@ -1396,7 +1408,13 @@
                     img.onload = () => {
                         loadedCount++;
                         if (loadedCount === totalImages) {
-                            scrollToBottom("auto");
+                            // scrollToBottom("auto");
+                            if (chatHistoryElement.value) {
+                                chatHistoryElement.value.scrollTo({
+                                    top: chatHistoryElement.value.scrollHeight,
+                                    behavior: "auto",
+                                });
+                            }
                         }
                     };
                 });

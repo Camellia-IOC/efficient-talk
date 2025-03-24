@@ -7,7 +7,6 @@ import com.ETGroup.EfficientTalkServer.entity.response.auth.RegisterResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.service.auth.AuthService;
-import com.ETGroup.EfficientTalkServer.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -22,9 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Resource
     private AuthService authService;
-    
-    @Resource
-    private MessageService messageService;
     
     @Operation(summary = "用户登录")
     @PostMapping("/login")
@@ -41,11 +37,6 @@ public class AuthController {
             return ResponseData.error(ResponseConfig.REGISTER_FAILED);
         }
         else {
-            // 创建新用户注册消息
-            if (!messageService.createRegisterMessage(response.getUserId(),param.getUsername())) {
-                log.warn("注册消息生成失败");
-            }
-            
             return ResponseData.success(response);
         }
     }

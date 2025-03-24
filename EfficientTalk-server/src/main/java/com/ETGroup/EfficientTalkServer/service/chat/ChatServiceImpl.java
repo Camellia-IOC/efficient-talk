@@ -338,7 +338,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public Boolean createChatGroup(CreateChatGroupRequestParam param) {
         ChatGroupPO chatGroup = new ChatGroupPO();
-        chatGroup.setGroupId(UUIDUtils.generateUUID());
+        chatGroup.setGroupId("GROUP-" + UUIDUtils.generateUUID());
         chatGroup.setGroupName(param.getGroupName());
         chatGroup.setOrgId(param.getOrgId());
         chatGroup.setCreator(param.getCreator());

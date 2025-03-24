@@ -289,7 +289,7 @@
             align: "center"
         },
         {
-            title: "上传时间",
+            title: "修改时间",
             dataIndex: "uploadTime",
             key: "uploadTime",
             width: "15%",

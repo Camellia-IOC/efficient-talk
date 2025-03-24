@@ -265,7 +265,7 @@
           align-items: center;
           width: 100%;
           height: 40px;
-          background-color: #F2F3F5;
+          background-color: #EBEEF5;
           border-radius: 10px;
           font-size: 14px;
           cursor: pointer;

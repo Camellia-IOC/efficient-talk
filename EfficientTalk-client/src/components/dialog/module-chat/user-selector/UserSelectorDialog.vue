@@ -24,7 +24,11 @@
                    v-model:value="searchKey"
                    @change="handleSearch"
                    allow-clear
-          />
+          >
+            <template #prefix>
+              <SearchOutlined/>
+            </template>
+          </a-input>
         </div>
         <div class="select-user-area"
              v-show="searchKey !== ''"
@@ -137,7 +141,8 @@
     import Logo from "../../../logo/Logo.vue";
     import { message } from "ant-design-vue";
     import {
-        CloseOutlined
+        CloseOutlined,
+        SearchOutlined
     } from "@ant-design/icons-vue";
     import EmptyContainer from "../../../empty-container/EmptyContainer.vue";
     import OrgTreeNode from "./OrgTreeNode.vue";

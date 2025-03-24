@@ -81,7 +81,7 @@ const router = createRouter({
                     // 通知公告
                     path: "notification",
                     name: "notification",
-                    component: () => import("../views/EmptyView.vue")
+                    component: () => import("../views/NoticeAndTodoView.vue")
                 },
                 {
                     // 应用中心

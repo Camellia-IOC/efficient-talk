@@ -1,11 +1,11 @@
 <template>
-  <div class="chat-cloud-disk-view-container"
-       ref="cloudDiskViewRef"
-  >
+  <div class="chat-cloud-disk-view-container">
     <div class="cloud-disk-info">
       <div class="title">聊天文件</div>
     </div>
-    <div class="result-table-container">
+    <div class="result-table-container"
+         ref="cloudDiskViewRef"
+    >
       <a-table :data-source="tableData"
                :columns="tableColumns"
                class="result-table"
@@ -144,12 +144,13 @@
     // 计算表格高度
     let observer = null;
     const cloudDiskViewRef = ref();
-    const tableHeight = ref(0);
+    const tableHeight = ref(483);
     const observeResize = () => {
         if (cloudDiskViewRef.value) {
             const observer = new ResizeObserver((entries) => {
                 entries.forEach((entry) => {
-                    tableHeight.value = entry.target.offsetHeight - 245;
+                    console.error("height" + entry.target.offsetHeight);
+                    tableHeight.value = entry.target.offsetHeight - 125;
                 });
             });
             observer.observe(cloudDiskViewRef.value);

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ETGroup.EfficientTalkServer.mapper.NoticeMapper">
+	<!--获取组织通知列表-->
+	<select id="getOrgNoticeList" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.notice.NoticeListItemDTO">
+		SELECT org_notice.id           as id,
+			   org_notice.title        as title,
+			   org_notice.content      as content,
+			   org_notice.org_id       as orgId,
+			   organizations.org_name  as orgName,
+			   org_notice.dept_id      as DeptId,
+			   departments.dept_name   as DeptName,
+			   org_notice.publisher    as publisher,
+			   user.username           as publisherName,
+			   org_notice.publish_time as publishTime
+		FROM org_notice
+				 LEFT JOIN organizations ON org_notice.org_id = organizations.org_id
+				 LEFT JOIN departments ON org_notice.dept_id = departments.dept_id
+				 LEFT JOIN users user ON org_notice.publisher = user.id
+		WHERE org_notice.org_id = #{orgId}
+		ORDER BY org_notice.publish_time DESC
+	</select>
+
+	<!--检查通知当前用户是否已读-->
+	<select id="checkNoticeIsRead" resultType="boolean">
+		SELECT COUNT(*) > 0
+		FROM org_notice_read_history
+		WHERE org_notice_read_history.user_id = #{userId}
+		  AND org_notice_read_history.notice_id = #{noticeId}
+	</select>
+
+	<!--发布组织通知-->
+	<insert id="publishOrgNotice">
+		INSERT INTO org_notice (id, title, content, org_id, dept_id, publisher, publish_time)
+		VALUES (#{id}, #{title}, #{content}, #{orgId}, #{deptId}, #{publisher}, #{publishTime})
+	</insert>
+
+	<!--已读通知-->
+	<insert id="readOrgNotice">
+		INSERT INTO org_notice_read_history (id, notice_id, user_id, read_time)
+		VALUES (#{id}, #{noticeId}, #{userId}, NOW())
+	</insert>
+
+	<!--更新通知-->
+	<update id="updateOrgNotice">
+		UPDATE org_notice
+		SET title        = #{title},
+			content      = #{content},
+			publish_time = #{publishTime}
+		WHERE id = #{id}
+	</update>
+
+	<!--删除通知-->
+	<delete id="deleteOrgNotice">
+		DELETE FROM org_notice
+		WHERE id = #{noticeId}
+	</delete>
+
+	<!--删除通知已读记录-->
+	<delete id="deleteOrgNoticeReadHistory">
+		DELETE FROM org_notice_read_history
+		WHERE notice_id = #{noticeId}
+	</delete>
+
+	<!--获取通知已读成员列表-->
+	<select id="getOrgNoticeReadHistory" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.user.BasicUserDTO">
+		SELECT users.id               as userId,
+			   users.username         as userName,
+			   users.avatar           as userAvatar,
+			   organizations.org_id   as orgId,
+			   organizations.org_name as orgName,
+			   departments.dept_id    as deptId,
+			   departments.dept_name  as deptName,
+			   jobs.job_id            as jobId,
+			   jobs.job_name          as jobName
+		FROM org_notice_read_history
+				 LEFT JOIN users ON org_notice_read_history.user_id = users.id
+				 LEFT JOIN organizations ON users.org_id = organizations.org_id
+				 LEFT JOIN departments ON users.dept_id = departments.dept_id
+				 LEFT JOIN jobs ON users.job_id = jobs.job_id
+		WHERE org_notice_read_history.notice_id = #{noticeId}
+		ORDER BY org_notice_read_history.read_time DESC
+	</select>
+</mapper>
