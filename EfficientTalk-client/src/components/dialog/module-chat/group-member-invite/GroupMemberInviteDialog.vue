@@ -88,6 +88,7 @@
             <OrgTreeNode v-model:selected="selectedUserList"
                          v-model:org-tree="orgTreeData"
                          :org-id="curOrgId"
+                         :cur-member-id-list="currentMemberIdList"
                          ref="orgTreeNodeRef"
             />
           </div>
@@ -101,7 +102,7 @@
           <div class="user-item"
                v-for="(item,index) in selectedUserList"
                :key="index"
-               v-show="selectedUserList.length!==0"
+               v-show="selectedUserList.length!==0&&!currentMemberIdList.includes(item.userId)"
           >
             <div class="user-info">
               <div class="user-avatar">
@@ -145,7 +146,7 @@
         SearchOutlined
     } from "@ant-design/icons-vue";
     import EmptyContainer from "../../../empty-container/EmptyContainer.vue";
-    import OrgTreeNode from "../user-selector/OrgTreeNode.vue"
+    import OrgTreeNode from "../user-selector/OrgTreeNode.vue";
     import SocialApi from "../../../../api/modules/SocialApi.js";
 
     // 组织树节点
@@ -155,6 +156,7 @@
     const isLoading = ref(false);
     const dialogTitle = ref("群聊成员邀请");
     const curOrgId = ref(null);
+    const curGroupId = ref();
     const orgTreeData = ref({
         deptList: [],
         userList: []
@@ -178,6 +180,7 @@
             });
         }
     };
+    const currentMemberIdList = ref([]);
     const selectedUserList = ref([]);
     const searchKey = ref("");
     const searchResultList = ref([]);
@@ -248,6 +251,35 @@
         });
     };
 
+    // 获取当前群聊内的成员ID列表
+    const getCurrentMemberIdList = async () => {
+        currentMemberIdList.value = [];
+        const response = await SocialApi.getChatGroupMemberIdList({
+            groupId: curGroupId.value
+        });
+
+        const res = response.data;
+        if (res.code === 0) {
+            currentMemberIdList.value = res.data;
+        }
+    };
+
+    const handleInviteMember = (idList) => {
+        SocialApi.inviteChatGroupMember({
+            groupId: curGroupId.value,
+            idList: idList
+        }).then((response) => {
+            const res = response.data;
+            if (res.code === 0) {
+                message.success("邀请成功");
+                dialogClose();
+            }
+            else {
+                message.error("邀请失败");
+            }
+        });
+    };
+
     // 处理选择确认
     const handleConfirm = () => {
         if (selectedUserList.value.length !== 0) {
@@ -255,6 +287,7 @@
             for (let i = 0; i < selectedUserList.value.length; i++) {
                 idList.push(selectedUserList.value[i].userId);
             }
+            handleInviteMember(idList);
             dialogClose();
         }
         else {
@@ -274,9 +307,11 @@
 
     // 对话框控制
     const dialogOpenFlag = ref(false);
-    const dialogOpen = (orgId) => {
+    const dialogOpen = async (orgId, groupId) => {
         curOrgId.value = orgId;
+        curGroupId.value = groupId;
         dialogOpenFlag.value = true;
+        await getCurrentMemberIdList();
         getOrgTreeData();
     };
     const dialogClose = () => {

@@ -157,4 +157,26 @@ export default class SocialApi {
             data
         });
     };
+
+    /**
+     * 获取群聊成员id列表
+     * @param data
+     */
+    static getChatGroupMemberIdList = (data) => {
+        return service.get({
+            url: this.requestPath + "/getChatGroupMemberIdList",
+            data
+        });
+    };
+
+    /**
+     * 邀请群聊成员
+     * @param data
+     */
+    static inviteChatGroupMember = (data) => {
+        return service.post({
+            url: this.requestPath + "/inviteChatGroupMember",
+            data
+        });
+    };
 }

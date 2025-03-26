@@ -9,7 +9,7 @@ import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasic
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskLevelContentResponseVO;
 import com.ETGroup.EfficientTalkServer.mapper.CloudDiskMapper;
-import com.ETGroup.EfficientTalkServer.utils.MinIOUtils;
+import com.ETGroup.EfficientTalkServer.utils.OSSUtils;
 import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class CloudDiskServiceImpl implements CloudDiskService {
     private CloudDiskMapper cloudDiskMapper;
     
     @Resource
-    private MinIOUtils minIOUtils;
+    private OSSUtils ossUtils;
     
     /**
      * 获取云盘基础信息
@@ -125,8 +125,8 @@ public class CloudDiskServiceImpl implements CloudDiskService {
                                          MultipartFile file,
                                          String savePath) {
         try {
-            if (minIOUtils.isBucketExist(diskId)) {
-                String filePath = minIOUtils.getObjectUrl(diskId, minIOUtils.upload(diskId, fileId, file));
+            if (ossUtils.isBucketExist(diskId)) {
+                String filePath = ossUtils.getObjectUrl(diskId, ossUtils.upload(diskId, fileId, file));
                 LocalDateTime updateTime = LocalDateTime.now();
                 
                 CloudDiskFilePO cloudDiskFile = new CloudDiskFilePO();
@@ -200,9 +200,9 @@ public class CloudDiskServiceImpl implements CloudDiskService {
      */
     @Override
     public boolean deleteCloudDiskFile(String diskId, String fileId) {
-        if (minIOUtils.isBucketExist(diskId)) {
+        if (ossUtils.isBucketExist(diskId)) {
             if (cloudDiskMapper.deleteCloudDiskFile(fileId) == 1) {
-                return minIOUtils.remove(diskId, fileId);
+                return ossUtils.remove(diskId, fileId);
             }
         }
         return false;

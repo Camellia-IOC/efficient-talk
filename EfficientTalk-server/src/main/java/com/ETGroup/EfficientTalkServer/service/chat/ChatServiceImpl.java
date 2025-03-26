@@ -1,6 +1,5 @@
 package com.ETGroup.EfficientTalkServer.service.chat;
 
-import com.ETGroup.EfficientTalkServer.config.oss.MinIOConfig;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.*;
@@ -9,15 +8,14 @@ import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestPa
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
-import com.ETGroup.EfficientTalkServer.utils.MinIOUtils;
+import com.ETGroup.EfficientTalkServer.utils.OSSUtils;
+import com.ETGroup.EfficientTalkServer.utils.RedisUtils;
 import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -31,10 +29,10 @@ public class ChatServiceImpl implements ChatService {
     private SocialMapper socialMapper;
     
     @Resource
-    private MinIOConfig minIOConfig;
+    private OSSUtils ossUtils;
     
     @Resource
-    private MinIOUtils minIOUtils;
+    private RedisUtils redisUtils;
     
     /**
      * 保存聊天记录
@@ -167,14 +165,14 @@ public class ChatServiceImpl implements ChatService {
         try {
             String bucketName;
             if (isGroup) {
-                bucketName = minIOUtils.getChatGroupFileBucketName(receiver);
+                bucketName = ossUtils.getChatGroupFileBucketName(receiver);
             }
             else {
-                bucketName = minIOUtils.getChatFileBucketName();
+                bucketName = ossUtils.getChatFileBucketName();
             }
             
-            if (minIOUtils.isBucketExist(bucketName)) {
-                String filePath = minIOUtils.getObjectUrl(bucketName, minIOUtils.upload(bucketName, fileId, file));
+            if (ossUtils.isBucketExist(bucketName)) {
+                String filePath = ossUtils.getObjectUrl(bucketName, ossUtils.upload(bucketName, fileId, file));
                 LocalDateTime createTime = LocalDateTime.now();
                 ChatFilePO chatFile = new ChatFilePO();
                 
@@ -232,14 +230,14 @@ public class ChatServiceImpl implements ChatService {
         try {
             String bucketName;
             if (isGroup) {
-                bucketName = minIOUtils.getChatGroupImageBucketName(receiver);
+                bucketName = ossUtils.getChatGroupImageBucketName(receiver);
             }
             else {
-                bucketName = minIOUtils.getChatImageBucketName();
+                bucketName = ossUtils.getChatImageBucketName();
             }
             
-            if (minIOUtils.isBucketExist(bucketName)) {
-                String filePath = minIOUtils.getObjectUrl(bucketName, minIOUtils.upload(bucketName, imageId, image));
+            if (ossUtils.isBucketExist(bucketName)) {
+                String filePath = ossUtils.getObjectUrl(bucketName, ossUtils.upload(bucketName, imageId, image));
                 LocalDateTime createTime = LocalDateTime.now();
                 
                 ChatImagePO chatImage = new ChatImagePO();
@@ -363,11 +361,14 @@ public class ChatServiceImpl implements ChatService {
                     chatGroupMember.setUserId(memberId);
                     chatGroupMember.setCreateTime(LocalDateTime.now());
                     socialMapper.addChatGroupMember(chatGroupMember);
+                    
+                    // 将成员存入redis
+                    redisUtils.setAdd("chat_group:member:" + chatGroup.getGroupId(), memberId);
                 }
             }
             
-            Boolean imageBucketFlag = minIOUtils.createBucket(minIOUtils.getChatGroupImageBucketName(chatGroup.getGroupId()));
-            Boolean fileBucketFlag = minIOUtils.createBucket(minIOUtils.getChatGroupFileBucketName(chatGroup.getGroupId()));
+            Boolean imageBucketFlag = ossUtils.createBucket(ossUtils.getChatGroupImageBucketName(chatGroup.getGroupId()));
+            Boolean fileBucketFlag = ossUtils.createBucket(ossUtils.getChatGroupFileBucketName(chatGroup.getGroupId()));
             return imageBucketFlag && fileBucketFlag;
         }
         catch (Exception e) {

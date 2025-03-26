@@ -789,7 +789,7 @@
     // 群聊成员邀请对话框
     const groupMemberInviteDialog = ref();
     const handleGroupMemberInviteDialogOpen = () => {
-        groupMemberInviteDialog.value.dialogOpen(curLoginUser.value.orgId);
+        groupMemberInviteDialog.value.dialogOpen(curLoginUser.value.orgId, props.chatInfo.userId);
     };
 
     // 获取群聊成员列表
@@ -1411,21 +1411,19 @@
             let loadedCount = 0;
             const totalImages = images.length;
 
-            // TODO 滚动问题
             if (totalImages === 0) {
-                // if (chatHistoryElement.value) {
-                //     chatHistoryElement.value.scrollTo({
-                //         top: chatHistoryElement.value.scrollHeight,
-                //         behavior: "auto",
-                //     });
-                // }
+                if (chatHistoryElement.value) {
+                    chatHistoryElement.value.scrollTo({
+                        top: chatHistoryElement.value.scrollHeight,
+                        behavior: "auto",
+                    });
+                }
             }
             else {
                 images.forEach(img => {
                     img.onload = () => {
                         loadedCount++;
                         if (loadedCount === totalImages) {
-                            // scrollToBottom("auto");
                             if (chatHistoryElement.value) {
                                 chatHistoryElement.value.scrollTo({
                                     top: chatHistoryElement.value.scrollHeight,

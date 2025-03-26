@@ -11,7 +11,7 @@ import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.service.chat.ChatService;
 import com.ETGroup.EfficientTalkServer.utils.FileUtils;
-import com.ETGroup.EfficientTalkServer.utils.MinIOUtils;
+import com.ETGroup.EfficientTalkServer.utils.OSSUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -40,7 +40,7 @@ public class ChatController {
     private FileUtils fileUtils;
     
     @Resource
-    private MinIOUtils minIOUtils;
+    private OSSUtils ossUtils;
     
     @Operation(summary = "保存对话列表")
     @PutMapping("/saveChatList")
@@ -172,13 +172,13 @@ public class ChatController {
         String objectName;
         Map<String, String> objectInfo;
         if (type.equals("media")) {
-            bucketName = isGroup ? minIOUtils.getChatGroupImageBucketName(groupId) : minIOUtils.getChatImageBucketName();
+            bucketName = isGroup ? ossUtils.getChatGroupImageBucketName(groupId) : ossUtils.getChatImageBucketName();
             objectInfo = isGroup ? chatMapper.getGroupChatImageInfo(fileId) : chatMapper.getChatImageInfo(fileId);
             objectId = fileId + "." + objectInfo.get("imageType");
             objectName = objectInfo.get("imageName");
         }
         else if (type.equals("file")) {
-            bucketName = isGroup ? minIOUtils.getChatGroupFileBucketName(groupId) : minIOUtils.getChatFileBucketName();
+            bucketName = isGroup ? ossUtils.getChatGroupFileBucketName(groupId) : ossUtils.getChatFileBucketName();
             objectInfo = isGroup ? chatMapper.getGroupChatFileInfo(fileId) : chatMapper.getChatFileInfo(fileId);
             objectId = fileId + "." + objectInfo.get("fileType");
             objectName = objectInfo.get("fileName");

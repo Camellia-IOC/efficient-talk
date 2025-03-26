@@ -3,6 +3,7 @@ package com.ETGroup.EfficientTalkServer.websocket;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
 import com.ETGroup.EfficientTalkServer.service.chat.ChatService;
+import com.ETGroup.EfficientTalkServer.utils.RedisUtils;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import jakarta.websocket.*;
@@ -23,10 +24,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/chat/{userId}")
 @Component
 public class ChatEndpoint {
-    // 引入聊天服务
-    private ChatService chatService;
+    // 引入服务
     private static AutowireCapableBeanFactory beanFactory;
+    private ChatService chatService;
     private SocialMapper socialMapper;
+    private RedisUtils redisUtils;
     
     @Resource
     public void setBeanFactory(AutowireCapableBeanFactory beanFactory) {
@@ -46,8 +48,25 @@ public class ChatEndpoint {
         // 获取服务实例
         this.chatService = beanFactory.getBean(ChatService.class);
         this.socialMapper = beanFactory.getBean(SocialMapper.class);
+        this.redisUtils = beanFactory.getBean(RedisUtils.class);
         
-        // TODO 从消息缓存队列中获取聊天记录，并发送给用户
+        // 从消息缓存队列中获取聊天记录，并发送给用户
+        try {
+            String message;
+            while (true) {
+                message = (String) redisUtils.listLeftPop("chat_history_cache:" + userId);
+                if (message != null) {
+                    session.getBasicRemote()
+                           .sendText(message);
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        catch (IOException e) {
+            log.error(e.toString());
+        }
     }
     
     @OnMessage
@@ -72,7 +91,8 @@ public class ChatEndpoint {
                     
                     Session session = sessionStorage.get(memberId);
                     if (session == null) {
-                        log.info("未找到用户");
+                        redisUtils.listRightPush("chat_history_cache:" + memberId, message);
+                        log.info("缓存群聊聊天记录成功");
                     }
                     else {
                         session.getBasicRemote()
@@ -90,6 +110,7 @@ public class ChatEndpoint {
                         .equals(msg.getSender())) {
                     Session session = sessionStorage.get(msg.getReceiver());
                     if (session == null) {
+                        redisUtils.listRightPush("chat_history_cache:" + msg.getReceiver(), message);
                         if (chatService.cacheChatHistory(msg) == 1) {
                             log.info("缓存聊天记录成功");
                         }
@@ -126,5 +147,10 @@ public class ChatEndpoint {
         }
         
         log.info("连接关闭:{}", session);
+    }
+    
+    @Autowired
+    public void setRedisUtils(RedisUtils redisUtils) {
+        this.redisUtils = redisUtils;
     }
 }

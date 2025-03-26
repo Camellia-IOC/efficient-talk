@@ -26,6 +26,7 @@
         <OrgTreeNode v-model:selected="selectedUserList"
                      v-model:org-tree="item.children"
                      :org-id="orgId"
+                     :cur-member-id-list="curMemberIdList"
                      ref="orgTreeNodeRef"
                      v-else
         />
@@ -70,6 +71,10 @@
         orgId: {
             type: String,
             default: null
+        },
+        curMemberIdList: {
+            type: Array,
+            default: () => []
         }
     });
 
@@ -91,9 +96,11 @@
     // 处理用户选择
     const handleUserSelect = (index) => {
         if (orgTree.value.userList[index].isSelected) {
-            orgTree.value.userList[index].isSelected = false;
-            selectedUserList.value.splice(
-                selectedUserList.value.findIndex((item) => item.userId === orgTree.value.userList[index].userId), 1);
+            if (!props.curMemberIdList.includes(orgTree.value.userList[index].userId)) {
+                orgTree.value.userList[index].isSelected = false;
+                selectedUserList.value.splice(
+                    selectedUserList.value.findIndex((item) => item.userId === orgTree.value.userList[index].userId), 1);
+            }
         }
         else {
             orgTree.value.userList[index].isSelected = true;
@@ -116,8 +123,14 @@
                     orgTree.value.deptList[index].children.deptList[i].isLoaded = false;
                 }
                 for (let i = 0; i < orgTree.value.deptList[index].children.userList.length; i++) {
-                    for (let j = 0; j < selectedUserList.value.length; j++) {
-                        orgTree.value.deptList[index].children.userList[i].isSelected = orgTree.value.deptList[index].children.userList[i].userId === selectedUserList.value[j].userId;
+                    if (props.curMemberIdList.includes(orgTree.value.deptList[index].children.userList[i].userId)) {
+                        console.error(1)
+                        orgTree.value.deptList[index].children.userList[i].isSelected = true;
+                    }
+                    else {
+                        for (let j = 0; j < selectedUserList.value.length; j++) {
+                            orgTree.value.deptList[index].children.userList[i].isSelected = orgTree.value.deptList[index].children.userList[i].userId === selectedUserList.value[j].userId;
+                        }
                     }
                 }
             }

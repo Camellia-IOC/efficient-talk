@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class FileUtils {
     @Resource
-    private MinIOUtils minIOUtils;
+    private OSSUtils ossUtils;
     
     /**
      * 获取文件Blob
@@ -62,14 +62,14 @@ public class FileUtils {
      * @return 文件Blob
      */
     public ResponseEntity<byte[]> getOSSFileBlob(String bucketName, String fileId, String fileName) {
-        if (!minIOUtils.isBucketExist(bucketName)) {
+        if (!ossUtils.isBucketExist(bucketName)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         else {
             byte[] fileContent;
             // 读取文件内容
             try {
-                fileContent = minIOUtils.getObjectBlob(bucketName, fileId);
+                fileContent = ossUtils.getObjectBlob(bucketName, fileId);
             }
             catch (Exception e) {
                 log.error("操作失败", e);

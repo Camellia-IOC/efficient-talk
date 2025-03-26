@@ -3,21 +3,28 @@ package com.ETGroup.EfficientTalkServer.controller;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupMemberListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.OrgTreeUserNodeDTO;
+import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupMemberPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.request.social.InviteChatGroupMemberRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.entity.response.social.*;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
 import com.ETGroup.EfficientTalkServer.service.social.SocialService;
+import com.ETGroup.EfficientTalkServer.utils.RedisUtils;
+import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Set;
 
 @Tag(name = "社交相关接口", description = "社交相关接口")
 @Slf4j
@@ -30,6 +37,9 @@ public class SocialController {
     
     @Resource
     private SocialMapper socialMapper;
+    
+    @Autowired
+    private RedisUtils redisUtils;
     
     @Operation(summary = "获取好友列表")
     @GetMapping("/getFriendList")
@@ -126,10 +136,28 @@ public class SocialController {
         return ResponseData.success(response);
     }
     
+    @Operation(summary = "获取群聊成员ID列表")
+    @GetMapping("/getChatGroupMemberIdList")
+    public ResponseData<ArrayList<String>> getChatGroupMemberIdList(@RequestParam String groupId) {
+        ArrayList<String> response;
+        Set<Object> cache = redisUtils.setMembers("chat_group:member:" + groupId);
+        if (cache != null) {
+            response = new ArrayList<>();
+            for (Object id : cache) {
+                response.add((String) id);
+            }
+        }
+        else {
+            response = socialMapper.getChatGroupMemberIdList(groupId);
+        }
+        return ResponseData.success(response);
+    }
+    
     @Operation(summary = "退出群聊")
     @DeleteMapping("/quitChatGroup")
     public ResponseData<Boolean> quitChatGroup(@RequestParam String userId, @RequestParam String groupId) {
         if (socialMapper.quitChatGroup(userId, groupId) == 1) {
+            redisUtils.setRemove("chat_group:member:" + groupId, userId);
             return ResponseData.success(true);
         }
         return ResponseData.error(ResponseConfig.ERROR);
@@ -140,5 +168,26 @@ public class SocialController {
     public ResponseData<ArrayList<OrgTreeUserNodeDTO>> getOrgMemberListByName(@RequestParam String orgId, @RequestParam String searchKey) {
         ArrayList<OrgTreeUserNodeDTO> response = socialMapper.getOrgMemberListByName(orgId, searchKey);
         return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "邀请新的群聊成员")
+    @PostMapping("/inviteChatGroupMember")
+    public ResponseData<String> inviteChatGroupMember(@RequestBody InviteChatGroupMemberRequestParam param) {
+        ArrayList<String> idList = param.getIdList();
+        try {
+            for (String id : idList) {
+                ChatGroupMemberPO member = new ChatGroupMemberPO();
+                member.setId(UUIDUtils.generateUUID());
+                member.setGroupId(param.getGroupId());
+                member.setUserId(id);
+                member.setCreateTime(LocalDateTime.now());
+                socialMapper.addChatGroupMember(member);
+                redisUtils.setAdd("chat_group:member:" + param.getGroupId(), id);
+            }
+            return ResponseData.success("邀请成功");
+        }
+        catch (Exception e) {
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
 }

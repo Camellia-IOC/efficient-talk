@@ -1,6 +1,6 @@
 package com.ETGroup.EfficientTalkServer.utils;
 
-import com.ETGroup.EfficientTalkServer.config.oss.MinIOConfig;
+import com.ETGroup.EfficientTalkServer.config.oss.OSSConfig;
 import io.minio.*;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
@@ -16,9 +16,9 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class MinIOUtils {
+public class OSSUtils {
     @Resource
-    private MinIOConfig minIOConfig;
+    private OSSConfig ossConfig;
     
     @Resource
     private MinioClient minIOClient;
@@ -28,7 +28,7 @@ public class MinIOUtils {
      * @return bucket名称
      */
     public String getChatImageBucketName() {
-        return minIOConfig.getChatImageBucketName();
+        return ossConfig.getChatImageBucketName();
     }
     
     /**
@@ -36,7 +36,7 @@ public class MinIOUtils {
      * @return bucket名称
      */
     public String getChatFileBucketName() {
-        return minIOConfig.getChatFileBucketName();
+        return ossConfig.getChatFileBucketName();
     }
     
     /**
@@ -47,7 +47,7 @@ public class MinIOUtils {
      * @return bucket名称
      */
     public String getChatGroupImageBucketName(String groupId) {
-        return minIOConfig.getChatGroupImageBucketName() + "-" + groupId;
+        return ossConfig.getChatGroupImageBucketName() + "-" + groupId;
     }
     
     /**
@@ -58,7 +58,7 @@ public class MinIOUtils {
      * @return bucket名称
      */
     public String getChatGroupFileBucketName(String groupId) {
-        return minIOConfig.getChatGroupFileBucketName() + "-" + groupId;
+        return ossConfig.getChatGroupFileBucketName() + "-" + groupId;
     }
     
     /**
