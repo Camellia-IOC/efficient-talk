@@ -19,6 +19,7 @@ spring:
       minimum-idle: 5
       read-only: false
   servlet:
+    # 文件上传配置
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
@@ -43,6 +44,16 @@ spring:
           max-idle: 10
           # 连接池中的最小空闲连接
           min-idle: 0
+
+minio:
+  endpoint: http://47.122.40.126:9000
+  access-key: admin
+  secret-key: 123456789
+  org-cloud-disk-bucket: org-cloud-disk
+  chat-file-bucket: chat-file
+  chat-image-bucket: chat-image
+  chat-group-file-bucket: chat-group-file
+  chat-group-image-bucket: chat-group-image
 
 mybatis-plus:
 #  config-location: classpath:MybatisConfig.xml

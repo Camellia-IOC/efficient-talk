@@ -1,5 +1,6 @@
 package com.ETGroup.EfficientTalkServer.service.chat;
 
+import com.ETGroup.EfficientTalkServer.config.oss.MinIOConfig;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatFileListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.*;
@@ -8,6 +9,7 @@ import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestPa
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
+import com.ETGroup.EfficientTalkServer.utils.MinIOUtils;
 import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,12 @@ public class ChatServiceImpl implements ChatService {
     
     @Resource
     private SocialMapper socialMapper;
+    
+    @Resource
+    private MinIOConfig minIOConfig;
+    
+    @Resource
+    private MinIOUtils minIOUtils;
     
     /**
      * 保存聊天记录
@@ -157,41 +165,42 @@ public class ChatServiceImpl implements ChatService {
                                  MultipartFile file,
                                  Boolean isGroup) {
         try {
-            String savePath;
+            String bucketName;
             if (isGroup) {
-                savePath = System.getProperty("user.dir") + "\\resources\\chat_group_files\\";
+                bucketName = minIOUtils.getChatGroupFileBucketName(receiver);
             }
             else {
-                savePath = System.getProperty("user.dir") + "\\resources\\chat_files\\";
+                bucketName = minIOUtils.getChatFileBucketName();
             }
-            File saveFile = new File(savePath + file.getOriginalFilename());
-            file.transferTo(saveFile);
-            String filePath = savePath + file.getOriginalFilename();
-            LocalDateTime createTime = LocalDateTime.now();
             
-            ChatFilePO chatFile = new ChatFilePO();
-            chatFile.setFileId(fileId);
-            chatFile.setFileName(fileName);
-            chatFile.setFilePath(filePath);
-            chatFile.setFileType(fileType);
-            chatFile.setFileSize(fileSize);
-            chatFile.setSender(sender);
-            chatFile.setReceiver(receiver);
-            chatFile.setCreateTime(createTime.toString());
-            
-            if (isGroup) {
-                if (chatMapper.uploadGroupChatFile(chatFile) == 1) {
-                    return filePath;
+            if (minIOUtils.isBucketExist(bucketName)) {
+                String filePath = minIOUtils.getObjectUrl(bucketName, minIOUtils.upload(bucketName, fileId, file));
+                LocalDateTime createTime = LocalDateTime.now();
+                ChatFilePO chatFile = new ChatFilePO();
+                
+                chatFile.setFileId(fileId);
+                chatFile.setFileName(fileName);
+                chatFile.setFilePath(filePath);
+                chatFile.setFileType(fileType);
+                chatFile.setFileSize(fileSize);
+                chatFile.setSender(sender);
+                chatFile.setReceiver(receiver);
+                chatFile.setCreateTime(createTime.toString());
+                
+                if (isGroup) {
+                    if (chatMapper.uploadGroupChatFile(chatFile) == 1) {
+                        return filePath;
+                    }
                 }
-            }
-            else {
-                if (chatMapper.uploadChatFile(chatFile) == 1) {
-                    return filePath;
+                else {
+                    if (chatMapper.uploadChatFile(chatFile) == 1) {
+                        return filePath;
+                    }
                 }
             }
             return null;
         }
-        catch (IOException e) {
+        catch (Exception e) {
             log.error("保存聊天文件失败:{}", e.toString());
             return null;
         }
@@ -221,41 +230,42 @@ public class ChatServiceImpl implements ChatService {
                                   MultipartFile image,
                                   Boolean isGroup) {
         try {
-            String savePath;
+            String bucketName;
             if (isGroup) {
-                savePath = System.getProperty("user.dir") + "\\resources\\chat_group_images\\";
+                bucketName = minIOUtils.getChatGroupImageBucketName(receiver);
             }
             else {
-                savePath = System.getProperty("user.dir") + "\\resources\\chat_images\\";
+                bucketName = minIOUtils.getChatImageBucketName();
             }
-            File saveFile = new File(savePath + image.getOriginalFilename());
-            image.transferTo(saveFile);
-            String filePath = savePath + image.getOriginalFilename();
-            LocalDateTime createTime = LocalDateTime.now();
             
-            ChatImagePO chatImage = new ChatImagePO();
-            chatImage.setImageId(imageId);
-            chatImage.setImageName(imageName);
-            chatImage.setImagePath(filePath);
-            chatImage.setImageType(imageType);
-            chatImage.setImageSize(imageSize);
-            chatImage.setSender(sender);
-            chatImage.setReceiver(receiver);
-            chatImage.setCreateTime(createTime.toString());
-            
-            if (isGroup) {
-                if (chatMapper.uploadGroupChatImage(chatImage) == 1) {
-                    return filePath;
+            if (minIOUtils.isBucketExist(bucketName)) {
+                String filePath = minIOUtils.getObjectUrl(bucketName, minIOUtils.upload(bucketName, imageId, image));
+                LocalDateTime createTime = LocalDateTime.now();
+                
+                ChatImagePO chatImage = new ChatImagePO();
+                chatImage.setImageId(imageId);
+                chatImage.setImageName(imageName);
+                chatImage.setImagePath(filePath);
+                chatImage.setImageType(imageType);
+                chatImage.setImageSize(imageSize);
+                chatImage.setSender(sender);
+                chatImage.setReceiver(receiver);
+                chatImage.setCreateTime(createTime.toString());
+                
+                if (isGroup) {
+                    if (chatMapper.uploadGroupChatImage(chatImage) == 1) {
+                        return filePath;
+                    }
                 }
-            }
-            else {
-                if (chatMapper.uploadChatImage(chatImage) == 1) {
-                    return filePath;
+                else {
+                    if (chatMapper.uploadChatImage(chatImage) == 1) {
+                        return filePath;
+                    }
                 }
             }
             return null;
         }
-        catch (IOException e) {
+        catch (Exception e) {
             log.error("保存聊天图片失败:{}", e.toString());
             return null;
         }
@@ -337,25 +347,33 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public Boolean createChatGroup(CreateChatGroupRequestParam param) {
-        ChatGroupPO chatGroup = new ChatGroupPO();
-        chatGroup.setGroupId("GROUP-" + UUIDUtils.generateUUID());
-        chatGroup.setGroupName(param.getGroupName());
-        chatGroup.setOrgId(param.getOrgId());
-        chatGroup.setCreator(param.getCreator());
-        chatGroup.setCreateTime(LocalDateTime.now());
-        
-        if (socialMapper.createChatGroup(chatGroup) == 1) {
-            for (String memberId : param.getMemberList()) {
-                ChatGroupMemberPO chatGroupMember = new ChatGroupMemberPO();
-                chatGroupMember.setId(UUIDUtils.generateUUID());
-                chatGroupMember.setGroupId(chatGroup.getGroupId());
-                chatGroupMember.setUserId(memberId);
-                chatGroupMember.setCreateTime(LocalDateTime.now());
-                socialMapper.addChatGroupMember(chatGroupMember);
+        try {
+            ChatGroupPO chatGroup = new ChatGroupPO();
+            chatGroup.setGroupId("group-" + UUIDUtils.generateUUID());
+            chatGroup.setGroupName(param.getGroupName());
+            chatGroup.setOrgId(param.getOrgId());
+            chatGroup.setCreator(param.getCreator());
+            chatGroup.setCreateTime(LocalDateTime.now());
+            
+            if (socialMapper.createChatGroup(chatGroup) == 1) {
+                for (String memberId : param.getMemberList()) {
+                    ChatGroupMemberPO chatGroupMember = new ChatGroupMemberPO();
+                    chatGroupMember.setId(UUIDUtils.generateUUID());
+                    chatGroupMember.setGroupId(chatGroup.getGroupId());
+                    chatGroupMember.setUserId(memberId);
+                    chatGroupMember.setCreateTime(LocalDateTime.now());
+                    socialMapper.addChatGroupMember(chatGroupMember);
+                }
             }
+            
+            Boolean imageBucketFlag = minIOUtils.createBucket(minIOUtils.getChatGroupImageBucketName(chatGroup.getGroupId()));
+            Boolean fileBucketFlag = minIOUtils.createBucket(minIOUtils.getChatGroupFileBucketName(chatGroup.getGroupId()));
+            return imageBucketFlag && fileBucketFlag;
         }
-        
-        return true;
+        catch (Exception e) {
+            log.error("创建群聊失败:{}", e.toString());
+            return false;
+        }
     }
     
     /**

@@ -5,11 +5,11 @@ import com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFolderDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.CloudDiskFilePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.CloudDiskFolderPO;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasicInfoResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskFileListResponseVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 @Mapper
 public interface CloudDiskMapper {
@@ -117,4 +117,14 @@ public interface CloudDiskMapper {
      * @return 已使用容量
      */
     Long getCloudDiskUsedCapacity(@Param("diskId") String diskId);
+    
+    /**
+     * 获取组织云盘文件名称
+     *
+     * @param diskId 云盘ID
+     * @param fileId 文件ID
+     *
+     * @return 组织云盘文件名称
+     */
+    Map<String, String> getFileName(@Param("diskId") String diskId, @Param("fileId") String fileId);
 }

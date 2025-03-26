@@ -11,6 +11,7 @@ import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
 import com.ETGroup.EfficientTalkServer.service.chat.ChatService;
 import com.ETGroup.EfficientTalkServer.utils.FileUtils;
+import com.ETGroup.EfficientTalkServer.utils.MinIOUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 
 @Tag(name = "通讯相关接口", description = "通讯相关接口")
 @Slf4j
@@ -33,6 +35,12 @@ public class ChatController {
     
     @Resource
     private ChatMapper chatMapper;
+    
+    @Resource
+    private FileUtils fileUtils;
+    
+    @Resource
+    private MinIOUtils minIOUtils;
     
     @Operation(summary = "保存对话列表")
     @PutMapping("/saveChatList")
@@ -157,19 +165,31 @@ public class ChatController {
     @GetMapping("/getChatFileBlob")
     public ResponseEntity<byte[]> getChatFileBlob(@RequestParam String fileId,
                                                   @RequestParam String type,
-                                                  @RequestParam(defaultValue = "false") boolean isGroup) {
-        String filePath;
+                                                  @RequestParam(defaultValue = "false") boolean isGroup,
+                                                  @RequestParam(required = false) String groupId) {
+        String bucketName;
+        String objectId;
+        String objectName;
+        Map<String, String> objectInfo;
         if (type.equals("media")) {
-            filePath = isGroup ? chatMapper.getGroupChatMediaFilePath(fileId) : chatMapper.getChatMediaFilePath(fileId);
+            bucketName = isGroup ? minIOUtils.getChatGroupImageBucketName(groupId) : minIOUtils.getChatImageBucketName();
+            objectInfo = isGroup ? chatMapper.getGroupChatImageInfo(fileId) : chatMapper.getChatImageInfo(fileId);
+            objectId = fileId + "." + objectInfo.get("imageType");
+            objectName = objectInfo.get("imageName");
         }
         else if (type.equals("file")) {
-            filePath = isGroup ? chatMapper.getGroupChatFilePath(fileId) : chatMapper.getChatFilePath(fileId);
+            bucketName = isGroup ? minIOUtils.getChatGroupFileBucketName(groupId) : minIOUtils.getChatFileBucketName();
+            objectInfo = isGroup ? chatMapper.getGroupChatFileInfo(fileId) : chatMapper.getChatFileInfo(fileId);
+            objectId = fileId + "." + objectInfo.get("fileType");
+            objectName = objectInfo.get("fileName");
         }
         else {
-            filePath = null;
+            bucketName = null;
+            objectId = null;
+            objectName = null;
         }
         
-        return FileUtils.getFileBlob(filePath);
+        return fileUtils.getOSSFileBlob(bucketName, objectId, objectName);
     }
     
     @Operation(summary = "创建群聊")

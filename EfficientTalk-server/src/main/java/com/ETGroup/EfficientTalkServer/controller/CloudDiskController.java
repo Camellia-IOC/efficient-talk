@@ -20,6 +20,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @Tag(name = "云盘相关接口", description = "云盘相关接口")
 @Slf4j
 @CrossOrigin
@@ -31,6 +33,9 @@ public class CloudDiskController {
     
     @Resource
     private CloudDiskMapper cloudDiskMapper;
+    
+    @Resource
+    private FileUtils fileUtils;
     
     @Operation(summary = "获取云盘基础信息")
     @GetMapping("/getCloudDiskBasicInfo")
@@ -135,8 +140,8 @@ public class CloudDiskController {
     
     @Operation(summary = "在组织云盘删除文件")
     @DeleteMapping("/deleteOrgCloudDiskFile")
-    public ResponseData<Void> deleteOrgCloudDiskFile(@RequestParam String fileId) {
-        boolean result = cloudDiskService.deleteCloudDiskFile(fileId);
+    public ResponseData<Void> deleteOrgCloudDiskFile(@RequestParam String diskId, @RequestParam String fileId) {
+        boolean result = cloudDiskService.deleteCloudDiskFile(diskId, fileId);
         if (result) {
             return ResponseData.success();
         }
@@ -167,8 +172,9 @@ public class CloudDiskController {
     
     @Operation(summary = "获取云盘文件Blob")
     @GetMapping("/getCloudDiskFileBlob")
-    public ResponseEntity<byte[]> getCloudDiskFileBlob(@RequestParam String fileId) {
-        String filePath = cloudDiskMapper.getFilePath(fileId);
-        return FileUtils.getFileBlob(filePath);
+    public ResponseEntity<byte[]> getCloudDiskFileBlob(@RequestParam String diskId, @RequestParam String fileId) {
+        Map<String, String> fileInfo = cloudDiskMapper.getFileName(diskId, fileId);
+        String fileName = fileId + "." + fileInfo.get("fileType");
+        return fileUtils.getOSSFileBlob(diskId, fileName, fileInfo.get("fileName"));
     }
 }

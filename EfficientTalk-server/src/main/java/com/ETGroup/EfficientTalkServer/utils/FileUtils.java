@@ -1,7 +1,9 @@
 package com.ETGroup.EfficientTalkServer.utils;
 
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,7 +12,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
+@Component
 public class FileUtils {
+    @Resource
+    private MinIOUtils minIOUtils;
+    
     /**
      * 获取文件Blob
      *
@@ -18,7 +24,7 @@ public class FileUtils {
      *
      * @return 文件Blob
      */
-    public static ResponseEntity<byte[]> getFileBlob(String filePath) {
+    public ResponseEntity<byte[]> getFileBlob(String filePath) {
         if (filePath == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -40,6 +46,40 @@ public class FileUtils {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDisposition(ContentDisposition.builder("attachment")
                                                             .filename(URLEncoder.encode(file.getName(), StandardCharsets.UTF_8))
+                                                            .build());
+            headers.setContentType(MediaType.parseMediaType("application/octet-stream;charset=UTF-8"));
+            
+            return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * 获取文件Blob
+     *
+     * @param bucketName bucket名称
+     * @param fileId 文件ID
+     *
+     * @return 文件Blob
+     */
+    public ResponseEntity<byte[]> getOSSFileBlob(String bucketName, String fileId, String fileName) {
+        if (!minIOUtils.isBucketExist(bucketName)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else {
+            byte[] fileContent;
+            // 读取文件内容
+            try {
+                fileContent = minIOUtils.getObjectBlob(bucketName, fileId);
+            }
+            catch (Exception e) {
+                log.error("操作失败", e);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            
+            // 设置响应头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                                                            .filename(URLEncoder.encode(fileName, StandardCharsets.UTF_8))
                                                             .build());
             headers.setContentType(MediaType.parseMediaType("application/octet-stream;charset=UTF-8"));
             

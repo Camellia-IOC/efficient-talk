@@ -9,6 +9,7 @@ import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasic
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskLevelContentResponseVO;
 import com.ETGroup.EfficientTalkServer.mapper.CloudDiskMapper;
+import com.ETGroup.EfficientTalkServer.utils.MinIOUtils;
 import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -25,6 +25,9 @@ import java.util.ArrayList;
 public class CloudDiskServiceImpl implements CloudDiskService {
     @Resource
     private CloudDiskMapper cloudDiskMapper;
+    
+    @Resource
+    private MinIOUtils minIOUtils;
     
     /**
      * 获取云盘基础信息
@@ -122,30 +125,30 @@ public class CloudDiskServiceImpl implements CloudDiskService {
                                          MultipartFile file,
                                          String savePath) {
         try {
-            String targetFolder = System.getProperty("user.dir") + "\\resources\\cloud_disk\\" + savePath;
-            File saveFile = new File(targetFolder + file.getOriginalFilename());
-            file.transferTo(saveFile);
-            String filePath = targetFolder + file.getOriginalFilename();
-            LocalDateTime updateTime = LocalDateTime.now();
-            
-            CloudDiskFilePO cloudDiskFile = new CloudDiskFilePO();
-            cloudDiskFile.setFileId(fileId);
-            cloudDiskFile.setFileName(fileName);
-            cloudDiskFile.setFolderId(folderId);
-            cloudDiskFile.setOrgId(orgId);
-            cloudDiskFile.setDiskId(diskId);
-            cloudDiskFile.setFileType(fileType);
-            cloudDiskFile.setFileSize(fileSize);
-            cloudDiskFile.setFilePath(filePath);
-            cloudDiskFile.setCreator(creatorId);
-            cloudDiskFile.setUpdateTime(updateTime);
-            
-            if (cloudDiskMapper.uploadOrgCloudDiskFile(cloudDiskFile) == 1) {
-                return filePath;
+            if (minIOUtils.isBucketExist(diskId)) {
+                String filePath = minIOUtils.getObjectUrl(diskId, minIOUtils.upload(diskId, fileId, file));
+                LocalDateTime updateTime = LocalDateTime.now();
+                
+                CloudDiskFilePO cloudDiskFile = new CloudDiskFilePO();
+                cloudDiskFile.setFileId(fileId);
+                cloudDiskFile.setFileName(fileName);
+                cloudDiskFile.setFolderId(folderId);
+                cloudDiskFile.setOrgId(orgId);
+                cloudDiskFile.setDiskId(diskId);
+                cloudDiskFile.setFileType(fileType);
+                cloudDiskFile.setFileSize(fileSize);
+                cloudDiskFile.setFilePath(filePath);
+                cloudDiskFile.setCreator(creatorId);
+                cloudDiskFile.setUpdateTime(updateTime);
+                
+                if (cloudDiskMapper.uploadOrgCloudDiskFile(cloudDiskFile) == 1) {
+                    return filePath;
+                }
             }
+            
             return null;
         }
-        catch (IOException e) {
+        catch (Exception e) {
             log.error("上传文件至组织云盘失败:{}", e.toString());
             return null;
         }
@@ -190,13 +193,19 @@ public class CloudDiskServiceImpl implements CloudDiskService {
     /**
      * 在组织云盘删除文件
      *
+     * @param diskId 云盘ID
      * @param fileId 文件ID
      *
      * @return 是否成功
      */
     @Override
-    public boolean deleteCloudDiskFile(String fileId) {
-        return cloudDiskMapper.deleteCloudDiskFile(fileId) == 1;
+    public boolean deleteCloudDiskFile(String diskId, String fileId) {
+        if (minIOUtils.isBucketExist(diskId)) {
+            if (cloudDiskMapper.deleteCloudDiskFile(fileId) == 1) {
+                return minIOUtils.remove(diskId, fileId);
+            }
+        }
+        return false;
     }
     
     /**

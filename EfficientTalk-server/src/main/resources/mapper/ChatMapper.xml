@@ -321,4 +321,36 @@
 		FROM chat_history
 		WHERE id = #{messageId}
 	</delete>
+
+	<!--获取聊天图片信息-->
+	<select id="getChatImageInfo" resultType="java.util.Map">
+		SELECT image_name as imageName,
+			   image_type as imageType
+		FROM chat_images
+		WHERE image_id = #{imageId}
+	</select>
+
+	<!--获取群聊聊天图片信息-->
+	<select id="getGroupChatImageInfo" resultType="java.util.Map">
+		SELECT image_name as imageName,
+			   image_type as imageType
+		FROM chat_group_images
+		WHERE image_id = #{imageId}
+	</select>
+
+	<!--获取聊天文件信息-->
+	<select id="getChatFileInfo" resultType="java.util.Map">
+		SELECT file_name as fileName,
+			   file_type as fileType
+		FROM chat_files
+		WHERE file_id = #{fileId}
+	</select>
+
+	<!--获取群聊聊天文件信息-->
+	<select id="getGroupChatFileInfo" resultType="java.util.Map">
+		SELECT file_name as fileName,
+			   file_type as fileType
+		FROM chat_group_files
+		WHERE file_id = #{fileId}
+	</select>
 </mapper>

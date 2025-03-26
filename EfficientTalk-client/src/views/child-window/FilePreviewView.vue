@@ -79,6 +79,7 @@
 
     // 文件属性
     const isLoading = ref(true);
+    const bucketName = ref();
     const fileId = ref();
     const fileType = ref();
     const fileBlob = ref();
@@ -119,15 +120,17 @@
             response = await ChatApi.getChatFileBlob({
                 fileId: fileId.value,
                 type: "file",
-                isGroup: isGroup.value
+                isGroup: isGroup.value,
+                groupId: bucketName.value
             });
         }
         else if (module.value === "CLOUD_DISK") {
             response = await CloudDiskApi.getCloudDiskFileBlob({
+                diskId: bucketName.value,
                 fileId: fileId.value
             });
         }
-        console.error(response)
+        console.error(response);
 
         // 获取文件Blob并转换为ArrayBuffer
         fileBlob.value = new Blob([response.data]);
@@ -141,6 +144,7 @@
 
     onBeforeMount(() => {
         const data = JSON.parse(route.query.data);
+        bucketName.value = data.bucketName;
         fileId.value = data.fileId;
         fileType.value = data.fileType;
         module.value = data.module;

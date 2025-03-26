@@ -122,6 +122,7 @@
     // 文件预览
     const handleFilePreview = (fileId, fileType) => {
         const data = {
+            bucketName: route.query.diskId,
             fileId: fileId,
             fileType: fileType,
             module: "CLOUD_DISK"

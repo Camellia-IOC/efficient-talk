@@ -213,4 +213,12 @@
 		FROM cloud_disk_files
 		WHERE cloud_disk_files.disk_id = #{diskId}
 	</select>
+
+	<select id="getFileName" resultType="map">
+		SELECT cloud_disk_files.file_name as fileName,
+			   cloud_disk_files.type      as fileType
+		FROM cloud_disk_files
+		WHERE cloud_disk_files.disk_id = #{diskId}
+		  AND cloud_disk_files.file_id = #{fileId}
+	</select>
 </mapper>

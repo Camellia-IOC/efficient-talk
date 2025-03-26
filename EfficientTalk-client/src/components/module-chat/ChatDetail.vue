@@ -37,6 +37,7 @@
       <div class="header-operation-bar">
         <a-button class="operation-btn"
                   v-show="chatInfo.isGroup"
+                  @click="handleGroupMemberInviteDialogOpen"
         >
           <UsergroupAddOutlined/>
         </a-button>
@@ -681,6 +682,9 @@
   <UserSelectorDialog ref="userSelectorDialog"
                       @handle-user-select="handleTransmitMessage"
   />
+
+  <!--群聊成员邀请对话框-->
+  <GroupMemberInviteDialog ref="groupMemberInviteDialog"/>
 </template>
 
 <script setup>
@@ -752,6 +756,7 @@
     import ChatGroupIcon from "../icon/ChatGroupIcon.vue";
     import { themeColor } from "../../config/config.js";
     import SocialApi from "../../api/modules/SocialApi.js";
+    import GroupMemberInviteDialog from "../dialog/module-chat/group-member-invite/GroupMemberInviteDialog.vue";
 
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
@@ -779,6 +784,12 @@
             return;
         }
         userSelectorDialog.value.dialogOpen(curLoginUser.value.orgId, messageList);
+    };
+
+    // 群聊成员邀请对话框
+    const groupMemberInviteDialog = ref();
+    const handleGroupMemberInviteDialogOpen = () => {
+        groupMemberInviteDialog.value.dialogOpen(curLoginUser.value.orgId);
     };
 
     // 获取群聊成员列表
@@ -1179,7 +1190,7 @@
         formData.append("file", file.origin);
         formData.append("sender", curLoginUser.value.userId);
         formData.append("receiver", props.chatInfo.userId);
-        formData.append("isGroup", props.chatInfo.isGroup)
+        formData.append("isGroup", props.chatInfo.isGroup);
 
         const response = await ChatApi.uploadChatFile(formData);
         const res = response.data;
@@ -1199,7 +1210,7 @@
         formData.append("image", image.origin);
         formData.append("sender", curLoginUser.value.userId);
         formData.append("receiver", props.chatInfo.userId);
-        formData.append("isGroup", props.chatInfo.isGroup)
+        formData.append("isGroup", props.chatInfo.isGroup);
 
         const response = await ChatApi.uploadChatImage(formData);
         const res = response.data;
@@ -1400,8 +1411,14 @@
             let loadedCount = 0;
             const totalImages = images.length;
 
+            // TODO 滚动问题
             if (totalImages === 0) {
-                scrollToBottom("auto");
+                // if (chatHistoryElement.value) {
+                //     chatHistoryElement.value.scrollTo({
+                //         top: chatHistoryElement.value.scrollHeight,
+                //         behavior: "auto",
+                //     });
+                // }
             }
             else {
                 images.forEach(img => {
@@ -1428,7 +1445,8 @@
             fileId: fileId,
             fileType: fileType,
             module: "CHAT",
-            isGroup: props.chatInfo.isGroup
+            isGroup: props.chatInfo.isGroup,
+            bucketName: props.chatInfo.userId
         };
         openFilePreviewChildWindow(data);
     };
@@ -1438,7 +1456,8 @@
         const data = {
             fileId: fileId,
             fileType: fileType,
-            isGroup: props.chatInfo.isGroup
+            isGroup: props.chatInfo.isGroup,
+            bucketName: props.chatInfo.userId
         };
         openMediaFilePreviewChildWindow(data);
     };

@@ -129,6 +129,7 @@
     };
     const deleteFile = async () => {
         const response = await CloudDiskApi.deleteOrgCloudDiskFile({
+            diskId: fileInfo.value.diskId,
             fileId: fileInfo.value.fileId
         });
 

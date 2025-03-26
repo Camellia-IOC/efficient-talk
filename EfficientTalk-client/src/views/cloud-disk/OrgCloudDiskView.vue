@@ -230,6 +230,7 @@
     // 文件预览
     const handleFilePreview = (fileId, fileType) => {
         const data = {
+            bucketName: route.query.diskId,
             fileId: fileId,
             fileType: fileType,
             module: "CLOUD_DISK"
@@ -443,6 +444,12 @@
 
             const response = await CloudDiskApi.uploadOrgCloudDiskFile(formData);
             const res = response.data;
+            if (res.code === 0 && res.data.filePath !== null) {
+                message.success("上传成功");
+            }
+            else {
+                message.error("上传失败");
+            }
         }
 
         refreshCurrentFolder();

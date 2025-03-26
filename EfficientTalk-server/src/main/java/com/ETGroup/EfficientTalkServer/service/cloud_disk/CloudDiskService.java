@@ -21,10 +21,10 @@ public interface CloudDiskService {
     /**
      * 按层级获取云盘内容
      *
-     * @param parentId   父目录ID
-     * @param pageIndex  页码
-     * @param pageSize   每页大小
-     * @param orderByKey 排序字段
+     * @param parentId    父目录ID
+     * @param pageIndex   页码
+     * @param pageSize    每页大小
+     * @param orderByKey  排序字段
      * @param orderByType 排序方式
      *
      * @return 该层级的云盘内容
@@ -73,18 +73,19 @@ public interface CloudDiskService {
     /**
      * 在组织云盘删除文件
      *
+     * @param diskId 云盘ID
      * @param fileId 文件ID
      *
      * @return 是否成功
      */
-    boolean deleteCloudDiskFile(String fileId);
+    boolean deleteCloudDiskFile(String diskId, String fileId);
     
     /**
      * 获取组织云盘最近文件
      *
-     * @param orgId     组织ID
-     * @param diskId    云盘ID
-     * @param pageSize  页面大小
+     * @param orgId    组织ID
+     * @param diskId   云盘ID
+     * @param pageSize 页面大小
      *
      * @return 最近文件列表
      */
@@ -92,34 +93,42 @@ public interface CloudDiskService {
     
     /**
      * 删除组织云盘文件夹
+     *
      * @param folderId 文件夹ID
+     *
      * @return 是否成功
      */
     boolean deleteCloudDiskFolder(String folderId);
     
     /**
      * 重命名组织云盘文件夹
-     * @param folderId 文件夹ID
+     *
+     * @param folderId      文件夹ID
      * @param newFolderName 文件夹名称
+     *
      * @return 是否成功
      */
     boolean renameOrgCloudDiskFolder(String folderId, String newFolderName);
     
     /**
      * 重命名组织云盘文件
-     * @param fileId 文件ID
+     *
+     * @param fileId      文件ID
      * @param newFileName 文件名
+     *
      * @return 是否成功
      */
     boolean renameOrgCloudDiskFile(String fileId, String newFileName);
     
     /**
      * 获取组织云盘我的文件
-     * @param orgId 组织ID
-     * @param diskId 云盘ID
-     * @param userId 用户ID
+     *
+     * @param orgId     组织ID
+     * @param diskId    云盘ID
+     * @param userId    用户ID
      * @param pageIndex 页面索引
-     * @param pageSize 页面大小
+     * @param pageSize  页面大小
+     *
      * @return 文件列表
      */
     CloudDiskFileListResponseVO getMyCloudDiskFiles(String orgId, String diskId, String userId, Integer pageIndex, Integer pageSize);

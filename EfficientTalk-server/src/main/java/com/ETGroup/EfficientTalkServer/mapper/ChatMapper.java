@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 
 @Mapper
 public interface ChatMapper {
@@ -174,4 +175,34 @@ public interface ChatMapper {
      * @return 删除条数
      */
     int deleteChatHistory(@Param("messageId") String messageId);
+    
+    /**
+     * 获取聊天图片信息
+     *
+     * @param imageId 图片id
+     *
+     * @return 图片信息
+     */
+    Map<String, String> getChatImageInfo(@Param("imageId") String imageId);
+    
+    /**
+     * 获取群聊聊天图片信息
+     * @param imageId 图片id
+     * @return 图片信息
+     */
+    Map<String, String> getGroupChatImageInfo(@Param("imageId") String imageId);
+    
+    /**
+     * 获取聊天文件信息
+     * @param fileId 文件id
+     * @return 文件信息
+     */
+    Map<String, String> getChatFileInfo(@Param("fileId") String fileId);
+    
+    /**
+     * 获取群聊聊天文件信息
+     * @param fileId 文件id
+     * @return 文件信息
+     */
+    Map<String, String> getGroupChatFileInfo(@Param("fileId") String fileId);
 }

@@ -39,6 +39,7 @@
 
     // 文件属性
     const isLoading = ref(true);
+    const bucketName = ref();
     const fileId = ref();
     const fileType = ref();
     const fileBlob = ref();
@@ -57,7 +58,8 @@
         const response = await ChatApi.getChatFileBlob({
             fileId: fileId.value,
             type: "media",
-            isGroup: isGroup.value
+            isGroup: isGroup.value,
+            groupId: bucketName.value
         });
 
         // 获取文件Blob并转换为ArrayBuffer
@@ -69,6 +71,7 @@
 
     onBeforeMount(async () => {
         const data = JSON.parse(route.query.data);
+        bucketName.value = data.bucketName;
         fileId.value = data.fileId;
         fileType.value = data.fileType;
         isGroup.value = data.isGroup;
