@@ -352,6 +352,7 @@
             if (chatList.value.vipList[i].userId === userId) {
                 chatList.value.vipList.splice(i, 1);
                 handleSaveChatList(chatList.value);
+                emits("setSelectedChat", null);
                 return;
             }
         }
@@ -359,6 +360,7 @@
             if (chatList.value.commonList[i].userId === userId) {
                 chatList.value.commonList.splice(i, 1);
                 handleSaveChatList(chatList.value);
+                emits("setSelectedChat", null);
                 return;
             }
         }
@@ -368,79 +370,48 @@
     const handleMessageReceive = async (event) => {
         const message = event.detail;
 
-        // 判断聊天列表中是否存在该用户
-        let existFlag = false;
-
-        // 遍历消息列表，修改相应的元素内容
+        // 获取发送人ID
+        let receiverId = null;
         if (message.isGroup) {
-            for (let i = 0; i < chatList.value.vipList.length; i++) {
-                if (chatList.value.vipList[i].userId === message.receiver) {
-                    chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
-                    chatList.value.vipList[i].lastMessageTime = message.time;
-
-                    // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                    if (curChatId.value !== message.receiver) {
-                        chatList.value.vipList[i].unreadCount++;
-                    }
-
-                    // 将对应元素提到数组第一个
-                    chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
-                    existFlag = true;
-                    break;
-                }
-            }
-            if (!existFlag) {
-                for (let i = 0; i < chatList.value.commonList.length; i++) {
-                    if (chatList.value.commonList[i].userId === message.receiver) {
-                        chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
-                        chatList.value.commonList[i].lastMessageTime = message.time;
-
-                        // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                        if (curChatId.value !== message.receiver) {
-                            chatList.value.commonList[i].unreadCount++;
-                        }
-
-                        // 将对应元素提到数组第一个
-                        chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
-                        existFlag = true;
-                        break;
-                    }
-                }
-            }
+            receiverId = message.receiver;
         }
         else {
-            for (let i = 0; i < chatList.value.vipList.length; i++) {
-                if (chatList.value.vipList[i].userId === message.sender) {
-                    chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
-                    chatList.value.vipList[i].lastMessageTime = message.time;
+            receiverId = message.sender;
+        }
+
+        // 遍历消息列表，修改相应的元素内容
+        let existFlag = false;
+        for (let i = 0; i < chatList.value.vipList.length; i++) {
+            if (chatList.value.vipList[i].userId === receiverId) {
+                chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
+                chatList.value.vipList[i].lastMessageTime = message.time;
+
+                // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
+                if (curChatId.value !== receiverId) {
+                    chatList.value.vipList[i].unreadCount++;
+                }
+
+                // 将对应元素提到数组第一个
+                chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
+                existFlag = true;
+                break;
+            }
+        }
+        if (!existFlag) {
+            for (let i = 0; i < chatList.value.commonList.length; i++) {
+                if (chatList.value.commonList[i].userId === receiverId) {
+                    chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
+                    chatList.value.commonList[i].lastMessageTime = message.time;
 
                     // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                    if (curChatId.value !== message.sender) {
-                        chatList.value.vipList[i].unreadCount++;
+                    if (curChatId.value !== receiverId) {
+                        chatList.value.commonList[i].unreadCount++;
                     }
 
                     // 将对应元素提到数组第一个
-                    chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
+                    chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
                     existFlag = true;
                     break;
-                }
-            }
-            if (!existFlag) {
-                for (let i = 0; i < chatList.value.commonList.length; i++) {
-                    if (chatList.value.commonList[i].userId === message.sender) {
-                        chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
-                        chatList.value.commonList[i].lastMessageTime = message.time;
-
-                        // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                        if (curChatId.value !== message.sender) {
-                            chatList.value.commonList[i].unreadCount++;
-                        }
-
-                        // 将对应元素提到数组第一个
-                        chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
-                        existFlag = true;
-                        break;
-                    }
                 }
             }
         }
