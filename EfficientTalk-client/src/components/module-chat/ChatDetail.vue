@@ -1141,21 +1141,23 @@
 
     // 接收消息
     const handleMessageReceive = (message) => {
-        const messageData = message.detail;
-        console.log("收到服务器消息：", messageData);
+        if (props.chatInfo !== null) {
+            const messageData = message.detail;
+            console.log("收到服务器消息：", messageData);
 
-        if (props.chatInfo.isGroup) {
-            if (messageData.receiver === props.chatInfo.userId) {
-                // 如果发送者是当前聊天的对象,注入消息并滚动到底部
-                chatHistory.value.push(messageData);
-                scrollToBottom("smooth");
+            if (props.chatInfo.isGroup) {
+                if (messageData.receiver === props.chatInfo.userId) {
+                    // 如果发送者是当前聊天的对象,注入消息并滚动到底部
+                    chatHistory.value.push(messageData);
+                    scrollToBottom("smooth");
+                }
             }
-        }
-        else {
-            if (messageData.sender === props.chatInfo.userId) {
-                // 如果发送者是当前聊天的对象,注入消息并滚动到底部
-                chatHistory.value.push(messageData);
-                scrollToBottom("smooth");
+            else {
+                if (messageData.sender === props.chatInfo.userId) {
+                    // 如果发送者是当前聊天的对象,注入消息并滚动到底部
+                    chatHistory.value.push(messageData);
+                    scrollToBottom("smooth");
+                }
             }
         }
     };
