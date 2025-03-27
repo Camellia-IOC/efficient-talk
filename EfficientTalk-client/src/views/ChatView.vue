@@ -1,12 +1,15 @@
 <template>
   <div class="chat-view-container">
     <div class="chat-list-container">
-      <ChatList @set-selected-chat="setSelectedChat"
+      <ChatList ref="chatListRef"
+                @set-selected-chat="setSelectedChat"
                 :friend-info="friendInfo"
       />
     </div>
     <div class="chat-detail-container">
-      <ChatDetail :chat-info="selectedChat"/>
+      <ChatDetail :chat-info="selectedChat"
+                  @remove-chat-list-item="handleChatListRemove"
+      />
     </div>
   </div>
 </template>
@@ -21,6 +24,12 @@
     import { useRoute } from "vue-router";
 
     const route = useRoute();
+
+    // 组件Ref
+    const chatListRef = ref();
+    const handleChatListRemove = (userId) => {
+        chatListRef.value.deleteFromChatList(userId);
+    };
 
     // 选中的聊天
     const selectedChat = ref(null);

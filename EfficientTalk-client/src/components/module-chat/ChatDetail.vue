@@ -758,6 +758,8 @@
     import SocialApi from "../../api/modules/SocialApi.js";
     import GroupMemberInviteDialog from "../dialog/module-chat/group-member-invite/GroupMemberInviteDialog.vue";
 
+    const emit = defineEmits(["removeChatListItem"]);
+
     // 图片上传对话框控制
     const pictureSelectorDialog = ref();
     const handlePictureSelectorDialogOpen = () => {
@@ -835,12 +837,13 @@
                 props.chatInfo.value = null;
                 chatDetailDrawerConfig.value.closeDrawer();
                 message.success("退出群聊成功");
+
+                // 退出群聊后更新消息列表
+                emit("removeChatListItem", props.chatInfo.userId);
             }
             else {
                 message.error("退出群聊失败");
             }
-
-            // TODO 退出群聊后要更新消息列表
         }
     });
 
