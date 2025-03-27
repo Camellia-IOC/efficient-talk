@@ -366,6 +366,7 @@
         }
     };
 
+    // TODO 待优化，同时接收大量消息并且发送对象不存在消息列表中时可能会重复插入该对象
     // 接收消息
     const handleMessageReceive = async (event) => {
         const message = event.detail;

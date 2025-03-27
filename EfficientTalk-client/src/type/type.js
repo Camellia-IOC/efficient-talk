@@ -3,4 +3,5 @@ export class ChatInfoObject {
     userId;
     userName;
     userAvatar;
+    isGroup;
 }

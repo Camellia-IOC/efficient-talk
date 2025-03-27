@@ -24,10 +24,6 @@ import "ant-design-vue/dist/reset.css";
 import "viewerjs/dist/viewer.css";
 import VueViewer from "v-viewer";
 
-// Emoji表情库
-// import Vue3EmojiPicker from 'vue3-emoji-picker';
-// import 'vue3-emoji-picker/css'
-
 import App from "../../App.vue";
 
 const pinia = createPinia();
@@ -55,6 +51,5 @@ app.use(pinia);
 app.use(router);
 app.use(Antd);
 app.use(VueViewer);
-// app.component("Vue3EmojiPicker", Vue3EmojiPicker)
 
 app.mount("#app");

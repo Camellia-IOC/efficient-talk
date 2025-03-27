@@ -497,38 +497,49 @@
       >
         <div class="operations-bar">
           <div class="left-bar">
-            <a-popover title="表情包"
-                       trigger="hover"
-                       class="emoji-selector"
+            <!--<a-popover title="表情包"-->
+            <!--           trigger="hover"-->
+            <!--           class="emoji-selector"-->
+            <!--&gt;-->
+            <!--  <template #content>-->
+            <!--    <div style="width:400px;height: 400px;overflow-y:auto ">-->
+            <!--      &lt;!&ndash;<Vue3EmojiPicker style="width: 100%;height: 100%;border-radius: 0"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 :native="true"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 :disable-skin-tones="true"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 :display-recent="true"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 :disable-sticky-group-names="true"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 :static-texts="{ placeholder: '搜索表情'}"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 v-model="selectedEmoji"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 @select="handleEmojiSelect"&ndash;&gt;-->
+            <!--      &lt;!&ndash;                 :group-names="{&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'recently-used':'最近使用',&ndash;&gt;-->
+            <!--      &lt;!&ndash;							   'smileys_people': '表情 & 人',&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'animals_nature': '动物 & 自然',&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'food_drink': '食物 & 饮品',&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'activities': '活动',&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'travel_places': '旅行地点',&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'objects': '物品',&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'symbols': '标志',&ndash;&gt;-->
+            <!--      &lt;!&ndash;								 'flags': '国旗'&ndash;&gt;-->
+            <!--      &lt;!&ndash;							 }"&ndash;&gt;-->
+            <!--      &lt;!&ndash;/>&ndash;&gt;-->
+            <!--    </div>-->
+            <!--  </template>-->
+            <!--  <a-button class="operation-btn">-->
+            <!--    <SmileOutlined/>-->
+            <!--  </a-button>-->
+            <!--</a-popover>-->
+            <V3Emoji :recent="true"
+                     default-select="recenet"
+                     :keep="true"
+                     :options-name="emojiOptionsName"
+                     @click-emoji="handleEmojiSelect"
+                     fix-pos="top-start"
             >
-              <template #content>
-                <div style="width:400px;height: 400px;overflow-y:auto ">
-                  <!--<Vue3EmojiPicker style="width: 100%;height: 100%;border-radius: 0"-->
-                  <!--                 :native="true"-->
-                  <!--                 :disable-skin-tones="true"-->
-                  <!--                 :display-recent="true"-->
-                  <!--                 :disable-sticky-group-names="true"-->
-                  <!--                 :static-texts="{ placeholder: '搜索表情'}"-->
-                  <!--                 v-model="selectedEmoji"-->
-                  <!--                 @select="handleEmojiSelect"-->
-                  <!--                 :group-names="{-->
-                  <!--								 'recently-used':'最近使用',-->
-                  <!--							   'smileys_people': '表情 & 人',-->
-                  <!--								 'animals_nature': '动物 & 自然',-->
-                  <!--								 'food_drink': '食物 & 饮品',-->
-                  <!--								 'activities': '活动',-->
-                  <!--								 'travel_places': '旅行地点',-->
-                  <!--								 'objects': '物品',-->
-                  <!--								 'symbols': '标志',-->
-                  <!--								 'flags': '国旗'-->
-                  <!--							 }"-->
-                  <!--/>-->
-                </div>
-              </template>
               <a-button class="operation-btn">
                 <SmileOutlined/>
               </a-button>
-            </a-popover>
+            </V3Emoji>
             <a-button class="operation-btn"
                       @click="handlePictureSelectorDialogOpen"
             >
@@ -757,6 +768,8 @@
     import { themeColor } from "../../config/config.js";
     import SocialApi from "../../api/modules/SocialApi.js";
     import GroupMemberInviteDialog from "../dialog/module-chat/group-member-invite/GroupMemberInviteDialog.vue";
+    import V3Emoji from "vue3-emoji";
+    import "vue3-emoji/dist/style.css";
 
     const emit = defineEmits(["removeChatListItem"]);
 
@@ -873,10 +886,19 @@
     // 输入消息
     const chatInput = ref("");
     const chatInputRef = ref(null);
-    const selectedEmoji = ref();
+    const emojiOptionsName = {
+        "Smileys & Emotion": "笑脸&表情",
+        "Food & Drink": "食物&饮料",
+        "Animals & Nature": "动物&自然",
+        "Travel & Places": "旅行&地点",
+        "People & Body": "人物&身体",
+        Objects: "物品",
+        Symbols: "符号",
+        Flags: "旗帜",
+        Activities: "活动"
+    };
     const handleEmojiSelect = (emoji) => {
-        chatInput.value += emoji.i;
-        selectedEmoji.value = "";
+        chatInput.value += emoji;
     };
     const isAiGenerating = ref(false);
     const aiWriterInput = ref("");
@@ -1116,7 +1138,6 @@
     const handleTransmitMessage = (userList, messageList) => {
         contextMenuOperations.transmitMessage(userList, messageList);
     };
-
 
     // 接收消息
     const handleMessageReceive = (message) => {
@@ -2192,6 +2213,19 @@
       background-color: white;
       width: 100%;
       height: 50px
+    }
+  }
+
+  // 表情包标题内边距
+  :deep(.PollUp-vue-used-vue-type-style-index-0-lang-module__tabName___NqY-i) {
+    display: flex;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 18px;
+    margin: 0;
+
+    p {
+      margin: 0 !important;
     }
   }
 </style>
