@@ -14,12 +14,12 @@
           </div>
         </template>
         <div v-if="item.isLoading||item.children === null||(item.children.deptList.length===0&&item.children.userList.length===0)"
-             style="width: 100%;height: 50px;display: flex;justify-content: center;align-items: center"
+             style="width: 100%;height: 50px;display: flex;justify-content: center;align-items: center;background-color: #FAFCFF"
         >
           <div v-if="item.isLoading">
             <a-spin tip="加载中"></a-spin>
           </div>
-          <div v-else-if="item.children===null||(item.children.deptList.length===0&&item.children.userList.length===0)">
+          <div v-else-if="item.children===null||(item.children.deptList.length===0&&item.children.userList.length===0)" style="color: var(--theme-color)">
             暂无数据
           </div>
         </div>
