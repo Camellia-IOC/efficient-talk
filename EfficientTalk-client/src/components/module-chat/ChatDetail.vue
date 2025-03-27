@@ -2217,12 +2217,19 @@
   }
 
   // 表情包标题内边距
-  :deep(.PollUp-vue-used-vue-type-style-index-0-lang-module__tabName___NqY-i) {
-    display: flex;
-    justify-content: space-between;
-    height: 40px;
-    padding: 0 18px;
-    margin: 0;
+  :deep(.PollUp-vue-used-vue-type-style-index-0-lang-module__pollup___g0sO7) {
+    border-radius: 10px;
+    border: global-variable.$border-line-width solid global-variable.$border-line-color;
+    box-shadow: none;
+
+    .PollUp-vue-used-vue-type-style-index-0-lang-module__tabName___NqY-i {
+      display: flex;
+      justify-content: space-between;
+      height: 40px;
+      padding: 0 18px;
+      margin: 0;
+      color: black;
+    }
 
     p {
       margin: 0 !important;
