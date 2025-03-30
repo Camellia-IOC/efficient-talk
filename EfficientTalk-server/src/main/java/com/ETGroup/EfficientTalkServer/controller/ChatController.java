@@ -6,6 +6,7 @@ import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestPa
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatFileListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.ChatHistoryResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.chat.UploadChatFileResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.FileDownloadInfoResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.mapper.ChatMapper;
@@ -196,6 +197,19 @@ public class ChatController {
     @PostMapping("/createChatGroup")
     public ResponseData<Boolean> createChatGroup(@RequestBody CreateChatGroupRequestParam param) {
         Boolean response = chatService.createChatGroup(param);
+        return ResponseData.success(response);
+    }
+    
+    @Operation(summary = "获取云盘文件下载地址")
+    @GetMapping("/getChatFileDownloadUrl")
+    public ResponseData<FileDownloadInfoResponseVO> getChatFileDownloadUrl(@RequestParam String fileId, @RequestParam Boolean isGroup) {
+        FileDownloadInfoResponseVO response;
+        if (isGroup) {
+            response = chatMapper.getChatGroupFileDownloadInfo(fileId);
+        }
+        else {
+            response = chatMapper.getChatFileDownloadInfo(fileId);
+        }
         return ResponseData.success(response);
     }
 }

@@ -124,4 +124,15 @@ export default class ChatApi {
             data
         });
     };
+
+    /**
+     * 获取云盘文件下载地址
+     * @param data
+     */
+    static getChatFileDownloadUrl = (data) => {
+        return service.get({
+            url: this.requestPath + "/getChatFileDownloadUrl",
+            data
+        });
+    };
 }

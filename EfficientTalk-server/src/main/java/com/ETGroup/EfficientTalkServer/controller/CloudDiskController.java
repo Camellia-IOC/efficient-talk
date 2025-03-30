@@ -3,10 +3,7 @@ package com.ETGroup.EfficientTalkServer.controller;
 import com.ETGroup.EfficientTalkServer.entity.request.cloud_disk.CreateCloudDiskFolderRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.cloud_disk.RenameFileRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.cloud_disk.RenameFolderRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasicInfoResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskFileListResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskLevelContentResponseVO;
-import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.UploadCloudDiskFileResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.*;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.mapper.CloudDiskMapper;
@@ -176,5 +173,12 @@ public class CloudDiskController {
         Map<String, String> fileInfo = cloudDiskMapper.getFileName(diskId, fileId);
         String fileName = fileId + "." + fileInfo.get("fileType");
         return fileUtils.getOSSFileBlob(diskId, fileName, fileInfo.get("fileName"));
+    }
+    
+    @Operation(summary = "获取云盘文件下载地址")
+    @GetMapping("/getCloudDiskFileDownloadUrl")
+    public ResponseData<FileDownloadInfoResponseVO> getCloudDiskFileDownloadUrl(@RequestParam String diskId, @RequestParam String fileId) {
+        FileDownloadInfoResponseVO response = cloudDiskMapper.getFileDownloadInfo(diskId, fileId);
+        return ResponseData.success(response);
     }
 }

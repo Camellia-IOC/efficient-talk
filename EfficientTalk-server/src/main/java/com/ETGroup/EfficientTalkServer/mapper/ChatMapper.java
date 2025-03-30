@@ -6,6 +6,7 @@ import com.ETGroup.EfficientTalkServer.entity.PO.ChatFilePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatImagePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatListPO;
 import com.ETGroup.EfficientTalkServer.entity.request.chat.SaveChatListRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.FileDownloadInfoResponseVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -187,22 +188,46 @@ public interface ChatMapper {
     
     /**
      * 获取群聊聊天图片信息
+     *
      * @param imageId 图片id
+     *
      * @return 图片信息
      */
     Map<String, String> getGroupChatImageInfo(@Param("imageId") String imageId);
     
     /**
      * 获取聊天文件信息
+     *
      * @param fileId 文件id
+     *
      * @return 文件信息
      */
     Map<String, String> getChatFileInfo(@Param("fileId") String fileId);
     
     /**
      * 获取群聊聊天文件信息
+     *
      * @param fileId 文件id
+     *
      * @return 文件信息
      */
     Map<String, String> getGroupChatFileInfo(@Param("fileId") String fileId);
+    
+    /**
+     * 获取聊天文件下载信息
+     *
+     * @param fileId 文件id
+     *
+     * @return 文件下载信息
+     */
+    FileDownloadInfoResponseVO getChatFileDownloadInfo(@Param("fileId") String fileId);
+    
+    /**
+     * 获取群聊文件下载信息
+     *
+     * @param fileId 文件id
+     *
+     * @return 文件下载信息
+     */
+    FileDownloadInfoResponseVO getChatGroupFileDownloadInfo(@Param("fileId") String fileId);
 }

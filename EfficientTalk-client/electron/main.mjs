@@ -3,8 +3,6 @@ import {
     app,
     BrowserWindow,
     session,
-    dialog,
-    Notification,
     clipboard,
     Tray,
     Menu,
@@ -14,7 +12,6 @@ import {
 
 // Node模块
 import path from "node:path";
-import fs from "node:fs";
 import { fileURLToPath } from "url";
 
 // 持久化存储
@@ -27,7 +24,7 @@ const __dirname = path.dirname(__filename);
 // 持久化存储仓库
 const configStore = new Store();
 const initStore = () => {
-    if (configStore.has("downloadPath")) {
+    if (!configStore.has("downloadPath")) {
         configStore.set("downloadPath", path.join(app.getPath("downloads"), "易飞讯"));
     }
 };
@@ -73,6 +70,7 @@ app.on("window-all-closed", () => {
 // 主窗口相关操作 start ###################################################################################################
 // 主窗口对象
 let mainWindow = null;
+let downloadFileNameMap = new Map();
 
 // 创建主窗口
 const createWindow = () => {
@@ -98,6 +96,41 @@ const createWindow = () => {
 
     mainWindow.loadURL(projectUrl)
               .then();
+
+    // 监听下载事件
+    mainWindow.webContents.session.on("will-download", (event, item, webContents) => {
+        // 匹配uuid，获取文件名称
+        const regex = /\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?=\.[^/]+|$)/i;
+        const match = item.getURL().match(regex);
+        const fileId = match ? match[1] : null;
+        const fileName = downloadFileNameMap.get(fileId);
+        downloadFileNameMap.delete(fileId);
+
+        // TODO 修改为通用下载路径
+        item.setSavePath(path.join(configStore.get("downloadPath"), fileName));
+
+        item.on("updated", (event, state) => {
+            if (state === "interrupted") {
+                console.log("下载已中断，但可以恢复");
+            }
+            else if (state === "progressing") {
+                if (item.isPaused()) {
+                    console.log("下载已暂停");
+                }
+                else {
+                    console.log(`Received bytes: ${item.getReceivedBytes()}`);
+                }
+            }
+        });
+        item.once("done", (event, state) => {
+            if (state === "completed") {
+                console.log("下载成功");
+            }
+            else {
+                console.log(`下载失败: ${state}`);
+            }
+        });
+    });
 };
 
 // 隐藏主窗口
@@ -436,41 +469,13 @@ ipcMain.handle("read-from-clipboard", () => {
     return clipboard.readText();
 });
 
-// // 处理文件选择(单选)
-// ipcMain.handle("select-file", async (event, params) => {
-//     const result = await dialog.showOpenDialog({
-//         properties: ["openFile", "multiSelections"],
-//         filters: params.filters,
-//         title: params.title,
-//     });
-//
-//     if (result.canceled) {
-//         return [];
-//     }
-//
-//     return result.filePaths;
-// });
-//
-// // 处理文件选择(多选)
-// ipcMain.handle("select-files", async (event, params) => {
-//     const result = await dialog.showOpenDialog({
-//         properties: ["openFile", "multiSelections"],
-//         filters: params.filters,
-//         title: params.title,
-//     });
-//
-//     if (result.canceled) {
-//         return [];
-//     }
-//
-//     return result.filePaths;
-// });
-//
-// // 判断文件是否存在
-// ipcMain.handle("file-check-is-exist", (event, path) => {
-//     return fs.existsSync(path);
-// });
-//
+// 下载文件
+ipcMain.handle("download", (event, params) => {
+    const fileName = params.fileName + "." + params.fileType;
+    downloadFileNameMap.set(params.fileId, fileName);
+    mainWindow.webContents.downloadURL(params.url);
+});
+
 // // 显示通知
 // ipcMain.handle("show-notification", (event, params) => {
 //     new Notification({

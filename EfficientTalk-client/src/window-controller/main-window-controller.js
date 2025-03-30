@@ -76,4 +76,12 @@ export default class MainWindowController {
             return "";
         });
     };
+
+    /**
+     * 下载文件
+     * @param params 下载参数
+     */
+    static download = (params) => {
+        systemController.download(params);
+    };
 }

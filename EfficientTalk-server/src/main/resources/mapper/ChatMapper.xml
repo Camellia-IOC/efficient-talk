@@ -353,4 +353,26 @@
 		FROM chat_group_files
 		WHERE file_id = #{fileId}
 	</select>
+
+	<!--获取聊天文件下载信息-->
+	<select id="getChatFileDownloadInfo"
+			resultType="com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.FileDownloadInfoResponseVO">
+		SELECT chat_files.file_id   as fileId,
+			   chat_files.file_name as fileName,
+			   chat_files.file_type as fileType,
+			   chat_files.file_path as url
+		FROM chat_files
+		WHERE file_id = #{fileId}
+	</select>
+
+	<!--获取群聊文件下载信息-->
+	<select id="getChatGroupFileDownloadInfo"
+			resultType="com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.FileDownloadInfoResponseVO">
+		SELECT chat_group_files.file_id   as fileId,
+			   chat_group_files.file_name as fileName,
+			   chat_group_files.file_type as fileType,
+			   chat_group_files.file_path as url
+		FROM chat_group_files
+		WHERE file_id = #{fileId}
+	</select>
 </mapper>

@@ -288,7 +288,10 @@
                   </div>
                   <div class="file-info">
                     <div class="operations-bar">
-                      <a-button class="operation-btn">下载</a-button>
+                      <a-button class="operation-btn"
+                                @click="handleDownloadFile(item.fileId)"
+                      >下载
+                      </a-button>
                       <a-button class="operation-btn"
                                 @click="handleFilePreview(item.fileId,item.fileType)"
                       >预览
@@ -407,7 +410,10 @@
                     <div class="file-info">
                       <label class="file-size">{{ translateFileSize(item.fileSize) }}</label>
                       <div class="operations-bar">
-                        <a-button class="operation-btn">下载</a-button>
+                        <a-button class="operation-btn"
+                                  @click="handleDownloadFile(item.fileId)"
+                        >下载
+                        </a-button>
                         <a-button class="operation-btn"
                                   @click="handleFilePreview(item.fileId, item.fileType)"
                         >预览
@@ -770,6 +776,7 @@
     import GroupMemberInviteDialog from "../dialog/module-chat/group-member-invite/GroupMemberInviteDialog.vue";
     import V3Emoji from "vue3-emoji";
     import "vue3-emoji/dist/style.css";
+    import MainWindowController from "../../window-controller/main-window-controller.js";
 
     const emit = defineEmits(["removeChatListItem"]);
 
@@ -1463,6 +1470,27 @@
         });
     };
 
+    // 处理文件下载
+    const handleDownloadFile = (fileId) => {
+        ChatApi.getChatFileDownloadUrl({
+            fileId: fileId,
+            isGroup: props.chatInfo.isGroup,
+        }).then((response) => {
+            const res = response.data;
+            if (res.code === 0) {
+                MainWindowController.download({
+                    fileId: res.data.fileId,
+                    fileName: res.data.fileName,
+                    fileType: res.data.fileType,
+                    url: res.data.url,
+                });
+            }
+            else {
+                message.error("下载失败");
+            }
+        });
+    };
+
     // 处理文件预览
     const handleFilePreview = (fileId, fileType) => {
         const data = {
@@ -1600,7 +1628,6 @@
         width: 100%;
         height: calc(100% - #{$footer-height});
         overflow-y: auto;
-        padding-bottom: 20px;
         background-color: global-variable.$background-color;
 
         .load-btn-container {
