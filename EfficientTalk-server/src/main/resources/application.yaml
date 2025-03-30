@@ -56,9 +56,6 @@ minio:
   chat-group-image-bucket: chat-group-image
 
 mybatis-plus:
-#  config-location: classpath:MybatisConfig.xml
-#  mapper-locations: classpath:mapper/**.xml
-#  check-config-location: true
   configuration:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 

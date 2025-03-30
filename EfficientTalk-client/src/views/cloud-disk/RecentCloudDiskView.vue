@@ -15,6 +15,11 @@
                :custom-row="handleRowOperation"
                :row-class-name="tableRowClassName"
       >
+        <template #emptyText>
+          <EmptyContainer :height="tableHeight-35"
+                          :description="'暂无数据'"
+          />
+        </template>
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'fileName'">
             <div style="display: flex;justify-content: center;align-items: center;width: 100%">
@@ -82,6 +87,7 @@
     import { openFilePreviewChildWindow } from "../../window-controller/controller/ChildWindowController.js";
     import CloudDiskApi from "../../api/modules/CloudDiskApi.js";
     import { useRoute } from "vue-router";
+    import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
 
     // 分页器配置
     const paginationConfig = ref({

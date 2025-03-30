@@ -36,12 +36,18 @@
 		FROM cloud_disk_folders
 				 LEFT JOIN users ON cloud_disk_folders.creator = users.id
 		WHERE parent_id = #{parentId}
-		<!--<if test="orderByKey != null and orderByKey != ''">-->
-		<!--	ORDER BY ${orderByKey}-->
-		<!--	<if test="orderByType == 'DESC'">-->
-		<!--		DESC-->
-		<!--	</if>-->
-		<!--</if>-->
+		<if test="orderByKey != null">
+			ORDER BY
+			<if test="orderByKey == 'NAME'">
+				cloud_disk_folders.folder_name
+			</if>
+			<if test="orderByKey == 'TIME'">
+				cloud_disk_folders.update_time
+			</if>
+			<if test="orderByType == 'DESC'">
+				DESC
+			</if>
+		</if>
 		LIMIT #{pageSize}
 		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
 		OFFSET #{pageOffset}
@@ -192,6 +198,7 @@
 				 LEFT JOIN users ON users.id = cloud_disk_files.creator
 		WHERE cloud_disk_files.org_id = #{orgId}
 		  AND cloud_disk_files.disk_id = #{diskId}
+		  AND cloud_disk_files.creator = #{userId}
 		ORDER BY cloud_disk_files.update_time DESC
 		LIMIT #{pageSize}
 		<bind name="pageOffset" value="(pageIndex - 1) * pageSize"/>
@@ -220,5 +227,17 @@
 		FROM cloud_disk_files
 		WHERE cloud_disk_files.disk_id = #{diskId}
 		  AND cloud_disk_files.file_id = #{fileId}
+	</select>
+
+	<!--获取下载文件信息-->
+	<select id="getFileDownloadInfo"
+			resultType="com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.FileDownloadInfoResponseVO">
+		SELECT cloud_disk_files.file_id   as fileId,
+			   cloud_disk_files.file_name as fileName,
+			   cloud_disk_files.type      as fileType,
+			   cloud_disk_files.file_path as url
+		FROM cloud_disk_files
+		WHERE disk_id = #{diskId}
+		  AND file_id = #{fileId}
 	</select>
 </mapper>

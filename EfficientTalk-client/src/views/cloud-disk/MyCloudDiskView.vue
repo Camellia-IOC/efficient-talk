@@ -1,7 +1,7 @@
 <template>
   <div class="chat-cloud-disk-view-container">
     <div class="cloud-disk-info">
-      <div class="title">聊天文件</div>
+      <div class="title">我的文件</div>
     </div>
     <div class="result-table-container"
          ref="cloudDiskViewRef"
@@ -24,6 +24,11 @@
                :custom-row="handleRowOperation"
                :row-class-name="tableRowClassName"
       >
+        <template #emptyText>
+          <EmptyContainer :height="tableHeight-35"
+                          :description="'暂无数据'"
+          />
+        </template>
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'fileName'">
             <div style="display: flex;justify-content: center;align-items: center;width: 100%">
@@ -91,6 +96,7 @@
     import { openFilePreviewChildWindow } from "../../window-controller/controller/ChildWindowController.js";
     import CloudDiskApi from "../../api/modules/CloudDiskApi.js";
     import { useRoute } from "vue-router";
+    import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
 
     const route = useRoute();
 

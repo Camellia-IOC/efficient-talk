@@ -5,6 +5,7 @@ import com.ETGroup.EfficientTalkServer.entity.DTO.cloud_disk.CloudDiskFolderDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.CloudDiskFilePO;
 import com.ETGroup.EfficientTalkServer.entity.PO.CloudDiskFolderPO;
 import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.CloudDiskBasicInfoResponseVO;
+import com.ETGroup.EfficientTalkServer.entity.response.cloud_disk.FileDownloadInfoResponseVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -127,4 +128,14 @@ public interface CloudDiskMapper {
      * @return 组织云盘文件名称
      */
     Map<String, String> getFileName(@Param("diskId") String diskId, @Param("fileId") String fileId);
+    
+    /**
+     * 获取组织云盘文件下载信息
+     *
+     * @param diskId 云盘ID
+     * @param fileId 文件ID
+     *
+     * @return 文件信息
+     */
+    FileDownloadInfoResponseVO getFileDownloadInfo(@Param("diskId") String diskId, @Param("fileId") String fileId);
 }

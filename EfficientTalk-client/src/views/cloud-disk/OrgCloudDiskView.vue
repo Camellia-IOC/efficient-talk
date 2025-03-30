@@ -43,7 +43,42 @@
         </a-button>
       </div>
       <div class="operation-bar-right">
-        <!--<a-select></a-select>-->
+        <a-popover placement="bottom">
+          <template #content>
+            <div class="filter-container">
+              <div class="filter-item">
+                <label>文件类型</label>
+                <a-select style="width: 100px"
+                          placeholder="全部"
+                          v-model:value="fileType"
+                          @change="handleFileTypeChange"
+                >
+                  <a-select-option value="">全部</a-select-option>
+                </a-select>
+              </div>
+            </div>
+          </template>
+          <a-button>筛选</a-button>
+        </a-popover>
+        <div class="operation-block">
+          <label style="font-size: 16px">排序</label>
+          <a-select style="width: 70px"
+                    placeholder="依据"
+                    v-model:value="orderByKey"
+                    @change="handleOrderConfigChange"
+          >
+            <a-select-option value="NAME">名称</a-select-option>
+            <a-select-option value="TIME">时间</a-select-option>
+          </a-select>
+          <a-select style="width: 70px"
+                    placeholder="顺序"
+                    v-model:value="orderByType"
+                    @change="handleOrderConfigChange"
+          >
+            <a-select-option value="ASC">正序</a-select-option>
+            <a-select-option value="DESC">倒序</a-select-option>
+          </a-select>
+        </div>
       </div>
     </div>
     <div class="result-table-container">
@@ -83,11 +118,19 @@
                    style="width: 30px;height: 30px;margin-right: 10px"
                    v-else-if="record.type==='folder'"
               />
-              <label class="single-line-ellipsis"
-                     style="min-width: calc(100% - 40px);text-align: left;font-weight: bold"
+              <a-tooltip placement="topLeft"
+                         :arrow="false"
+                         :color="themeColor"
               >
-                {{ record.name }}
-              </label>
+                <template #title>
+                  {{ record.name }}
+                </template>
+                <label class="single-line-ellipsis"
+                       style="min-width: calc(100% - 40px);text-align: left;font-weight: bold"
+                >
+                  {{ record.name }}
+                </label>
+              </a-tooltip>
             </div>
           </template>
           <template v-else-if="column.dataIndex === 'uploadUser'">
@@ -96,9 +139,17 @@
                    alt="avatar"
                    style="width: 20px;height: 20px;border-radius: 50%"
               >
-              <div style="display: flex;justify-content: center;align-items: center">
-                {{ record.creatorName }}
-              </div>
+              <a-tooltip placement="top"
+                         :arrow="false"
+                         :color="themeColor"
+              >
+                <template #title>
+                  {{ record.creatorName }}
+                </template>
+                <div style="display: flex;justify-content: center;align-items: center">
+                  {{ record.creatorName }}
+                </div>
+              </a-tooltip>
             </div>
           </template>
           <template v-else-if="column.dataIndex === 'uploadTime'">
@@ -181,6 +232,7 @@
     import CloudDiskItemEditorDialog
         from "../../components/dialog/module-cloud-disk/cloud-disk-item-editor/CloudDiskItemEditorDialog.vue";
     import { openFilePreviewChildWindow } from "../../window-controller/controller/ChildWindowController.js";
+    import { themeColor } from "../../config/config.js";
 
     const route = useRoute();
 
@@ -266,7 +318,7 @@
         if (cloudDiskViewRef.value) {
             const observer = new ResizeObserver((entries) => {
                 entries.forEach((entry) => {
-                    tableHeight.value = entry.target.offsetHeight - 275;
+                    tableHeight.value = entry.target.offsetHeight - 260;
                 });
             });
             observer.observe(cloudDiskViewRef.value);
@@ -317,6 +369,11 @@
     const cloudDiskFolders = ref([]);
     const cloudDiskFiles = ref([]);
     const tableData = ref([]);
+    const orderByKey = ref("NAME");
+    const orderByType = ref("ASC");
+    const handleOrderConfigChange = () => {
+        getCloudDiskData();
+    };
 
     // 获取打开文件夹的路径串
     const getFileSavePath = () => {
@@ -335,7 +392,9 @@
         const response = await CloudDiskApi.getCloudDiskLevelContent({
             parentId: parentId === null ? openedFolder.value[openedFolder.value.length - 1].folderId : parentId,
             pageIndex: paginationConfig.value.pageIndex,
-            pageSize: paginationConfig.value.pageSize
+            pageSize: paginationConfig.value.pageSize,
+            orderByKey: orderByKey.value,
+            orderByType: orderByType.value
         });
 
         const res = response.data;
@@ -548,6 +607,14 @@
         align-items: center;
         width: 50%;
         gap: 10px;
+
+        .operation-block {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 8px;
+          gap: 10px;
+        }
       }
     }
 
