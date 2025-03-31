@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -38,7 +37,7 @@ public class SocialController {
     @Resource
     private SocialMapper socialMapper;
     
-    @Autowired
+    @Resource
     private RedisUtils redisUtils;
     
     @Operation(summary = "获取好友列表")
@@ -95,9 +94,15 @@ public class SocialController {
     @Operation(summary = "获取用户的好友分组")
     @GetMapping("/getUserFriendGroups")
     public ResponseData<UserFriendGroupsResponseVO> getUserFriendGroups(@RequestParam String userId) {
-        UserFriendGroupsResponseVO response = new UserFriendGroupsResponseVO();
-        response.setFriendGroups(socialMapper.getUserFriendGroups(userId));
-        return ResponseData.success(response);
+        try {
+            UserFriendGroupsResponseVO response = new UserFriendGroupsResponseVO();
+            response.setFriendGroups(socialMapper.getUserFriendGroups(userId));
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取用户的好友分组失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "获取组织层级")
@@ -110,64 +115,106 @@ public class SocialController {
     @Operation(summary = "获取组织信息")
     @GetMapping("/getOrganizationInfo")
     public ResponseData<OrganizationInfoResponseVO> getOrganizationInfo(@RequestParam String orgId) {
-        OrganizationInfoResponseVO response = new OrganizationInfoResponseVO();
-        response.setOrgInfo(socialMapper.getOrganizationInfo(orgId));
-        return ResponseData.success(response);
+        try {
+            OrganizationInfoResponseVO response = new OrganizationInfoResponseVO();
+            response.setOrgInfo(socialMapper.getOrganizationInfo(orgId));
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取组织信息失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "获取群聊列表")
     @GetMapping("/getChatGroupList")
     public ResponseData<ArrayList<ChatGroupListItemDTO>> getChatGroupList(@RequestParam String userId) {
-        ArrayList<ChatGroupListItemDTO> response = socialMapper.getChatGroupList(userId);
-        return ResponseData.success(response);
+        try {
+            ArrayList<ChatGroupListItemDTO> response = socialMapper.getChatGroupList(userId);
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取群聊列表失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "获取群聊基本信息")
     @GetMapping("/getChatGroupBasicInfo")
     public ResponseData<ChatGroupPO> getChatGroupBasicInfo(@RequestParam String groupId) {
-        ChatGroupPO response = socialMapper.getChatGroupBasicInfo(groupId);
-        return ResponseData.success(response);
+        try {
+            ChatGroupPO response = socialMapper.getChatGroupBasicInfo(groupId);
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取群聊基本信息失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "获取群聊成员列表")
     @GetMapping("/getChatGroupMemberList")
     public ResponseData<ArrayList<ChatGroupMemberListItemDTO>> getChatGroupMemberList(@RequestParam String groupId) {
-        ArrayList<ChatGroupMemberListItemDTO> response = socialMapper.getChatGroupMemberList(groupId);
-        return ResponseData.success(response);
+        try {
+            ArrayList<ChatGroupMemberListItemDTO> response = socialMapper.getChatGroupMemberList(groupId);
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取群聊成员列表失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "获取群聊成员ID列表")
     @GetMapping("/getChatGroupMemberIdList")
     public ResponseData<ArrayList<String>> getChatGroupMemberIdList(@RequestParam String groupId) {
-        ArrayList<String> response;
-        Set<Object> cache = redisUtils.setMembers("chat_group:member:" + groupId);
-        if (cache != null) {
-            response = new ArrayList<>();
-            for (Object id : cache) {
-                response.add((String) id);
+        try {
+            ArrayList<String> response;
+            Set<Object> cache = redisUtils.setMembers("chat_group:member:" + groupId);
+            if (cache != null) {
+                response = new ArrayList<>();
+                for (Object id : cache) {
+                    response.add((String) id);
+                }
             }
+            else {
+                response = socialMapper.getChatGroupMemberIdList(groupId);
+            }
+            return ResponseData.success(response);
         }
-        else {
-            response = socialMapper.getChatGroupMemberIdList(groupId);
+        catch (Exception e) {
+            log.error("获取群聊成员ID列表失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
         }
-        return ResponseData.success(response);
     }
     
     @Operation(summary = "退出群聊")
     @DeleteMapping("/quitChatGroup")
     public ResponseData<Boolean> quitChatGroup(@RequestParam String userId, @RequestParam String groupId) {
-        if (socialMapper.quitChatGroup(userId, groupId) == 1) {
-            redisUtils.setRemove("chat_group:member:" + groupId, userId);
-            return ResponseData.success(true);
+        try {
+            if (socialMapper.quitChatGroup(userId, groupId) == 1) {
+                redisUtils.setRemove("chat_group:member:" + groupId, userId);
+                return ResponseData.success(true);
+            }
+            return ResponseData.error(ResponseConfig.ERROR);
         }
-        return ResponseData.error(ResponseConfig.ERROR);
+        catch (Exception e) {
+            log.error("退出群聊失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "根据名称获取组织成员列表")
     @GetMapping("/getOrgMemberListByName")
     public ResponseData<ArrayList<OrgTreeUserNodeDTO>> getOrgMemberListByName(@RequestParam String orgId, @RequestParam String searchKey) {
-        ArrayList<OrgTreeUserNodeDTO> response = socialMapper.getOrgMemberListByName(orgId, searchKey);
-        return ResponseData.success(response);
+        try {
+            ArrayList<OrgTreeUserNodeDTO> response = socialMapper.getOrgMemberListByName(orgId, searchKey);
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取组织成员列表失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "邀请新的群聊成员")

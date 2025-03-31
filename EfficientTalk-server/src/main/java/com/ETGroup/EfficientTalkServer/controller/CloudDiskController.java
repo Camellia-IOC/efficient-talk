@@ -170,15 +170,27 @@ public class CloudDiskController {
     @Operation(summary = "获取云盘文件Blob")
     @GetMapping("/getCloudDiskFileBlob")
     public ResponseEntity<byte[]> getCloudDiskFileBlob(@RequestParam String diskId, @RequestParam String fileId) {
-        Map<String, String> fileInfo = cloudDiskMapper.getFileName(diskId, fileId);
-        String fileName = fileId + "." + fileInfo.get("fileType");
-        return fileUtils.getOSSFileBlob(diskId, fileName, fileInfo.get("fileName"));
+        try {
+            Map<String, String> fileInfo = cloudDiskMapper.getFileName(diskId, fileId);
+            String fileName = fileId + "." + fileInfo.get("fileType");
+            return fileUtils.getOSSFileBlob(diskId, fileName, fileInfo.get("fileName"));
+        }
+        catch (Exception e) {
+            log.error("获取云盘文件Blob失败", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
     @Operation(summary = "获取云盘文件下载地址")
     @GetMapping("/getCloudDiskFileDownloadUrl")
     public ResponseData<FileDownloadInfoResponseVO> getCloudDiskFileDownloadUrl(@RequestParam String diskId, @RequestParam String fileId) {
-        FileDownloadInfoResponseVO response = cloudDiskMapper.getFileDownloadInfo(diskId, fileId);
-        return ResponseData.success(response);
+        try {
+            FileDownloadInfoResponseVO response = cloudDiskMapper.getFileDownloadInfo(diskId, fileId);
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取云盘文件下载地址失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
 }

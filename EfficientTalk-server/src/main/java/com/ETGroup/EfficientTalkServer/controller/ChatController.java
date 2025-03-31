@@ -172,25 +172,30 @@ public class ChatController {
         String objectId;
         String objectName;
         Map<String, String> objectInfo;
-        if (type.equals("media")) {
-            bucketName = isGroup ? ossUtils.getChatGroupImageBucketName(groupId) : ossUtils.getChatImageBucketName();
-            objectInfo = isGroup ? chatMapper.getGroupChatImageInfo(fileId) : chatMapper.getChatImageInfo(fileId);
-            objectId = fileId + "." + objectInfo.get("imageType");
-            objectName = objectInfo.get("imageName");
+        try {
+            if (type.equals("media")) {
+                bucketName = isGroup ? ossUtils.getChatGroupImageBucketName(groupId) : ossUtils.getChatImageBucketName();
+                objectInfo = isGroup ? chatMapper.getGroupChatImageInfo(fileId) : chatMapper.getChatImageInfo(fileId);
+                objectId = fileId + "." + objectInfo.get("imageType");
+                objectName = objectInfo.get("imageName");
+            }
+            else if (type.equals("file")) {
+                bucketName = isGroup ? ossUtils.getChatGroupFileBucketName(groupId) : ossUtils.getChatFileBucketName();
+                objectInfo = isGroup ? chatMapper.getGroupChatFileInfo(fileId) : chatMapper.getChatFileInfo(fileId);
+                objectId = fileId + "." + objectInfo.get("fileType");
+                objectName = objectInfo.get("fileName");
+            }
+            else {
+                bucketName = null;
+                objectId = null;
+                objectName = null;
+            }
+            return fileUtils.getOSSFileBlob(bucketName, objectId, objectName);
         }
-        else if (type.equals("file")) {
-            bucketName = isGroup ? ossUtils.getChatGroupFileBucketName(groupId) : ossUtils.getChatFileBucketName();
-            objectInfo = isGroup ? chatMapper.getGroupChatFileInfo(fileId) : chatMapper.getChatFileInfo(fileId);
-            objectId = fileId + "." + objectInfo.get("fileType");
-            objectName = objectInfo.get("fileName");
+        catch (Exception e) {
+            log.error("获取聊天文件Blob失败", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        else {
-            bucketName = null;
-            objectId = null;
-            objectName = null;
-        }
-        
-        return fileUtils.getOSSFileBlob(bucketName, objectId, objectName);
     }
     
     @Operation(summary = "创建群聊")
@@ -204,12 +209,18 @@ public class ChatController {
     @GetMapping("/getChatFileDownloadUrl")
     public ResponseData<FileDownloadInfoResponseVO> getChatFileDownloadUrl(@RequestParam String fileId, @RequestParam Boolean isGroup) {
         FileDownloadInfoResponseVO response;
-        if (isGroup) {
-            response = chatMapper.getChatGroupFileDownloadInfo(fileId);
+        try {
+            if (isGroup) {
+                response = chatMapper.getChatGroupFileDownloadInfo(fileId);
+            }
+            else {
+                response = chatMapper.getChatFileDownloadInfo(fileId);
+            }
+            return ResponseData.success(response);
         }
-        else {
-            response = chatMapper.getChatFileDownloadInfo(fileId);
+        catch (Exception e) {
+            log.error("获取云盘文件下载地址失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
         }
-        return ResponseData.success(response);
     }
 }
