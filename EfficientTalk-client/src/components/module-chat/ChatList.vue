@@ -229,10 +229,8 @@
         CloseCircleOutlined
     } from "@ant-design/icons-vue";
     import { formatMessageTime } from "../../utils/time-utils.js";
-    import UserApi from "../../api/modules/UserApi.js";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
-    import { saveChatRecord } from "../../database/chat-history.js";
     import ChatGroupIcon from "../icon/ChatGroupIcon.vue";
     import GroupCreatorDialog from "../dialog/module-chat/group-creator/GroupCreatorDialog.vue";
     import { useChatDataStore } from "../../store/ChatDataStore.js";
@@ -407,104 +405,6 @@
         return null;
     };
 
-    // 获取缓存的聊天记录
-    const getChatHistoryCache = async (userId) => {
-        const response = await ChatApi.getChatHistoryCache({
-            userId: userId
-        });
-
-        const res = response.data;
-        if (res.code === 0) {
-            let data = res.data.chatHistory;
-            if (data.length === 0) {
-                return;
-            }
-
-            for (let i = 0; i < data.length; i++) {
-                // 保存聊天记录至本地
-                const message = data[i];
-                await saveChatRecord(message);
-
-                let existFlag = false;
-                // 遍历置顶列表
-                for (let j = 0; j < chatDataStore.chatList.vipList.length; j++) {
-                    if (chatDataStore.chatList.vipList[j].userId === message.sender) {
-                        if (chatDataStore.chatList.vipList[j].lastMessageTime < message.time) {
-                            chatDataStore.chatList.vipList[j].lastMessage = chatDataStore.translateMessageContent(message.type, message.content);
-                            chatDataStore.chatList.vipList[j].lastMessageTime = message.time;
-
-                            // 将对应元素提到数组第一个
-                            chatDataStore.chatList.vipList.unshift(chatDataStore.chatList.vipList.splice(j, 1)[0]);
-                        }
-                        // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                        if (chatDataStore.curChatId !== message.sender) {
-                            chatDataStore.chatList.vipList[j].unreadCount++;
-                        }
-                        existFlag = true;
-                        break;
-                    }
-                }
-
-                // 如果在置顶列表中没有找到，再遍历普通列表
-                if (!existFlag) {
-                    for (let j = 0; j < chatDataStore.chatList.commonList.length; j++) {
-                        if (chatDataStore.chatList.commonList[j].userId === message.sender) {
-                            if (chatDataStore.chatList.commonList[j].lastMessageTime < message.time) {
-                                chatDataStore.chatList.commonList[j].lastMessage = chatDataStore.translateMessageContent(message.type, message.content);
-                                chatDataStore.chatList.commonList[j].lastMessageTime = message.time;
-
-                                // 将对应元素提到数组第一个
-                                chatDataStore.chatList.commonList.unshift(chatDataStore.chatList.commonList.splice(j, 1)[0]);
-                            }
-                            // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
-                            if (chatDataStore.curChatId !== message.sender) {
-                                chatDataStore.chatList.commonList[j].unreadCount++;
-                            }
-                            existFlag = true;
-                            break;
-                        }
-                    }
-                }
-
-                // 如果不存在该用户，则添加到聊天列表中
-                if (!existFlag) {
-                    let newMessage = {
-                        userId: message.sender,
-                        userName: null,
-                        userAvatar: null,
-                        lastMessage: chatDataStore.translateMessageContent(message.type, message.content),
-                        lastMessageTime: message.time,
-                        unreadCount: 1
-                    };
-
-                    // 获取用户基本信息
-                    await UserApi.getUserBasicInfo({
-                        userId: message.sender
-                    }).then((response) => {
-                        const res = response.data;
-                        if (res.code === 0) {
-                            const data = res.data;
-                            if (data != null) {
-                                newMessage.userName = data.userName;
-                                newMessage.userAvatar = data.userAvatar;
-                            }
-                        }
-                    }).catch(() => {
-                        console.error("获取用户基本信息失败");
-                        newMessage.userName = "未知用户";
-                        // TODO 默认头像需要替换
-                        newMessage.userAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png";
-                    });
-
-                    chatDataStore.chatList.commonList.unshift(newMessage);
-                }
-            }
-        }
-
-        // 保存聊天列表至本地和云端
-        chatDataStore.handleSaveChatList();
-    };
-
     onBeforeMount(async () => {
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
@@ -516,9 +416,6 @@
             chatDataStore.chatList = await getChatList(curLoginUser.value.userId);
             isFriendListLoading.value = false;
         }
-
-        // 获取缓存的聊天记录，并更新至聊天列表
-        await getChatHistoryCache(curLoginUser.value.userId);
 
         // 如果传入的好友ID不为null,则将聊天对象设置为该好友
         if (props.friendInfo !== null) {

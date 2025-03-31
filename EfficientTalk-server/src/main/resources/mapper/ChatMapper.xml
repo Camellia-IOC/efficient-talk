@@ -5,14 +5,14 @@
 <mapper namespace="com.ETGroup.EfficientTalkServer.mapper.ChatMapper">
 	<!--保存聊天记录-->
 	<insert id="saveChatHistory" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
-		INSERT INTO chat_history (id, sender, receiver, type, file_id, content, send_time)
-		VALUES (#{id}, #{sender}, #{receiver}, #{type}, #{fileId}, #{content}, #{time})
+		INSERT INTO chat_history (id, sender, receiver, owner, type, file_id, content, send_time)
+		VALUES (#{id}, #{sender}, #{receiver}, #{owner}, #{type}, #{fileId}, #{content}, #{time})
 	</insert>
 
 	<!--保存群聊聊天记录-->
 	<insert id="saveGroupChatHistory" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
-		INSERT INTO chat_group_history (id, sender, receiver, type, file_id, content, send_time)
-		VALUES (#{id}, #{sender}, #{receiver}, #{type}, #{fileId}, #{content}, #{time})
+		INSERT INTO chat_group_history (id, sender, receiver, owner, type, file_id, content, send_time)
+		VALUES (#{id}, #{sender}, #{receiver}, #{owner}, #{type}, #{fileId}, #{content}, #{time})
 	</insert>
 
 	<!--缓存聊天记录-->
@@ -61,8 +61,8 @@
 		FROM chat_history
 				 LEFT JOIN chat_files ON chat_history.file_id = chat_files.file_id
 		<where>
-			((chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
-				OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId}))
+			((chat_history.owner = #{userId} AND chat_history.receiver = #{friendId})
+				OR (chat_history.owner = #{userId} AND chat_history.sender = #{friendId}))
 			<if test="lastTime != null">
 				AND send_time &lt; #{lastTime}
 			</if>
@@ -90,6 +90,7 @@
 				 LEFT JOIN users ON chat_group_history.sender = users.id
 		<where>
 			chat_group_history.receiver = #{groupId}
+			  AND chat_group_history.owner = #{userId}
 			<if test="lastTime != null">
 				AND send_time &lt; #{lastTime}
 			</if>
@@ -202,8 +203,8 @@
 			LEFT JOIN chat_files ON chat_history.file_id = chat_files.file_id
 		</if>
 		<where>
-			((chat_history.sender = #{userId} AND chat_history.receiver = #{friendId})
-				OR (chat_history.receiver = #{userId} AND chat_history.sender = #{friendId}))
+			((chat_history.owner = #{userId} AND chat_history.receiver = #{friendId})
+				OR (chat_history.owner = #{userId} AND chat_history.sender = #{friendId}))
 			<if test="type == 'all' and (searchKey != null and searchKey != '')">
 				AND chat_history.content LIKE CONCAT('%', #{searchKey}, '%')
 			</if>
@@ -258,6 +259,7 @@
 		</if>
 		<where>
 			chat_group_history.receiver = #{groupId}
+			  AND chat_group_history.owner = #{userId}
 			<if test="type == 'all' and (searchKey != null and searchKey != '')">
 				AND chat_group_history.content LIKE CONCAT('%', #{searchKey}, '%')
 			</if>
@@ -319,6 +321,13 @@
 	<delete id="deleteChatHistory">
 		DELETE
 		FROM chat_history
+		WHERE id = #{messageId}
+	</delete>
+
+	<!--删除群聊聊天记录-->
+	<delete id="deleteGroupChatHistory">
+		DELETE
+		FROM chat_group_history
 		WHERE id = #{messageId}
 	</delete>
 

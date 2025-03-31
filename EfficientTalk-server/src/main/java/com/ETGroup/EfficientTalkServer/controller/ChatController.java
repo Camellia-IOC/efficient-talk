@@ -80,15 +80,21 @@ public class ChatController {
     @GetMapping("/getChatHistoryCache")
     public ResponseData<ChatHistoryResponseVO> getChatHistoryCache(@RequestParam String userId) {
         ChatHistoryResponseVO response = new ChatHistoryResponseVO();
-        response.setChatHistory(chatService.getChatHistoryCache(userId));
-        return ResponseData.success(response);
+        try {
+            response.setChatHistory(chatService.getChatHistoryCache(userId));
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取缓存的聊天记录失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
     }
     
     @Operation(summary = "删除聊天记录")
     @DeleteMapping("/deleteChatHistory")
     public ResponseData<Void> deleteChatHistory(@RequestParam("idList") ArrayList<String> idList,
                                                 @RequestParam(defaultValue = "false") boolean isGroup) {
-        if (chatService.deleteChatHistory(idList)) {
+        if (chatService.deleteChatHistory(idList, isGroup)) {
             return ResponseData.success();
         }
         else {

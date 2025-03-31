@@ -1002,7 +1002,8 @@
 
             const idList = idListStr.split(",");
             ChatApi.deleteChatHistory({
-                idList: idListStr
+                idList: idListStr,
+                isGroup: props.chatInfo.isGroup
             }).then((response) => {
                 const res = response.data;
                 if (res.code === 0) {
@@ -1037,7 +1038,7 @@
             for (let i = 0; i < userList.length; i++) {
                 for (let j = 0; j < messageList.length; j++) {
                     const newMessage = {
-                        id: UUID.generate(),
+                        id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
                         sender: curLoginUser.value.userId,
                         receiver: userList[i],
                         type: messageList[j].type,
@@ -1185,7 +1186,7 @@
         }
         else {
             const message = {
-                id: UUID.generate(),
+                id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
                 sender: curLoginUser.value.userId,
                 senderAvatar: curLoginUser.value.userAvatar,
                 senderName: curLoginUser.value.userName,
@@ -1272,7 +1273,7 @@
 
                 // 发送消息
                 const message = {
-                    id: UUID.generate(),
+                    id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
                     sender: curLoginUser.value.userId,
                     receiver: props.chatInfo.userId,
                     type: messageItem.type,

@@ -16,6 +16,8 @@ public class ChatRecordDTO {
     private String senderName = null;
     // 接收者ID
     private String receiver;
+    // 消息所属用户ID
+    private String owner;
     // 消息类型
     private String type;
     // 图片名

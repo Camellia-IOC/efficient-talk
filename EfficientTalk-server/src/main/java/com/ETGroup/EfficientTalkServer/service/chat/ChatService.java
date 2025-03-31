@@ -50,6 +50,15 @@ public interface ChatService {
     ArrayList<ChatRecordDTO> getChatHistoryCache(String userId);
     
     /**
+     * 删除聊天记录缓存
+     *
+     * @param userId 用户ID
+     *
+     * @return 是否删除成功
+     */
+    Boolean deleteChatHistoryCache(String userId);
+    
+    /**
      * 保存对话列表
      *
      * @param param 保存参数
@@ -176,11 +185,12 @@ public interface ChatService {
     /**
      * 删除聊天记录
      *
-     * @param idList 聊天记录ID
+     * @param idList  聊天记录ID
+     * @param isGroup 是否为群聊
      *
      * @return 是否删除成功
      */
-    boolean deleteChatHistory(ArrayList<String> idList);
+    boolean deleteChatHistory(ArrayList<String> idList, Boolean isGroup);
     
     /**
      * 创建群聊

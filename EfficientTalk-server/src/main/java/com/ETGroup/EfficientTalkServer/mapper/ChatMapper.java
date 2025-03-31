@@ -116,7 +116,8 @@ public interface ChatMapper {
     /**
      * 分类获取群聊聊天记录
      *
-     * @param groupId   用户ID
+     * @param userId    用户ID
+     * @param groupId   群聊ID
      * @param pageIndex 页码
      * @param pageSize  页面大小
      * @param type      消息类型
@@ -125,7 +126,8 @@ public interface ChatMapper {
      *
      * @return 聊天记录
      */
-    ArrayList<ChatRecordDTO> getGroupChatHistoryByType(@Param("groupId") String groupId,
+    ArrayList<ChatRecordDTO> getGroupChatHistoryByType(@Param("userId") String userId,
+                                                       @Param("groupId") String groupId,
                                                        @Param("pageIndex") Integer pageIndex,
                                                        @Param("pageSize") Integer pageSize,
                                                        @Param("type") String type,
@@ -176,6 +178,16 @@ public interface ChatMapper {
      * @return 删除条数
      */
     int deleteChatHistory(@Param("messageId") String messageId);
+    
+    
+    /**
+     * 删除群聊聊天记录
+     *
+     * @param messageId 消息id
+     *
+     * @return 删除条数
+     */
+    int deleteGroupChatHistory(@Param("messageId") String messageId);
     
     /**
      * 获取聊天图片信息

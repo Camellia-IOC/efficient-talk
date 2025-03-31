@@ -4,6 +4,7 @@ import com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
 import com.ETGroup.EfficientTalkServer.service.chat.ChatService;
 import com.ETGroup.EfficientTalkServer.utils.RedisUtils;
+import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import jakarta.websocket.*;
@@ -56,12 +57,29 @@ public class ChatEndpoint {
             while (true) {
                 message = (String) redisUtils.listLeftPop("chat_history_cache:" + userId);
                 if (message != null) {
+                    ChatRecordDTO msg = JSON.parseObject(message, ChatRecordDTO.class);
+                    msg.setId(UUIDUtils.generateTimeStampUUID());
+                    msg.setOwner(userId);
                     session.getBasicRemote()
-                           .sendText(message);
+                           .sendText(JSON.toJSONString(msg));
+                    if (msg.getIsGroup()) {
+                        chatService.saveGroupChatHistory(msg);
+                    }
+                    else {
+                        chatService.saveChatHistory(msg);
+                    }
                 }
                 else {
                     break;
                 }
+            }
+            
+            // 删除数据库中的缓存记录
+            if (chatService.deleteChatHistoryCache(userId)) {
+                log.info("清理聊天记录缓存成功");
+            }
+            else {
+                log.error("清理聊天记录缓存失败");
             }
         }
         catch (IOException e) {
@@ -78,6 +96,7 @@ public class ChatEndpoint {
             
             // 如果是群聊消息
             if (msg.getIsGroup()) {
+                msg.setOwner(msg.getSender());
                 if (chatService.saveGroupChatHistory(msg) == 1) {
                     log.info("保存群聊聊天记录成功");
                 }
@@ -96,12 +115,17 @@ public class ChatEndpoint {
                         log.info("缓存群聊聊天记录成功");
                     }
                     else {
+                        msg.setIsCache(false);
+                        msg.setId(UUIDUtils.generateTimeStampUUID());
+                        msg.setOwner(memberId);
                         session.getBasicRemote()
-                               .sendText(message);
+                               .sendText(JSON.toJSONString(msg));
+                        chatService.saveGroupChatHistory(msg);
                     }
                 }
             }
             else {
+                msg.setOwner(msg.getSender());
                 if (chatService.saveChatHistory(msg) == 1) {
                     log.info("保存聊天记录成功");
                 }
@@ -118,8 +142,11 @@ public class ChatEndpoint {
                         }
                     }
                     else {
+                        msg.setId(UUIDUtils.generateTimeStampUUID());
+                        msg.setOwner(msg.getReceiver());
                         session.getBasicRemote()
-                               .sendText(message);
+                               .sendText(JSON.toJSONString(msg));
+                        chatService.saveChatHistory(msg);
                     }
                 }
             }

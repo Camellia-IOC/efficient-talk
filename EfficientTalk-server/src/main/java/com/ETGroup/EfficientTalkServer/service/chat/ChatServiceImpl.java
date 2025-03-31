@@ -14,6 +14,7 @@ import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -66,10 +67,33 @@ public class ChatServiceImpl implements ChatService {
      * @return 聊天记录
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ArrayList<ChatRecordDTO> getChatHistoryCache(String userId) {
         ArrayList<ChatRecordDTO> chatHistoryCache = chatMapper.getChatHistoryCache(userId);
+        for (ChatRecordDTO record : chatHistoryCache) {
+            record.setIsCache(true);
+        }
         chatMapper.deleteChatHistoryCache(userId);
         return chatHistoryCache;
+    }
+    
+    /**
+     * 删除聊天记录缓存
+     *
+     * @param userId 用户ID
+     *
+     * @return 是否删除成功
+     */
+    @Override
+    public Boolean deleteChatHistoryCache(String userId) {
+        try {
+            chatMapper.deleteChatHistoryCache(userId);
+            return true;
+        }
+        catch (Exception e) {
+            log.error("删除缓存失败", e);
+            return false;
+        }
     }
     
     /**
@@ -312,7 +336,7 @@ public class ChatServiceImpl implements ChatService {
                                                          LocalDateTime lastTime,
                                                          Boolean isGroup) {
         if (isGroup) {
-            return chatMapper.getGroupChatHistoryByType(friendId, pageIndex, pageSize, type, searchKey, lastTime);
+            return chatMapper.getGroupChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime);
         }
         else {
             return chatMapper.getChatHistoryByType(userId, friendId, pageIndex, pageSize, type, searchKey, lastTime);
@@ -322,15 +346,25 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 删除聊天记录
      *
-     * @param idList 聊天记录ID
+     * @param idList  聊天记录ID
+     * @param isGroup 是否为群聊
      *
      * @return 是否删除成功
      */
     @Override
-    public boolean deleteChatHistory(ArrayList<String> idList) {
-        for (String id : idList) {
-            if (chatMapper.deleteChatHistory(id) != 1) {
-                return false;
+    public boolean deleteChatHistory(ArrayList<String> idList, Boolean isGroup) {
+        if (isGroup) {
+            for (String id : idList) {
+                if (chatMapper.deleteGroupChatHistory(id) != 1) {
+                    return false;
+                }
+            }
+        }
+        else {
+            for (String id : idList) {
+                if (chatMapper.deleteChatHistory(id) != 1) {
+                    return false;
+                }
             }
         }
         return true;

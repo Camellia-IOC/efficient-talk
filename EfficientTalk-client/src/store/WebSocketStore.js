@@ -32,6 +32,7 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
             const messageData = JSON.parse(message.data);
             console.log("收到服务器消息：", messageData);
 
+            // TODO 缓存消息优化
             // 保存聊天记录
             saveChatRecord(messageData).then();
 
