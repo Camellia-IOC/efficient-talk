@@ -22,7 +22,7 @@ export const useChatDataStore = defineStore("chat-data-store", () => {
 
     // 当前聊天对象
     const curChatId = ref("");
-    const curSelectedChatInfo = ref(null)
+    const curSelectedChatInfo = ref(null);
 
     // 未读消息总数
     const totalUnreadCount = computed(() => {
@@ -152,24 +152,8 @@ export const useChatDataStore = defineStore("chat-data-store", () => {
                 }
             }
             else {
-                // 获取用户基本信息
-                await UserApi.getUserBasicInfo({
-                    userId: message.sender
-                }).then((response) => {
-                    const res = response.data;
-                    if (res.code === 0) {
-                        const data = res.data;
-                        if (data != null) {
-                            newMessage.userName = data.userName;
-                            newMessage.userAvatar = data.userAvatar;
-                        }
-                    }
-                }).catch(() => {
-                    console.error("获取用户基本信息失败");
-                    newMessage.userName = "未知用户";
-                    // TODO 默认头像需要替换
-                    newMessage.userAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png";
-                });
+                newMessage.userName = message.senderName;
+                newMessage.userAvatar = message.senderAvatar;
             }
 
             chatList.value.commonList.unshift(newMessage);
@@ -182,7 +166,7 @@ export const useChatDataStore = defineStore("chat-data-store", () => {
      * 发送消息
      * @param message 消息
      */
-    const sendMessage = (message) => {
+    const sendMessage = async (message) => {
         const receiver = message.receiver;
 
         // 遍历消息列表，修改相应的元素内容
@@ -213,7 +197,51 @@ export const useChatDataStore = defineStore("chat-data-store", () => {
         }
 
         if (!existFlag) {
-            // TODO 转发消息后需要更新聊天列表
+            let newMessage = {
+                userId: message.sender,
+                userName: null,
+                userAvatar: null,
+                lastMessage: message.content,
+                lastMessageTime: message.time,
+                unreadCount: 1,
+                isGroup: message.isGroup,
+                creator: null
+            };
+
+            if (message.isGroup) {
+                newMessage.userId = message.receiver;
+
+                const response = await SocialApi.getChatGroupBasicInfo({
+                    groupId: message.receiver
+                });
+
+                const res = response.data;
+                if (res.code === 0) {
+                    newMessage.userName = res.data.groupName;
+                    newMessage.creator = res.data.creator;
+                }
+            }
+            else {
+                // 获取用户基本信息
+                await UserApi.getUserBasicInfo({
+                    userId: message.receiver
+                }).then((response) => {
+                    const res = response.data;
+                    if (res.code === 0) {
+                        const data = res.data;
+                        if (data != null) {
+                            newMessage.userName = data.userName;
+                            newMessage.userAvatar = data.userAvatar;
+                        }
+                    }
+                }).catch(() => {
+                    console.error("获取用户基本信息失败");
+                    newMessage.userName = "未知用户";
+                    newMessage.userAvatar = null;
+                });
+            }
+
+            chatList.value.commonList.unshift(newMessage);
         }
 
         // 保存聊天列表至本地和云端
