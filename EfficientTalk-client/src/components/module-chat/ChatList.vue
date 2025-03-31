@@ -16,13 +16,13 @@
             :spinning="isFriendListLoading"
     >
       <EmptyContainer description="暂无进行中的会话"
-                      v-show="chatListFilter(chatList.commonList).length===0&&chatListFilter(chatList.vipList).length===0"
+                      v-show="chatListFilter(chatDataStore.chatList.commonList).length===0&&chatListFilter(chatDataStore.chatList.vipList).length===0"
       />
       <div class="chat-list-item-container"
-           v-show="chatListFilter(chatList.vipList).length!==0"
+           v-show="chatListFilter(chatDataStore.chatList.vipList).length!==0"
       >
         <a-dropdown :trigger="['contextmenu']"
-                    v-for="(item,index) in chatListFilter(chatList.vipList) "
+                    v-for="(item,index) in chatListFilter(chatDataStore.chatList.vipList) "
                     :key="index"
         >
           <div class="chat-list-item chat-list-item-top"
@@ -112,10 +112,10 @@
         </a-dropdown>
       </div>
       <div class="chat-list-item-container"
-           v-show="chatListFilter(chatList.commonList).length!==0"
+           v-show="chatListFilter(chatDataStore.chatList.commonList).length!==0"
       >
         <a-dropdown :trigger="['contextmenu']"
-                    v-for="(item,index) in chatListFilter(chatList.commonList) "
+                    v-for="(item,index) in chatListFilter(chatDataStore.chatList.commonList) "
                     :key="index"
         >
           <div class="chat-list-item"
@@ -238,6 +238,7 @@
     import ChatGroupIcon from "../icon/ChatGroupIcon.vue";
     import SocialApi from "../../api/modules/SocialApi.js";
     import GroupCreatorDialog from "../dialog/module-chat/group-creator/GroupCreatorDialog.vue";
+    import { useChatDataStore } from "../../store/ChatDataStore.js";
 
     const props = defineProps({
         friendInfo: {
@@ -246,16 +247,19 @@
         }
     });
 
-    // 创建群聊对话框控制
-    const groupCreatorDialogRef = ref();
-    const handleOpenGroupCreatorDialog = () => {
-        groupCreatorDialogRef.value.dialogOpen(curLoginUser.value.orgId, curLoginUser.value.userId);
-    };
+    // 聊天数据
+    const chatDataStore = useChatDataStore();
 
     // 当前登录的用户信息
     const curLoginUser = ref({});
     const updateCurLoginUser = async () => {
         curLoginUser.value = await getCurUserData();
+    };
+
+    // 创建群聊对话框控制
+    const groupCreatorDialogRef = ref();
+    const handleOpenGroupCreatorDialog = () => {
+        groupCreatorDialogRef.value.dialogOpen(curLoginUser.value.orgId, curLoginUser.value.userId);
     };
 
     // 聊天列表加载标识符
@@ -303,13 +307,13 @@
      * @param {string} userId 用户ID
      */
     const setUserMessageToTop = (userId) => {
-        for (let i = 0; i < chatList.value.commonList.length; i++) {
-            if (chatList.value.commonList[i].userId === userId) {
-                chatList.value.vipList.unshift(chatList.value.commonList[i]);
-                chatList.value.commonList.splice(i, 1);
+        for (let i = 0; i < chatDataStore.chatList.commonList.length; i++) {
+            if (chatDataStore.chatList.commonList[i].userId === userId) {
+                chatDataStore.chatList.vipList.unshift(chatDataStore.chatList.commonList[i]);
+                chatDataStore.chatList.commonList.splice(i, 1);
             }
         }
-        handleSaveChatList(chatList.value);
+        handleSaveChatList(chatDataStore.chatList);
     };
 
     /**
@@ -317,13 +321,13 @@
      * @param {string} userId 用户ID
      */
     const setUserMessageToCommon = (userId) => {
-        for (let i = 0; i < chatList.value.vipList.length; i++) {
-            if (chatList.value.vipList[i].userId === userId) {
-                chatList.value.commonList.unshift(chatList.value.vipList[i]);
-                chatList.value.vipList.splice(i, 1);
+        for (let i = 0; i < chatDataStore.chatList.vipList.length; i++) {
+            if (chatDataStore.chatList.vipList[i].userId === userId) {
+                chatDataStore.chatList.commonList.unshift(chatDataStore.chatList.vipList[i]);
+                chatDataStore.chatList.vipList.splice(i, 1);
             }
         }
-        handleSaveChatList(chatList.value);
+        handleSaveChatList(chatDataStore.chatList);
     };
 
     /**
@@ -332,19 +336,19 @@
      * @param {boolean} state 已读状态
      */
     const setMessageReadState = (userId, state) => {
-        for (let i = 0; i < chatList.value.vipList.length; i++) {
-            if (chatList.value.vipList[i].userId === userId) {
-                const unreadCount = chatList.value.vipList[i].unreadCount === 0 ? 1 : chatList.value.vipList[i].unreadCount;
-                chatList.value.vipList[i].unreadCount = state ? 0 : unreadCount;
-                handleSaveChatList(chatList.value);
+        for (let i = 0; i < chatDataStore.chatList.vipList.length; i++) {
+            if (chatDataStore.chatList.vipList[i].userId === userId) {
+                const unreadCount = chatDataStore.chatList.vipList[i].unreadCount === 0 ? 1 : chatDataStore.chatList.vipList[i].unreadCount;
+                chatDataStore.chatList.vipList[i].unreadCount = state ? 0 : unreadCount;
+                handleSaveChatList(chatDataStore.chatList);
                 return;
             }
         }
-        for (let i = 0; i < chatList.value.commonList.length; i++) {
-            if (chatList.value.commonList[i].userId === userId) {
-                const unreadCount = chatList.value.commonList[i].unreadCount === 0 ? 1 : chatList.value.commonList[i].unreadCount;
-                chatList.value.commonList[i].unreadCount = state ? 0 : unreadCount;
-                handleSaveChatList(chatList.value);
+        for (let i = 0; i < chatDataStore.chatList.commonList.length; i++) {
+            if (chatDataStore.chatList.commonList[i].userId === userId) {
+                const unreadCount = chatDataStore.chatList.commonList[i].unreadCount === 0 ? 1 : chatDataStore.chatList.commonList[i].unreadCount;
+                chatDataStore.chatList.commonList[i].unreadCount = state ? 0 : unreadCount;
+                handleSaveChatList(chatDataStore.chatList);
                 return;
             }
         }
@@ -355,18 +359,18 @@
      * @param {string} userId 用户ID
      */
     const deleteFromChatList = (userId) => {
-        for (let i = 0; i < chatList.value.vipList.length; i++) {
-            if (chatList.value.vipList[i].userId === userId) {
-                chatList.value.vipList.splice(i, 1);
-                handleSaveChatList(chatList.value);
+        for (let i = 0; i < chatDataStore.chatList.vipList.length; i++) {
+            if (chatDataStore.chatList.vipList[i].userId === userId) {
+                chatDataStore.chatList.vipList.splice(i, 1);
+                handleSaveChatList(chatDataStore.chatList);
                 emits("setSelectedChat", null);
                 return;
             }
         }
-        for (let i = 0; i < chatList.value.commonList.length; i++) {
-            if (chatList.value.commonList[i].userId === userId) {
-                chatList.value.commonList.splice(i, 1);
-                handleSaveChatList(chatList.value);
+        for (let i = 0; i < chatDataStore.chatList.commonList.length; i++) {
+            if (chatDataStore.chatList.commonList[i].userId === userId) {
+                chatDataStore.chatList.commonList.splice(i, 1);
+                handleSaveChatList(chatDataStore.chatList);
                 emits("setSelectedChat", null);
                 return;
             }
@@ -389,35 +393,35 @@
 
         // 遍历消息列表，修改相应的元素内容
         let existFlag = false;
-        for (let i = 0; i < chatList.value.vipList.length; i++) {
-            if (chatList.value.vipList[i].userId === receiverId) {
-                chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
-                chatList.value.vipList[i].lastMessageTime = message.time;
+        for (let i = 0; i < chatDataStore.chatList.vipList.length; i++) {
+            if (chatDataStore.chatList.vipList[i].userId === receiverId) {
+                chatDataStore.chatList.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
+                chatDataStore.chatList.vipList[i].lastMessageTime = message.time;
 
                 // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
                 if (curChatId.value !== receiverId) {
-                    chatList.value.vipList[i].unreadCount++;
+                    chatDataStore.chatList.vipList[i].unreadCount++;
                 }
 
                 // 将对应元素提到数组第一个
-                chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
+                chatDataStore.chatList.vipList.unshift(chatDataStore.chatList.vipList.splice(i, 1)[0]);
                 existFlag = true;
                 break;
             }
         }
         if (!existFlag) {
-            for (let i = 0; i < chatList.value.commonList.length; i++) {
-                if (chatList.value.commonList[i].userId === receiverId) {
-                    chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
-                    chatList.value.commonList[i].lastMessageTime = message.time;
+            for (let i = 0; i < chatDataStore.chatList.commonList.length; i++) {
+                if (chatDataStore.chatList.commonList[i].userId === receiverId) {
+                    chatDataStore.chatList.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
+                    chatDataStore.chatList.commonList[i].lastMessageTime = message.time;
 
                     // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
                     if (curChatId.value !== receiverId) {
-                        chatList.value.commonList[i].unreadCount++;
+                        chatDataStore.chatList.commonList[i].unreadCount++;
                     }
 
                     // 将对应元素提到数组第一个
-                    chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
+                    chatDataStore.chatList.commonList.unshift(chatDataStore.chatList.commonList.splice(i, 1)[0]);
                     existFlag = true;
                     break;
                 }
@@ -471,11 +475,11 @@
                 });
             }
 
-            chatList.value.commonList.unshift(newMessage);
+            chatDataStore.chatList.commonList.unshift(newMessage);
         }
 
         // 保存聊天列表至本地和云端
-        await handleSaveChatList(chatList.value);
+        await handleSaveChatList(chatDataStore.chatList);
     };
 
     // 发送消息
@@ -485,26 +489,26 @@
 
         // 遍历消息列表，修改相应的元素内容
         let existFlag = false;
-        for (let i = 0; i < chatList.value.vipList.length; i++) {
-            if (chatList.value.vipList[i].userId === receiver) {
+        for (let i = 0; i < chatDataStore.chatList.vipList.length; i++) {
+            if (chatDataStore.chatList.vipList[i].userId === receiver) {
                 existFlag = true;
                 // 根据消息类型修改消息内容
-                chatList.value.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
-                chatList.value.vipList[i].lastMessageTime = message.time;
+                chatDataStore.chatList.vipList[i].lastMessage = translateMessageContent(message.type, message.content);
+                chatDataStore.chatList.vipList[i].lastMessageTime = message.time;
                 // 将对应元素提到数组第一个
-                chatList.value.vipList.unshift(chatList.value.vipList.splice(i, 1)[0]);
+                chatDataStore.chatList.vipList.unshift(chatDataStore.chatList.vipList.splice(i, 1)[0]);
                 break;
             }
         }
         if (!existFlag) {
-            for (let i = 0; i < chatList.value.commonList.length; i++) {
-                if (chatList.value.commonList[i].userId === receiver) {
+            for (let i = 0; i < chatDataStore.chatList.commonList.length; i++) {
+                if (chatDataStore.chatList.commonList[i].userId === receiver) {
                     existFlag = true;
                     // 根据消息类型修改消息内容
-                    chatList.value.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
-                    chatList.value.commonList[i].lastMessageTime = message.time;
+                    chatDataStore.chatList.commonList[i].lastMessage = translateMessageContent(message.type, message.content);
+                    chatDataStore.chatList.commonList[i].lastMessageTime = message.time;
                     // 将对应元素提到数组第一个
-                    chatList.value.commonList.unshift(chatList.value.commonList.splice(i, 1)[0]);
+                    chatDataStore.chatList.commonList.unshift(chatDataStore.chatList.commonList.splice(i, 1)[0]);
                     break;
                 }
             }
@@ -515,7 +519,7 @@
         }
 
         // 保存聊天列表至本地和云端
-        await handleSaveChatList(chatList.value);
+        await handleSaveChatList(chatDataStore.chatList);
     };
 
     const emits = defineEmits(["setSelectedChat"]);
@@ -547,18 +551,10 @@
                 item.unreadCount = 0;
 
                 // 保存聊天列表至本地和云端
-                await handleSaveChatList(chatList.value);
+                await handleSaveChatList(chatDataStore.chatList);
             }
         }
     };
-
-    // 聊天列表
-    const chatList = ref({
-        // 置顶列表
-        vipList: [],
-        // 普通列表
-        commonList: []
-    });
 
     // 从服务器获取聊天列表
     const getCloudChatList = async (userId) => {
@@ -619,18 +615,18 @@
 
                 let existFlag = false;
                 // 遍历置顶列表
-                for (let j = 0; j < chatList.value.vipList.length; j++) {
-                    if (chatList.value.vipList[j].userId === message.sender) {
-                        if (chatList.value.vipList[j].lastMessageTime < message.time) {
-                            chatList.value.vipList[j].lastMessage = translateMessageContent(message.type, message.content);
-                            chatList.value.vipList[j].lastMessageTime = message.time;
+                for (let j = 0; j < chatDataStore.chatList.vipList.length; j++) {
+                    if (chatDataStore.chatList.vipList[j].userId === message.sender) {
+                        if (chatDataStore.chatList.vipList[j].lastMessageTime < message.time) {
+                            chatDataStore.chatList.vipList[j].lastMessage = translateMessageContent(message.type, message.content);
+                            chatDataStore.chatList.vipList[j].lastMessageTime = message.time;
 
                             // 将对应元素提到数组第一个
-                            chatList.value.vipList.unshift(chatList.value.vipList.splice(j, 1)[0]);
+                            chatDataStore.chatList.vipList.unshift(chatDataStore.chatList.vipList.splice(j, 1)[0]);
                         }
                         // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
                         if (curChatId.value !== message.sender) {
-                            chatList.value.vipList[j].unreadCount++;
+                            chatDataStore.chatList.vipList[j].unreadCount++;
                         }
                         existFlag = true;
                         break;
@@ -639,18 +635,18 @@
 
                 // 如果在置顶列表中没有找到，再遍历普通列表
                 if (!existFlag) {
-                    for (let j = 0; j < chatList.value.commonList.length; j++) {
-                        if (chatList.value.commonList[j].userId === message.sender) {
-                            if (chatList.value.commonList[j].lastMessageTime < message.time) {
-                                chatList.value.commonList[j].lastMessage = translateMessageContent(message.type, message.content);
-                                chatList.value.commonList[j].lastMessageTime = message.time;
+                    for (let j = 0; j < chatDataStore.chatList.commonList.length; j++) {
+                        if (chatDataStore.chatList.commonList[j].userId === message.sender) {
+                            if (chatDataStore.chatList.commonList[j].lastMessageTime < message.time) {
+                                chatDataStore.chatList.commonList[j].lastMessage = translateMessageContent(message.type, message.content);
+                                chatDataStore.chatList.commonList[j].lastMessageTime = message.time;
 
                                 // 将对应元素提到数组第一个
-                                chatList.value.commonList.unshift(chatList.value.commonList.splice(j, 1)[0]);
+                                chatDataStore.chatList.commonList.unshift(chatDataStore.chatList.commonList.splice(j, 1)[0]);
                             }
                             // 如果发送消息的用户不是当前聊天对象，则增加未读消息数
                             if (curChatId.value !== message.sender) {
-                                chatList.value.commonList[j].unreadCount++;
+                                chatDataStore.chatList.commonList[j].unreadCount++;
                             }
                             existFlag = true;
                             break;
@@ -688,13 +684,13 @@
                         newMessage.userAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png";
                     });
 
-                    chatList.value.commonList.unshift(newMessage);
+                    chatDataStore.chatList.commonList.unshift(newMessage);
                 }
             }
         }
 
         // 保存聊天列表至本地和云端
-        await handleSaveChatList(chatList.value);
+        await handleSaveChatList(chatDataStore.chatList);
     };
 
     onBeforeMount(async () => {
@@ -708,9 +704,9 @@
 
         // TODO 逻辑需要修改，先获取本地，没有再获取云端
         // 读取聊天列表
-        chatList.value = await getCloudChatList(curLoginUser.value.userId);
-        if (chatList.value === null) {
-            chatList.value = await getChatList(curLoginUser.value.userId);
+        chatDataStore.chatList = await getCloudChatList(curLoginUser.value.userId);
+        if (chatDataStore.chatList === null) {
+            chatDataStore.chatList = await getChatList(curLoginUser.value.userId);
             isFriendListLoading.value = false;
         }
 
@@ -721,28 +717,28 @@
         if (props.friendInfo !== null) {
             let flag = false;
             // 遍历置顶列表
-            for (let i = 0; i < chatList.value.vipList.length; i++) {
-                if (chatList.value.vipList[i].userId === props.friendInfo.userId) {
+            for (let i = 0; i < chatDataStore.chatList.vipList.length; i++) {
+                if (chatDataStore.chatList.vipList[i].userId === props.friendInfo.userId) {
                     flag = true;
                     // 更新聊天对象的名称和头像
-                    chatList.value.vipList[i].userName = props.friendInfo.userName;
-                    chatList.value.vipList[i].userAvatar = props.friendInfo.userAvatar;
+                    chatDataStore.chatList.vipList[i].userName = props.friendInfo.userName;
+                    chatDataStore.chatList.vipList[i].userAvatar = props.friendInfo.userAvatar;
                     // 清空未读消息数
-                    chatList.value.vipList[i].unreadCount = 0;
+                    chatDataStore.chatList.vipList[i].unreadCount = 0;
                     break;
                 }
             }
 
             if (!flag) {
                 // 如果在置顶列表没有找到，遍历普通列表
-                for (let i = 0; i < chatList.value.commonList.length; i++) {
-                    if (chatList.value.commonList[i].userId === props.friendInfo.userId) {
+                for (let i = 0; i < chatDataStore.chatList.commonList.length; i++) {
+                    if (chatDataStore.chatList.commonList[i].userId === props.friendInfo.userId) {
                         flag = true;
                         // 更新聊天对象的名称和头像
-                        chatList.value.commonList[i].userName = props.friendInfo.userName;
-                        chatList.value.commonList[i].userAvatar = props.friendInfo.userAvatar;
+                        chatDataStore.chatList.commonList[i].userName = props.friendInfo.userName;
+                        chatDataStore.chatList.commonList[i].userAvatar = props.friendInfo.userAvatar;
                         // 清空未读消息数
-                        chatList.value.commonList[i].unreadCount = 0;
+                        chatDataStore.chatList.commonList[i].unreadCount = 0;
                         break;
                     }
                 }
@@ -762,11 +758,11 @@
                     chatInfo.creator = props.friendInfo.creator;
                 }
                 // 在聊天列表的头部添加该好友
-                chatList.value.commonList.unshift(chatInfo);
+                chatDataStore.chatList.commonList.unshift(chatInfo);
             }
 
             // 保存对话列表
-            await handleSaveChatList(chatList.value);
+            await handleSaveChatList(chatDataStore.chatList);
 
             curChatId.value = props.friendInfo.userId;
             const chatInfo = {

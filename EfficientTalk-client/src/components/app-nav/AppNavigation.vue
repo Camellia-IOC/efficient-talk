@@ -56,7 +56,21 @@
            :class="{ 'nav-item-active': selectedNavIndex === item.index }"
            @click="handleNavChange(item.index, item.path)"
       >
-        <div class="nav-item-icon">
+        <a-badge :count="chatDataStore.totalUnreadCount"
+                 v-if="item.index === 0"
+        >
+          <div class="nav-item-icon">
+            <component :is="item.iconActive"
+                       v-if="selectedNavIndex === item.index"
+            />
+            <component :is="item.icon"
+                       v-else
+            />
+          </div>
+        </a-badge>
+        <div class="nav-item-icon"
+             v-else
+        >
           <component :is="item.iconActive"
                      v-if="selectedNavIndex === item.index"
           />
@@ -121,9 +135,11 @@
     import { useWebSocketStore } from "../../store/WebSocketStore.js";
     import OnlineStateSwitcherDialog from "../dialog/module-chat/online-state-switcher/OnlineStateSwitcherDialog.vue";
     import MainWindowController from "../../window-controller/main-window-controller.js";
+    import { useChatDataStore } from "../../store/ChatDataStore.js";
 
     const router = useRouter();
     const websocketStore = useWebSocketStore();
+    const chatDataStore = useChatDataStore();
 
     // 用户状态切换对话框
     const onlineStateSwitcherDialogRef = ref();
