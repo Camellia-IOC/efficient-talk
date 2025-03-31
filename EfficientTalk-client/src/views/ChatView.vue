@@ -22,8 +22,11 @@
     import ChatList from "../components/module-chat/ChatList.vue";
     import ChatDetail from "../components/module-chat/ChatDetail.vue";
     import { useRoute } from "vue-router";
+    import { useChatDataStore } from "../store/ChatDataStore.js";
 
     const route = useRoute();
+
+    const chatDataStore = useChatDataStore();
 
     // 组件Ref
     const chatListRef = ref();
@@ -32,12 +35,13 @@
     };
 
     // 选中的聊天
-    const selectedChat = ref(null);
+    const selectedChat = ref(chatDataStore.curSelectedChatInfo);
     const friendInfo = ref(null);
 
     // 设置选中的聊天
     const setSelectedChat = (chat) => {
         selectedChat.value = chat;
+        chatDataStore.curSelectedChatInfo = selectedChat.value;
     };
 
     onBeforeMount(() => {
@@ -50,6 +54,7 @@
                     userAvatar: friendInfo.value.userAvatar,
                     isGroup: friendInfo.value.isGroup
                 };
+                chatDataStore.curSelectedChatInfo = selectedChat.value;
             }
         }
     });

@@ -4,6 +4,7 @@ import { saveChatRecord } from "../database/chat-history.js";
 import UserApi from "../api/modules/UserApi.js";
 import { message } from "ant-design-vue";
 import MainWindowController from "../window-controller/main-window-controller.js";
+import { useChatDataStore } from "./ChatDataStore.js";
 
 // WebSocket全局配置
 export const useWebSocketStore = defineStore("web-socket-store", () => {
@@ -12,6 +13,9 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
     /** @type {Ref<WebSocket>} */
     const socket = ref(null);
     const curLoginUserId = ref(null);
+
+    // 聊天数据全局配置
+    const chatDataStore = useChatDataStore();
 
     // 在线状态
     const onlineState = ref("OUTLINE");
@@ -30,6 +34,9 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
 
             // 保存聊天记录
             saveChatRecord(messageData).then();
+
+            // 更新聊天数据
+            chatDataStore.receiveMessage(messageData).then();
 
             // 广播消息
             window.dispatchEvent(new CustomEvent("messageReceive", {
@@ -68,6 +75,7 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
     const sendMessage = (message) => {
         if (socket.value !== null) {
             socket.value.send(JSON.stringify(message));
+            chatDataStore.sendMessage(message);
         }
     };
 

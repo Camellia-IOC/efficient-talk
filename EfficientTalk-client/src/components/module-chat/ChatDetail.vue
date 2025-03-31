@@ -1417,22 +1417,18 @@
         openChatHistoryChildWindow(data);
     };
 
-    // 聊天对象变化
-    const handleChatObjectChange = async (event) => {
-        // 如果处于消息选择模式，切换回正常模式
-        if (isSelectMessageMode.value) {
-            contextMenuOperations.switchSelectMessageMode();
-        }
-
-        // 关闭详情抽屉
-        chatDetailDrawerConfig.value.closeDrawer();
-
+    /**
+     * 重载聊天记录
+     * @param chatObjectId 聊天对象ID
+     * @param isGroup 是否为群聊
+     */
+    const reloadChatHistory = async (chatObjectId, isGroup) => {
         // 重置分页
         historyPageConfig.value.resetPage();
 
         chatHistory.value = [];
-        const friendId = event.detail.userId;
-        const historyPage = await getCloudChatHistory(friendId, null, event.detail.isGroup);
+        const friendId = chatObjectId;
+        const historyPage = await getCloudChatHistory(friendId, null, isGroup);
         historyPageConfig.value.lastCount = historyPage.length;
         chatHistory.value = chatHistory.value.concat(historyPage.reverse());
         if (chatHistory.value.length === 0) {
@@ -1468,6 +1464,20 @@
                 });
             }
         });
+    };
+
+    // 聊天对象变化
+    const handleChatObjectChange = async (event) => {
+        // 如果处于消息选择模式，切换回正常模式
+        if (isSelectMessageMode.value) {
+            contextMenuOperations.switchSelectMessageMode();
+        }
+
+        // 关闭详情抽屉
+        chatDetailDrawerConfig.value.closeDrawer();
+
+        // 重载聊天记录
+        await reloadChatHistory(event.detail.userId, event.detail.isGroup);
     };
 
     // 处理文件下载
@@ -1522,6 +1532,10 @@
 
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
+
+        if (props.chatInfo !== null) {
+            await reloadChatHistory(props.chatInfo.userId, props.chatInfo.isGroup);
+        }
     });
 
     onBeforeUnmount(() => {
