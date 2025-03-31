@@ -95,12 +95,13 @@
 		ORDER BY handleTime DESC
 	</select>
 
-	<!--检查是否存在关联记录,返回关联邀请记录ID-->
+	<!--检查是否存在关联记录,返回关联邀请记录-->
 	<select id="checkRelativeInvitation" resultType="java.lang.String">
-		SELECT id
+		SELECT friend_invitations.id
 		FROM friend_invitations
-		WHERE user_id = #{userId}
-		  AND friend_id = #{friendId}
+		WHERE friend_invitations.user_id = #{userId}
+		  AND friend_invitations.friend_id = #{friendId}
+		  AND friend_invitations.state = 0
 	</select>
 
 	<!--获取邀请记录状态-->

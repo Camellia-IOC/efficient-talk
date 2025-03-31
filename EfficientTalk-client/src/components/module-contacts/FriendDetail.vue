@@ -49,9 +49,9 @@
                   @click="handleDeleteFriend"
         >删除好友
         </a-button>
-        <a-button @click="handleCreateFriendInvite"
-                  class="operation-btn"
+        <a-button class="operation-btn"
                   v-else-if="friendInfo.isFriend === false"
+                  @click="handleEditInvitationDialogOpen"
         >添加好友
         </a-button>
         <a-button type="primary"
@@ -62,6 +62,9 @@
       </div>
     </div>
   </div>
+
+  <!--编辑添加信息对话框-->
+  <EditInvitationDialog ref="editInvitationDialog"/>
 </template>
 
 <script setup>
@@ -76,6 +79,7 @@
     import { message } from "ant-design-vue";
     import Logo from "../logo/Logo.vue";
     import { themeColor } from "../../config/config.js";
+    import EditInvitationDialog from "../dialog/module-social/add-friend/EditInvitationDialog.vue";
 
     const router = useRouter();
 
@@ -90,6 +94,12 @@
     const curLoginUser = ref({});
     const updateCurLoginUser = async () => {
         curLoginUser.value = await getCurUserData();
+    };
+
+    // 编辑添加信息对话框
+    const editInvitationDialog = ref();
+    const handleEditInvitationDialogOpen = () => {
+        editInvitationDialog.value.dialogOpen(curLoginUser.value.userId, props.friendId);
     };
 
     // 好友信息
@@ -161,25 +171,6 @@
         }).catch((err) => {
             console.error(err);
             message.error("删除失败");
-        });
-    };
-
-    // 添加好友
-    const handleCreateFriendInvite = () => {
-        SocialApi.createFriendInvite({
-            userId: curLoginUser.value.userId,
-            friendId: props.friendId
-        }).then((response) => {
-            const res = response.data;
-            if (res.code === 0) {
-                message.success("已发送好友邀请");
-            }
-            else {
-                message.error("发送好友邀请失败");
-            }
-        }).catch((err) => {
-            console.error(err);
-            message.error("发送好友邀请失败");
         });
     };
 </script>

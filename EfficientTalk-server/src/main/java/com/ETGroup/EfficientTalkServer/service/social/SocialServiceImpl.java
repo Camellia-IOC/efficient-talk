@@ -110,8 +110,6 @@ public class SocialServiceImpl implements SocialService {
         // 检查好友申请记录是否已存在
         String relativeInvitationId = socialMapper.checkRelativeInvitation(param.getUserId(), param.getFriendId());
         if (relativeInvitationId != null) {
-            // TODO 逻辑是否需要修改
-            
             return true;
         }
         
@@ -147,7 +145,7 @@ public class SocialServiceImpl implements SocialService {
             // 更新申请记录
             LocalDateTime handleTime = LocalDateTime.now();
             socialMapper.handleFriendInvite(param.getInvitationId(), param.getAccept() ? 1 : 2, handleTime);
-            String relativeInvitationId = socialMapper.checkRelativeInvitation(param.getFriendId(), param.getUserId());
+            String relativeInvitationId = socialMapper.checkRelativeInvitation(param.getUserId(), param.getFriendId());
             
             // 如果存在相对申请，则更新
             if (relativeInvitationId != null) {

@@ -35,7 +35,7 @@ public interface SocialMapper {
     // 获取好友申请列表
     ArrayList<FriendInvitationListItemDTO> getFriendInvitationList(String userId);
     
-    // 检查是否存在关联记录,返回关联邀请记录ID
+    // 检查是否存在关联记录,返回关联邀请记录
     String checkRelativeInvitation(@Param("userId") String userId, @Param("friendId") String friendId);
     
     // 获取邀请记录状态
