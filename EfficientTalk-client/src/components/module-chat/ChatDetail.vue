@@ -7,7 +7,7 @@
         <div class="user-avatar"
              v-if="!chatInfo.isGroup"
         >
-          <img v-if="chatInfo.userAvatar!==null"
+          <img v-if="chatInfo.userAvatar!==null&&chatInfo.userAvatar!==undefined"
                :src="chatInfo.userAvatar"
                class="avatar"
                alt="avatar"
@@ -81,7 +81,7 @@
                    :key="index"
               >
                 <div class="user-avatar">
-                  <img v-if="item.userAvatar!==null"
+                  <img v-if="item.userAvatar!==null&&chatInfo.userAvatar!==undefined"
                        :src="item.userAvatar"
                        alt="avatar"
                        class="avatar"
@@ -146,17 +146,33 @@
           <div v-if="item.sender !== curLoginUser.userId"
                class="others-message"
           >
-            <div class="message-avatar">
-              <img class="avatar"
-                   :src="chatInfo.userAvatar"
-                   alt="avatar"
-                   v-if="!chatInfo.isGroup"
-              >
-              <img class="avatar"
+            <div class="message-avatar"
+                 v-if="chatInfo.isGroup"
+            >
+              <img v-if="item.senderAvatar!==null&&item.senderAvatar!==undefined"
+                   class="avatar"
                    :src="item.senderAvatar"
                    alt="avatar"
-                   v-else
-              >
+              />
+              <a-avatar v-else
+                        class="avatar"
+                        style="display:flex;justify-content:center;align-items:center;font-size: 24px"
+              >{{ item.senderName.substring(0, 2) }}
+              </a-avatar>
+            </div>
+            <div class="message-avatar"
+                 v-else
+            >
+              <img v-if="chatInfo.userAvatar!==null&&chatInfo.userAvatar!==undefined"
+                   :src="chatInfo.userAvatar"
+                   class="avatar"
+                   alt="avatar"
+              />
+              <a-avatar v-else
+                        class="avatar"
+                        style="display:flex;justify-content:center;align-items:center;font-size: 24px"
+              >{{ chatInfo.userName.substring(0, 2) }}
+              </a-avatar>
             </div>
             <div class="message-info">
               <div class="user-name"
@@ -456,10 +472,16 @@
               </div>
             </div>
             <div class="message-avatar">
-              <img class="avatar"
+              <img v-if="curLoginUser.userAvatar!==null&&curLoginUser.userAvatar!==undefined"
                    :src="curLoginUser.userAvatar"
+                   class="avatar"
                    alt="avatar"
-              >
+              />
+              <a-avatar v-else
+                        class="avatar"
+                        style="display:flex;justify-content:center;align-items:center;font-size: 24px"
+              >{{ curLoginUser.userName.substring(0, 2) }}
+              </a-avatar>
             </div>
           </div>
         </div>
@@ -1040,6 +1062,8 @@
                     const newMessage = {
                         id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
                         sender: curLoginUser.value.userId,
+                        senderAvatar: curLoginUser.value.userAvatar || null,
+                        senderName: curLoginUser.value.userName || null,
                         receiver: userList[i],
                         type: messageList[j].type,
                         fileId: messageList[j].fileId,
@@ -1188,8 +1212,8 @@
             const message = {
                 id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
                 sender: curLoginUser.value.userId,
-                senderAvatar: curLoginUser.value.userAvatar,
-                senderName: curLoginUser.value.userName,
+                senderAvatar: curLoginUser.value.userAvatar || null,
+                senderName: curLoginUser.value.userName || null,
                 receiver: props.chatInfo.userId,
                 type: "text",
                 fileId: null,
@@ -1275,6 +1299,8 @@
                 const message = {
                     id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
                     sender: curLoginUser.value.userId,
+                    senderAvatar: curLoginUser.value.userAvatar || null,
+                    senderName: curLoginUser.value.userName || null,
                     receiver: props.chatInfo.userId,
                     type: messageItem.type,
                     fileId: messageItem.fileId,
