@@ -7,7 +7,8 @@ import {
     Tray,
     Menu,
     ipcMain,
-    screen
+    Notification,
+    nativeImage
 } from "electron";
 
 // Node模块
@@ -42,6 +43,9 @@ app.whenReady()
        // 初始化仓库
        initStore();
 
+       // 设置应用名称
+       app.setAppUserModelId("易飞讯");
+
        // 托盘图标功能
        const contextMenu = Menu.buildFromTemplate([
            {
@@ -70,6 +74,8 @@ app.on("window-all-closed", () => {
 // 主窗口相关操作 start ###################################################################################################
 // 主窗口对象
 let mainWindow = null;
+
+// 下载文件名称映射
 let downloadFileNameMap = new Map();
 
 // 创建主窗口
@@ -317,65 +323,6 @@ ipcMain.handle("app-window-get-config", (e, appId) => {
 });
 // 应用窗口相关操作 end ###################################################################################################
 
-// 系统通知窗口相关操作 start ##############################################################################################
-// 系统通知窗口
-let systemNoticeWindow = null;
-
-// 新建系统通知窗口
-const openSystemNoticeWindow = () => {
-    if (systemNoticeWindow === null || systemNoticeWindow === undefined) {
-        systemNoticeWindow = new BrowserWindow({
-            width: 400,
-            height: 600,
-            webPreferences: {
-                webSecurity: false,
-                nodeIntegration: true,
-                preload: path.join(__dirname, "preload.cjs"),
-                session: session.fromPartition(`persist:${sessionId}`)
-            },
-            icon: path.join(__dirname, iconPath),
-            // 禁用大小调节
-            resizable: false,
-            // 是否使用自带标题栏
-            frame: false,
-            transparent: true,
-        });
-
-        // 窗口路由
-        systemNoticeWindow.loadURL(projectUrl + "#" + "/system-notice")
-                          .then();
-
-        // 程序启动后开启开发者工具
-        systemNoticeWindow.webContents.openDevTools();
-
-        // 窗口位置设置
-        systemNoticeWindow.setAlwaysOnTop(true);
-        const windowSize = systemNoticeWindow.getSize(); // 获取窗口的大小
-        const mainScreen = screen.getPrimaryDisplay(); // 获取主屏幕的信息
-        const workArea = mainScreen.workArea; // 获取工作区域（排除任务栏等）
-        const x = workArea.x + workArea.width - windowSize[0];
-        const y = workArea.y + workArea.height - windowSize[1];
-        systemNoticeWindow.setPosition(x, y);
-    }
-    else {
-        systemNoticeWindow.show();
-    }
-};
-
-// 关闭系统通知窗口
-const closeSystemNoticeWindow = () => {
-    if (systemNoticeWindow !== null) {
-        systemNoticeWindow.close();
-        systemNoticeWindow = null;
-    }
-};
-
-// 关闭系统通知
-ipcMain.handle("system-notice-window-close", () => {
-    closeSystemNoticeWindow();
-});
-// 系统通知窗口相关操作 end ################################################################################################
-
 // 业务功能 start ########################################################################################################
 // 关闭所有窗口
 const closeAllWindow = () => {
@@ -394,9 +341,6 @@ const closeAllWindow = () => {
             appWindowManager[appId] = null;
         }
     });
-
-    // 关闭系统通知窗口
-    closeSystemNoticeWindow();
 };
 
 // 登录
@@ -425,9 +369,6 @@ ipcMain.handle("system-login", (e, param) => {
 
     mainWindow.loadURL(projectUrl + "#/app")
               .then();
-
-    // 打开系统通知窗口
-    // openSystemNoticeWindow();
 });
 
 // 登出
@@ -476,12 +417,12 @@ ipcMain.handle("download", (event, params) => {
     mainWindow.webContents.downloadURL(params.url);
 });
 
-// // 显示通知
-// ipcMain.handle("show-notification", (event, params) => {
-//     new Notification({
-//         title: params.title,
-//         body: params.body,
-//         icon: params.icon,
-//     }).show();
-// });
+// 显示通知
+ipcMain.handle("show-notification", (event, params) => {
+    new Notification({
+        title: params.title,
+        body: params.body,
+        icon: nativeImage.createFromPath(path.join(__dirname, iconPath))
+    }).show();
+});
 // 业务功能 end ##########################################################################################################

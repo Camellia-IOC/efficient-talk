@@ -292,12 +292,14 @@
     // 保存聊天列表
     const handleSaveChatList = async (chatList) => {
         const chatListJson = JSON.stringify(chatList);
+        // 保存至本地
         await saveChatList(curLoginUser.value.userId, chatListJson);
+        // 保存至云端
         await saveCloudChatList(curLoginUser.value.userId, chatListJson);
     };
 
     /**
-     * 将消息设为置顶/取消置顶
+     * 将消息设为置顶
      * @param {string} userId 用户ID
      */
     const setUserMessageToTop = (userId) => {
@@ -309,6 +311,11 @@
         }
         handleSaveChatList(chatList.value);
     };
+
+    /**
+     * 将消息取消置顶
+     * @param {string} userId 用户ID
+     */
     const setUserMessageToCommon = (userId) => {
         for (let i = 0; i < chatList.value.vipList.length; i++) {
             if (chatList.value.vipList[i].userId === userId) {
@@ -372,7 +379,7 @@
         const message = event.detail;
 
         // 获取发送人ID
-        let receiverId = null;
+        let receiverId;
         if (message.isGroup) {
             receiverId = message.receiver;
         }

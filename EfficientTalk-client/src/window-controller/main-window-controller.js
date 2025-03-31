@@ -84,4 +84,12 @@ export default class MainWindowController {
     static download = (params) => {
         systemController.download(params);
     };
+
+    /**
+     * 显示通知
+     * @param params 通知参数
+     */
+    static showNotification = (params) => {
+        systemController.showNotification(params);
+    };
 }

@@ -40,9 +40,5 @@ contextBridge.exposeInMainWorld("systemController", {
     copyToClipboard: (content) => ipcRenderer.invoke("copy-to-clipboard", content),
     readFromClipboard: () => ipcRenderer.invoke("read-from-clipboard"),
     download: (params) => ipcRenderer.invoke("download", params),
+    showNotification: (params) => ipcRenderer.invoke("show-notification", params)
 });
-
-// // 通知控制器
-// contextBridge.exposeInMainWorld("notificationController", {
-//     showNotification: (params) => ipcRenderer.invoke("show-notification", params),
-// });

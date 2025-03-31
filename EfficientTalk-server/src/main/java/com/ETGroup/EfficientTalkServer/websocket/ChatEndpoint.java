@@ -65,7 +65,7 @@ public class ChatEndpoint {
             }
         }
         catch (IOException e) {
-            log.error(e.toString());
+            log.error("获取缓存消息失败", e);
         }
     }
     
@@ -91,7 +91,8 @@ public class ChatEndpoint {
                     
                     Session session = sessionStorage.get(memberId);
                     if (session == null) {
-                        redisUtils.listRightPush("chat_history_cache:" + memberId, message);
+                        msg.setIsCache(true);
+                        redisUtils.listRightPush("chat_history_cache:" + memberId, JSON.toJSONString(msg));
                         log.info("缓存群聊聊天记录成功");
                     }
                     else {
@@ -110,7 +111,8 @@ public class ChatEndpoint {
                         .equals(msg.getSender())) {
                     Session session = sessionStorage.get(msg.getReceiver());
                     if (session == null) {
-                        redisUtils.listRightPush("chat_history_cache:" + msg.getReceiver(), message);
+                        msg.setIsCache(true);
+                        redisUtils.listRightPush("chat_history_cache:" + msg.getReceiver(), JSON.toJSONString(msg));
                         if (chatService.cacheChatHistory(msg) == 1) {
                             log.info("缓存聊天记录成功");
                         }

@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { saveChatRecord } from "../database/chat-history.js";
 import UserApi from "../api/modules/UserApi.js";
 import { message } from "ant-design-vue";
+import MainWindowController from "../window-controller/main-window-controller.js";
 
 // WebSocket全局配置
 export const useWebSocketStore = defineStore("web-socket-store", () => {
@@ -34,6 +35,15 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
             window.dispatchEvent(new CustomEvent("messageReceive", {
                 detail: messageData
             }));
+
+            // 如果不是缓存消息，则显示系统通知
+            if (!messageData.isCache) {
+                MainWindowController.showNotification({
+                    title: messageData.senderName,
+                    body: messageData.content,
+                    icon: messageData.senderAvatar
+                });
+            }
         };
         socket.value.onclose = () => {
             console.log("WebSocket连接已关闭");

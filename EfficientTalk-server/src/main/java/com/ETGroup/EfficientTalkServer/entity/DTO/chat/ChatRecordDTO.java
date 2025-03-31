@@ -40,4 +40,6 @@ public class ChatRecordDTO {
     private Boolean isGroup;
     // 是否选中(前端用)
     private Boolean isSelected = false;
+    // 是否为缓存消息(前端用)
+    private Boolean isCache = false;
 }
