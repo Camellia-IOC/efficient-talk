@@ -11,7 +11,8 @@
         />
         <a-avatar class="avatar"
                   v-else
-        >{{ item.friendName.substring(0, 2)}}</a-avatar>
+        >{{ item.friendName.substring(0, 2) }}
+        </a-avatar>
       </div>
       <!--信息-->
       <div class="info-detail">
@@ -88,6 +89,10 @@
         ref,
         watch
     } from "vue";
+    import { UUID } from "uuidjs";
+    import dayjs from "dayjs";
+    import { useWebSocketStore } from "../../../../../store/WebSocketStore.js";
+    import { useCurLoginUserStore } from "../../../../../store/CurLoginUserStore.js";
 
     const emit = defineEmits(["handleInvitation"]);
 
@@ -126,8 +131,24 @@
     // 用户选择的分组ID
     const userGroupId = ref(null);
 
+    const webSocketStore = useWebSocketStore();
+    const curLoginUserStore = useCurLoginUserStore();
+
     // 处理好友邀请
     const handleInvitation = (invitationId, friendId, userGroupId, friendGroupId, accept) => {
+        const handleMessage = {
+            id: UUID.generate(),
+            sender: curLoginUserStore.curLoginUser.userId,
+            senderAvatar: curLoginUserStore.curLoginUser.userAvatar,
+            senderName: curLoginUserStore.curLoginUser.userName,
+            receiver: friendId,
+            type: "text",
+            fileId: null,
+            content: "我已同意您的好友申请",
+            time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+            isGroup: false
+        };
+        webSocketStore.sendMessage(handleMessage);
         emit("handleInvitation", invitationId, friendId, userGroupId, friendGroupId, accept);
     };
 
