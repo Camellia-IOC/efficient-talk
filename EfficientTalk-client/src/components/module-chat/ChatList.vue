@@ -259,7 +259,7 @@
     };
 
     // 聊天列表加载标识符
-    const isFriendListLoading = ref(true);
+    const isFriendListLoading = ref(false);
 
     // 搜索内容
     const searchInput = ref("");
@@ -409,11 +409,24 @@
         // 初始化当前登录的用户信息
         await updateCurLoginUser();
 
-        // TODO 逻辑需要修改，先获取本地，没有再获取云端
         // 读取聊天列表
-        chatDataStore.chatList = await getCloudChatList(curLoginUser.value.userId);
-        if (chatDataStore.chatList === null) {
-            chatDataStore.chatList = await getChatList(curLoginUser.value.userId);
+        if (!chatDataStore.isChatListUpdated) {
+            isFriendListLoading.value = true;
+            // 判断是否使用本地存储
+            if (await chatDataStore.checkIsUseLocalCache()) {
+                const localChatList = await getChatList(curLoginUser.value.userId);
+                if (localChatList !== null) {
+                    chatDataStore.chatList = localChatList;
+                }
+                else {
+                    chatDataStore.chatList = await getCloudChatList(curLoginUser.value.userId);
+                }
+            }
+            else {
+                chatDataStore.chatList = await getCloudChatList(curLoginUser.value.userId);
+            }
+
+            chatDataStore.isChatListUpdated = true;
             isFriendListLoading.value = false;
         }
 

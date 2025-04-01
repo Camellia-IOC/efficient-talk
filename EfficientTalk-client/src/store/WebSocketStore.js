@@ -5,6 +5,7 @@ import UserApi from "../api/modules/UserApi.js";
 import { message } from "ant-design-vue";
 import MainWindowController from "../window-controller/main-window-controller.js";
 import { useChatDataStore } from "./ChatDataStore.js";
+import dayjs from "dayjs";
 
 // WebSocket全局配置
 export const useWebSocketStore = defineStore("web-socket-store", () => {
@@ -34,7 +35,7 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
 
             // TODO 缓存消息优化
             // 保存聊天记录
-            saveChatRecord(messageData).then();
+            saveChatRecord(messageData, curLoginUserId.value).then();
 
             // 更新聊天数据
             chatDataStore.receiveMessage(messageData).then();
@@ -75,8 +76,9 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
     // 发送消息
     const sendMessage = (message) => {
         if (socket.value !== null) {
+            message.time = dayjs(message.time).format("YYYY-MM-DD HH:mm:ss");
             socket.value.send(JSON.stringify(message));
-            chatDataStore.sendMessage(message);
+            chatDataStore.sendMessage(message).then();
         }
     };
 

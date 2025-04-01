@@ -765,7 +765,10 @@
         saveChatRecord
     } from "../../database/chat-history.js";
     import { getCurUserData } from "../../database/cur-user.js";
-    import { formatMessageTime } from "../../utils/time-utils.js";
+    import {
+        formatMessageTime,
+        getCurrentTimeStamp
+    } from "../../utils/time-utils.js";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import FileSelectorDialog from "../dialog/module-chat/file-selector/FileSelectorDialog.vue";
     import ChatApi from "../../api/modules/ChatApi.js";
@@ -799,6 +802,8 @@
     import V3Emoji from "vue3-emoji";
     import "vue3-emoji/dist/style.css";
     import MainWindowController from "../../window-controller/main-window-controller.js";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
+    import { useChatDataStore } from "../../store/ChatDataStore.js";
 
     const emit = defineEmits(["removeChatListItem"]);
 
@@ -890,6 +895,7 @@
     });
 
     // 当前登录的用户信息
+    const curLoginUserStore = useCurLoginUserStore();
     const curLoginUser = ref({});
     const updateCurLoginUser = async () => {
         curLoginUser.value = await getCurUserData();
@@ -897,6 +903,9 @@
 
     // WebSocket连接
     const websocketStore = useWebSocketStore();
+
+    // 聊天数据全局配置
+    const chatDataStore = useChatDataStore();
 
     // 消息记录对话框元素
     const chatHistoryElement = ref();
@@ -1068,11 +1077,11 @@
                         type: messageList[j].type,
                         fileId: messageList[j].fileId,
                         content: messageList[j].content,
-                        time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+                        time: getCurrentTimeStamp(),
                         isGroup: userList[i].slice(0, 5) === "GROUP",
                     };
 
-                    websocketStore.sendMessage(newMessage);
+                    websocketStore.sendMessage({...newMessage});
                     window.dispatchEvent(new CustomEvent("messageSend", {
                         detail: newMessage
                     }));
@@ -1163,7 +1172,7 @@
 
     // 保存聊天记录
     const handleSaveChatHistory = (record) => {
-        saveChatRecord(record);
+        saveChatRecord(record, curLoginUserStore.curLoginUser.userId);
     };
 
     // 处理转发消息
@@ -1218,10 +1227,10 @@
                 type: "text",
                 fileId: null,
                 content: chatInput.value,
-                time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+                time: getCurrentTimeStamp(),
                 isGroup: props.chatInfo.isGroup
             };
-            websocketStore.sendMessage(message);
+            websocketStore.sendMessage({...message});
             chatHistory.value.push(message);
 
             // 发送消息后滚动到底部
@@ -1308,10 +1317,10 @@
                     fileType: messageItem.fileType,
                     fileSize: messageItem.fileSize,
                     content: filePath,
-                    time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+                    time: getCurrentTimeStamp(),
                     isGroup: props.chatInfo.isGroup
                 };
-                websocketStore.sendMessage(message);
+                websocketStore.sendMessage({...message});
 
                 // 添加文件信息至本地消息记录
                 message.fileName = messageItem.fileName;
@@ -1418,7 +1427,20 @@
     const handleLoadMoreHistory = async () => {
         const oldContainerSize = chatHistoryElement.value.scrollHeight;
         const friendId = props.chatInfo.userId;
-        const historyPage = await getCloudChatHistory(friendId, chatHistory.value[0].time, props.chatInfo.isGroup);
+
+        // 判断是否使用本地缓存
+        let historyPage;
+        if (await chatDataStore.checkIsUseLocalCache()) {
+            historyPage = await getChatHistory(friendId, curLoginUser.value.userId, props.chatInfo.isGroup, chatHistory.value[0].time, historyPageConfig.value.pageSize);
+            // 如果本地数据为空，则从云端获取
+            if (historyPage.length === 0) {
+                historyPage = await getCloudChatHistory(friendId, null, props.chatInfo.isGroup);
+            }
+        }
+        else {
+            historyPage = await getCloudChatHistory(friendId, chatHistory.value[0].time, props.chatInfo.isGroup);
+        }
+
         historyPageConfig.value.lastCount = historyPage.length;
         chatHistory.value = historyPage.reverse().concat(chatHistory.value);
 
@@ -1455,12 +1477,20 @@
 
         chatHistory.value = [];
         const friendId = chatObjectId;
-        const historyPage = await getCloudChatHistory(friendId, null, isGroup);
+
+        let historyPage;
+        if (await chatDataStore.checkIsUseLocalCache()) {
+            historyPage = await getChatHistory(friendId, curLoginUser.value.userId, isGroup, null, historyPageConfig.value.pageSize);
+            // 如果本地数据为空，则从云端获取
+            if (historyPage.length === 0) {
+                historyPage = await getCloudChatHistory(friendId, null, isGroup);
+            }
+        }
+        else {
+            historyPage = await getCloudChatHistory(friendId, null, isGroup);
+        }
         historyPageConfig.value.lastCount = historyPage.length;
         chatHistory.value = chatHistory.value.concat(historyPage.reverse());
-        if (chatHistory.value.length === 0) {
-            chatHistory.value = await getChatHistory(friendId, curLoginUser.value.userId);
-        }
 
         await nextTick(() => {
             const images = document.querySelectorAll(".image-message img");

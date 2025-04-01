@@ -26,5 +26,5 @@ export const getChatList = async (userId) => {
     if (chatList.length > 0) {
         return JSON.parse(chatList[0].chatList);
     }
-    return [];
+    return null;
 };

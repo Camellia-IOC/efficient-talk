@@ -8,14 +8,16 @@ import UserApi from "../api/modules/UserApi.js";
 import { saveChatList } from "../database/chat-list.js";
 import ChatApi from "../api/modules/ChatApi.js";
 import { useCurLoginUserStore } from "./CurLoginUserStore.js";
+import MainWindowController from "../window-controller/main-window-controller.js";
 
-// 当前登录用户信息全局配置
+// 聊天数据信息全局配置
 export const useChatDataStore = defineStore("chat-data-store", () => {
-    // 用户基本信息
+    // 聊天数据信息
     const chatList = ref({
         vipList: [],
         commonList: []
     });
+    const isChatListUpdated = ref(false);
 
     // 当前登录用户
     const curLoginUserStore = useCurLoginUserStore();
@@ -248,14 +250,25 @@ export const useChatDataStore = defineStore("chat-data-store", () => {
         handleSaveChatList();
     };
 
+    // 判断是否使用本地缓存
+    const checkIsUseLocalCache = async () => {
+        return await MainWindowController.getAssignedSystemSettingConfig({
+            userId: curLoginUserStore.curLoginUser.userId,
+            module: "moduleCache",
+            key: "localCache"
+        });
+    };
+
     return {
         chatList,
+        isChatListUpdated,
         curChatId,
         curSelectedChatInfo,
         totalUnreadCount,
         receiveMessage,
         sendMessage,
         handleSaveChatList,
-        translateMessageContent
+        translateMessageContent,
+        checkIsUseLocalCache
     };
 });

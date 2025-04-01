@@ -468,6 +468,11 @@ ipcMain.handle("get-system-setting-config", (event, userId) => {
     return configStore.get(`${storeKeys.users}.${userId}.${storeKeys.systemSettingConfig}`);
 });
 
+// 获取指定的系统设置
+ipcMain.handle("get-assigned-system-setting-config", (event, params) => {
+    return configStore.get(`${storeKeys.users}.${params.userId}.${storeKeys.systemSettingConfig}.${params.module}.${params.key}`);
+});
+
 // 保存系统设置
 ipcMain.handle("set-system-setting-config", (event, config) => {
     configStore.set(`${storeKeys.users}.${config.userId}.${storeKeys.systemSettingConfig}.${config.module}.${config.key}`, config.value);

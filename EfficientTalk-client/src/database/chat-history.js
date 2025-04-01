@@ -1,5 +1,6 @@
 import { db } from "./db.js";
 import { getCurrentTime } from "../utils/time-utils.js";
+import dayjs from "dayjs";
 
 /**
  * 保存聊天记录
@@ -41,21 +42,27 @@ export const saveChatRecord = async (record, userId) => {
 export const getChatHistory = async (friendId, userId, isGroup, lastTime, pageSize) => {
     let chatHistory;
     let pageStartTime = lastTime === null ? getCurrentTime() : lastTime;
+    pageStartTime = dayjs(pageStartTime).valueOf();
     if (isGroup) {
         chatHistory = await db.chatHistory
                               .orderBy("time")
                               .filter((record) => record.owner === userId && record.receiver === friendId && record.time < pageStartTime)
                               .limit(pageSize)
+                              .reverse()
                               .sortBy("time");
     }
     else {
         chatHistory = await db.chatHistory
                               .orderBy("time")
-                              .filter((record) => record.owner === userId && (record.sender === friendId && record.receiver === userId) || (record.sender === userId && record.receiver === friendId) && record.time < pageStartTime)
+                              .filter((record) => record.owner === userId && ((record.sender === friendId && record.receiver === userId) || (record.sender === userId && record.receiver === friendId)) && record.time < pageStartTime)
                               .limit(pageSize)
+                              .reverse()
                               .sortBy("time");
     }
     if (chatHistory.length > 0) {
+        for (let i = 0; i < chatHistory.length; i++) {
+            chatHistory[i].time = dayjs(chatHistory[i].time).format("YYYY-MM-DD HH:mm:ss");
+        }
         return chatHistory;
     }
     return [];

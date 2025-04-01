@@ -14,6 +14,13 @@ export const getCurrentTime = () => {
 };
 
 /**
+ * 获取当前时间戳
+ */
+export const getCurrentTimeStamp = () => {
+    return dayjs().valueOf();
+};
+
+/**
  * 格式化消息时间
  * @param time 时间戳或日期字符串
  * @param position 所属位置

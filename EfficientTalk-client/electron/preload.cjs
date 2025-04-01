@@ -43,6 +43,7 @@ contextBridge.exposeInMainWorld("systemController", {
     showNotification: (params) => ipcRenderer.invoke("show-notification", params),
     loadSystemSettingConfig: (config) => ipcRenderer.invoke("load-system-setting-config", config),
     getSystemSettingConfig: (userId) => ipcRenderer.invoke("get-system-setting-config", userId),
+    getAssignedSystemSettingConfig: (params) => ipcRenderer.invoke("get-assigned-system-setting-config", params),
     setSystemSettingConfig: (config) => ipcRenderer.invoke("set-system-setting-config", config),
     selectSystemPath: () => ipcRenderer.invoke("select-system-path"),
 });

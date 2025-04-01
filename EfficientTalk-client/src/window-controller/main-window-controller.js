@@ -111,6 +111,15 @@ export default class MainWindowController {
     };
 
     /**
+     * 获取指定的系统设置
+     * @param params 参数
+     * @returns {Promise} 系统设置
+     */
+    static getAssignedSystemSettingConfig = (params) => {
+        return systemController.getAssignedSystemSettingConfig(params);
+    };
+
+    /**
      * 设置系统设置
      * @param config 系统设置
      */
