@@ -10,20 +10,20 @@ export const saveCurUserData = async (userData) => {
         id: userData.userId,
         username: userData.userName,
         avatar: userData.userAvatar,
-        org_id: userData.orgId,
-        dept_id: userData.deptId,
-        job_id: userData.jobId
+        orgId: userData.orgId,
+        deptId: userData.deptId,
+        jobId: userData.jobId
     });
 
     // 记录当前登录的用户
     await db.curUser.put({
         key: "CUR_USER",
-        user_id: userData.userId,
+        userId: userData.userId,
         username: userData.userName,
         avatar: userData.userAvatar,
-        org_id: userData.orgId,
-        dept_id: userData.deptId,
-        job_id: userData.jobId
+        orgId: userData.orgId,
+        deptId: userData.deptId,
+        jobId: userData.jobId
     });
 };
 
@@ -35,12 +35,12 @@ export const getCurUserData = async () => {
     const curUser = await db.curUser.where("key").equals("CUR_USER").toArray();
     if (curUser.length > 0) {
         return {
-            userId: curUser[0].user_id,
+            userId: curUser[0].userId,
             userName: curUser[0].username,
             userAvatar: curUser[0].avatar,
-            orgId: curUser[0].org_id,
-            deptId: curUser[0].dept_id,
-            jobId: curUser[0].job_id
+            orgId: curUser[0].orgId,
+            deptId: curUser[0].deptId,
+            jobId: curUser[0].jobId
         };
     }
     return null;

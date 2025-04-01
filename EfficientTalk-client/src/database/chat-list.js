@@ -7,7 +7,7 @@ import { db } from "./db.js";
  */
 export const saveChatList = async (userId, chatList) => {
     await db.chatList.put({
-        user_id: userId,
+        userId: userId,
         chatList: chatList
     }).then(() => {
         console.log("保存聊天列表成功");
@@ -22,7 +22,7 @@ export const saveChatList = async (userId, chatList) => {
  * @return {Promise<*>} 聊天列表对象
  */
 export const getChatList = async (userId) => {
-    const chatList = await db.chatList.where("user_id").equals(userId).toArray();
+    const chatList = await db.chatList.where("userId").equals(userId).toArray();
     if (chatList.length > 0) {
         return JSON.parse(chatList[0].chatList);
     }
