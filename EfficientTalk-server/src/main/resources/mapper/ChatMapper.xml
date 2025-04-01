@@ -92,8 +92,10 @@
 		FROM chat_history
 				 LEFT JOIN chat_files ON chat_history.file_id = chat_files.file_id
 		<where>
-			((chat_history.owner = #{userId} AND chat_history.receiver = #{friendId})
-				OR (chat_history.owner = #{userId} AND chat_history.sender = #{friendId}))
+			((chat_history.owner = #{userId} AND chat_history.receiver = #{friendId} AND
+			  chat_history.sender = #{userId})
+				OR (chat_history.owner = #{userId} AND chat_history.sender = #{friendId} AND
+					chat_history.receiver = #{userId}))
 			<if test="lastTime != null">
 				AND send_time &lt; #{lastTime}
 			</if>
