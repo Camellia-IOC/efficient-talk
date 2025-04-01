@@ -87,12 +87,6 @@ const router = createRouter({
                     component: () => import("../views/AppStoreView.vue")
                 },
                 {
-                    // 关于我们
-                    path: "about-us",
-                    name: "about-us",
-                    component: () => import("../views/EmptyView.vue")
-                },
-                {
                     // 系统设置
                     path: "system-setting",
                     name: "system-setting",

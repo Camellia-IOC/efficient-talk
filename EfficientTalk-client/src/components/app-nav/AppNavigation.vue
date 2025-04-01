@@ -203,14 +203,8 @@
 
     const footerNavConfig = [
         {
-            name: "关于我们",
-            index: "footer-1",
-            icon: QuestionCircleOutlined,
-            path: "/app/about-us"
-        },
-        {
             name: "系统设置",
-            index: "footer-2",
+            index: "footer-1",
             icon: SettingOutlined,
             path: "/app/system-setting"
         }
