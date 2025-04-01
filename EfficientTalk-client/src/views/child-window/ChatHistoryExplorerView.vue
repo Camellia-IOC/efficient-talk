@@ -27,7 +27,14 @@
                   <img class="avatar"
                        :src="item.senderAvatar"
                        alt="avatar"
+                       v-if="item.senderAvatar !== undefined && item.senderAvatar !== null"
                   >
+                  <a-avatar class="avatar"
+                            style="display:flex;justify-content:center;align-items:center;font-size: 24px"
+                            v-else
+                  >
+                    {{ item.senderName.substring(0, 2) }}
+                  </a-avatar>
                 </div>
                 <div class="message-info">
                   <div class="user-name">
@@ -131,7 +138,12 @@
                     <img :src="item.senderAvatar"
                          alt="avatar"
                          class="user-avatar"
+                         v-if="item.senderAvatar!==undefined && item.senderAvatar !== null"
                     />
+                    <a-avatar class="user-avatar"
+                              v-else
+                              style="display:flex;justify-content:center;align-items:center;font-size: 24px"
+                    ></a-avatar>
                     <label class="user-name">{{ item.senderName }}</label>
                     <label class="time">{{ formatDate(item.time) }}</label>
                   </div>
