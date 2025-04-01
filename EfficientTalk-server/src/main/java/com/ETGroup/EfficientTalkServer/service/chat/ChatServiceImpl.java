@@ -60,6 +60,18 @@ public class ChatServiceImpl implements ChatService {
     }
     
     /**
+     * 缓存群聊聊天记录
+     *
+     * @param record 聊天记录
+     *
+     * @return 缓存成功的条数
+     */
+    @Override
+    public Integer cacheChatGroupHistory(ChatRecordDTO record) {
+        return chatMapper.cacheChatGroupHistory(record);
+    }
+    
+    /**
      * 获取缓存的聊天记录
      *
      * @param userId 用户id
@@ -78,6 +90,23 @@ public class ChatServiceImpl implements ChatService {
     }
     
     /**
+     * 获取缓存的群聊聊天记录
+     *
+     * @param userId 用户id
+     *
+     * @return 聊天记录
+     */
+    @Override
+    public ArrayList<ChatRecordDTO> getChatGroupHistoryCache(String userId) {
+        ArrayList<ChatRecordDTO> chatHistoryCache = chatMapper.getChatGroupHistoryCache(userId);
+        for (ChatRecordDTO record : chatHistoryCache) {
+            record.setIsCache(true);
+        }
+        chatMapper.deleteChatHistoryCache(userId);
+        return chatHistoryCache;
+    }
+    
+    /**
      * 删除聊天记录缓存
      *
      * @param userId 用户ID
@@ -88,6 +117,7 @@ public class ChatServiceImpl implements ChatService {
     public Boolean deleteChatHistoryCache(String userId) {
         try {
             chatMapper.deleteChatHistoryCache(userId);
+            chatMapper.deleteChatGroupHistoryCache(userId);
             return true;
         }
         catch (Exception e) {

@@ -39,9 +39,21 @@ public class ChatEndpoint {
     // 保存正在连接的会话，key为用户ID，value为Session对象
     private static final Map<String, Session> sessionStorage = new ConcurrentHashMap<>();
     
+    /**
+     * 重置消息信息
+     *
+     * @param owner   消息所属用户ID
+     * @param isCache 是否缓存
+     */
+    private void resetMessageInfo(String owner, Boolean isCache, ChatRecordDTO msg) {
+        msg.setId(UUIDUtils.generateTimeStampUUID());
+        msg.setOwner(owner);
+        msg.setIsCache(isCache);
+    }
+    
     @OnOpen
     public void onOpen(@PathParam("userId") String userId, Session session) {
-        log.info("连接打开:{}", userId);
+        log.info("用户:{} 已上线", userId);
         
         // 保存当前用户的会话
         sessionStorage.put(userId, session);
@@ -53,24 +65,49 @@ public class ChatEndpoint {
         
         // 从消息缓存队列中获取聊天记录，并发送给用户
         try {
-            String message;
-            while (true) {
-                message = (String) redisUtils.listLeftPop("chat_history_cache:" + userId);
-                if (message != null) {
-                    ChatRecordDTO msg = JSON.parseObject(message, ChatRecordDTO.class);
-                    msg.setId(UUIDUtils.generateTimeStampUUID());
-                    msg.setOwner(userId);
-                    session.getBasicRemote()
-                           .sendText(JSON.toJSONString(msg));
-                    if (msg.getIsGroup()) {
-                        chatService.saveGroupChatHistory(msg);
+            String key = "chat_history_cache:" + userId;
+            
+            // 如果缓存命中
+            if (redisUtils.getListLength(key) != null) {
+                while (true) {
+                    String message = (String) redisUtils.listLeftPop(key);
+                    if (message != null) {
+                        ChatRecordDTO msg = JSON.parseObject(message, ChatRecordDTO.class);
+                        session.getBasicRemote()
+                               .sendText(JSON.toJSONString(msg));
+                        if (msg.getIsGroup()) {
+                            chatService.saveGroupChatHistory(msg);
+                        }
+                        else {
+                            chatService.saveChatHistory(msg);
+                        }
                     }
                     else {
+                        break;
+                    }
+                }
+            }
+            else {
+                // 获取数据库中的离线消息
+                ArrayList<ChatRecordDTO> userMsgList = chatService.getChatHistoryCache(userId);
+                if (!userMsgList.isEmpty()) {
+                    for (ChatRecordDTO msg : userMsgList) {
+                        msg.setOwner(userId);
+                        msg.setIsCache(true);
+                        session.getBasicRemote()
+                               .sendText(JSON.toJSONString(msg));
                         chatService.saveChatHistory(msg);
                     }
                 }
-                else {
-                    break;
+                
+                ArrayList<ChatRecordDTO> groupMsgList = chatService.getChatGroupHistoryCache(userId);
+                if (!groupMsgList.isEmpty()) {
+                    for (ChatRecordDTO msg : groupMsgList) {
+                        msg.setIsCache(true);
+                        session.getBasicRemote()
+                               .sendText(JSON.toJSONString(msg));
+                        chatService.saveGroupChatHistory(msg);
+                    }
                 }
             }
             
@@ -110,14 +147,17 @@ public class ChatEndpoint {
                     
                     Session session = sessionStorage.get(memberId);
                     if (session == null) {
-                        msg.setIsCache(true);
-                        redisUtils.listRightPush("chat_history_cache:" + memberId, JSON.toJSONString(msg));
+                        // 设置消息信息
+                        resetMessageInfo(memberId, true, msg);
+                        String key = "chat_history_cache:" + memberId;
+                        redisUtils.listRightPush(key, JSON.toJSONString(msg));
+                        redisUtils.setKeyTimeout(key, 60 * 60 * 24 * 7);
+                        chatService.cacheChatGroupHistory(msg);
                         log.info("缓存群聊聊天记录成功");
                     }
                     else {
-                        msg.setIsCache(false);
-                        msg.setId(UUIDUtils.generateTimeStampUUID());
-                        msg.setOwner(memberId);
+                        // 设置消息信息
+                        resetMessageInfo(memberId, false, msg);
                         session.getBasicRemote()
                                .sendText(JSON.toJSONString(msg));
                         chatService.saveGroupChatHistory(msg);
@@ -135,15 +175,15 @@ public class ChatEndpoint {
                         .equals(msg.getSender())) {
                     Session session = sessionStorage.get(msg.getReceiver());
                     if (session == null) {
-                        msg.setIsCache(true);
-                        redisUtils.listRightPush("chat_history_cache:" + msg.getReceiver(), JSON.toJSONString(msg));
-                        if (chatService.cacheChatHistory(msg) == 1) {
-                            log.info("缓存聊天记录成功");
-                        }
+                        // 设置消息信息
+                        resetMessageInfo(msg.getReceiver(), true, msg);
+                        String key = "chat_history_cache:" + msg.getReceiver();
+                        redisUtils.listRightPush(key, JSON.toJSONString(msg));
+                        redisUtils.setKeyTimeout(key, 60 * 60 * 24 * 7);
+                        chatService.cacheChatHistory(msg);
                     }
                     else {
-                        msg.setId(UUIDUtils.generateTimeStampUUID());
-                        msg.setOwner(msg.getReceiver());
+                        resetMessageInfo(msg.getReceiver(), false, msg);
                         session.getBasicRemote()
                                .sendText(JSON.toJSONString(msg));
                         chatService.saveChatHistory(msg);
@@ -151,8 +191,8 @@ public class ChatEndpoint {
                 }
             }
         }
-        catch (Exception exception) {
-            log.error(exception.toString());
+        catch (Exception e) {
+            log.error("消息处理失败", e);
         }
     }
     

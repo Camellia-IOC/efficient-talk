@@ -73,6 +73,18 @@ public class RedisUtils {
     }
     
     /**
+     * 获取list键中元素个数
+     *
+     * @param key 键
+     *
+     * @return 查询结果
+     */
+    public Long getListLength(String key) {
+        return redisTemplate.opsForList()
+                            .size(key);
+    }
+    
+    /**
      * 设置指定key的过期时间
      *
      * @param key  键
@@ -80,8 +92,8 @@ public class RedisUtils {
      *
      * @return 查询结果
      */
-    public boolean setKeyTimeout(String key, long time) {
-        return redisTemplate.expire(key, time, TimeUnit.SECONDS);
+    public void setKeyTimeout(String key, long time) {
+        redisTemplate.expire(key, time, TimeUnit.SECONDS);
     }
     
     /**
@@ -91,7 +103,7 @@ public class RedisUtils {
      *
      * @return 查询结果
      */
-    public long getTime(String key) {
+    public long getKeyTimeout(String key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
     

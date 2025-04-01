@@ -21,6 +21,12 @@
 		VALUES (#{id}, #{sender}, #{receiver}, #{type}, #{fileId}, #{content}, #{time})
 	</insert>
 
+	<!--缓存群聊聊天记录-->
+	<insert id="cacheChatGroupHistory" parameterType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		INSERT INTO chat_group_history_cache (id, sender, receiver, owner, type, file_id, content, send_time)
+		VALUES (#{id}, #{sender}, #{receiver}, #{owner}, #{type}, #{fileId}, #{content}, #{time})
+	</insert>
+
 	<!--获取缓存的聊天记录-->
 	<select id="getChatHistoryCache" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
 		SELECT chat_history_cache.id        as id,
@@ -39,11 +45,36 @@
 		ORDER BY send_time
 	</select>
 
+	<!--获取缓存的聊天记录-->
+	<select id="getChatGroupHistoryCache" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.chat.ChatRecordDTO">
+		SELECT chat_group_history_cache.id        as id,
+			   chat_group_history_cache.sender    as sender,
+			   chat_group_history_cache.receiver  as receiver,
+			   chat_group_history_cache.type      as type,
+			   chat_group_history_cache.file_id   as fileId,
+			   chat_files.file_name               as fileName,
+			   chat_files.file_type               as fileType,
+			   chat_files.file_size               as fileSize,
+			   chat_group_history_cache.content   as content,
+			   chat_group_history_cache.send_time as time
+		FROM chat_group_history_cache
+				 LEFT JOIN chat_files ON chat_group_history_cache.file_id = chat_files.file_id
+		WHERE chat_group_history_cache.owner = #{userId}
+		ORDER BY send_time
+	</select>
+
 	<!--删除缓存的聊天记录-->
 	<delete id="deleteChatHistoryCache">
 		DELETE
 		FROM chat_history_cache
 		WHERE receiver = #{userId}
+	</delete>
+
+	<!--删除群聊缓存的聊天记录-->
+	<delete id="deleteChatGroupHistoryCache">
+		DELETE
+		FROM chat_group_history_cache
+		WHERE owner = #{userId}
 	</delete>
 
 	<!--获取聊天记录-->

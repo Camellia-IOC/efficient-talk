@@ -28,14 +28,59 @@ public interface ChatMapper {
      */
     Integer saveGroupChatHistory(ChatRecordDTO record);
     
-    // 缓存聊天记录
+    /**
+     * 缓存聊天记录
+     *
+     * @param record 聊天记录
+     *
+     * @return 缓存数量
+     */
     Integer cacheChatHistory(ChatRecordDTO record);
     
-    // 获取缓存的聊天记录
+    /**
+     * 缓存群聊聊天记录
+     *
+     * @param record 聊天记录
+     *
+     * @return 缓存数量
+     */
+    Integer cacheChatGroupHistory(ChatRecordDTO record);
+    
+    /**
+     * 获取聊天记录缓存
+     *
+     * @param userId 用户id
+     *
+     * @return 聊天记录
+     */
     ArrayList<ChatRecordDTO> getChatHistoryCache(@Param("userId") String userId);
     
-    // 删除缓存的聊天记录
+    /**
+     * 获取群聊聊天记录缓存
+     *
+     * @param userId 用户id
+     *
+     * @return 聊天记录
+     */
+    ArrayList<ChatRecordDTO> getChatGroupHistoryCache(@Param("userId") String userId);
+    
+    /**
+     * 删除聊天记录缓存
+     *
+     * @param userId 用户id
+     *
+     * @return 删除数目
+     */
     Integer deleteChatHistoryCache(@Param("userId") String userId);
+    
+    /**
+     * 删除群聊聊天记录缓存
+     *
+     * @param userId 用户id
+     *
+     * @return 删除数目
+     */
+    Integer deleteChatGroupHistoryCache(@Param("userId") String userId);
     
     // 获取聊天记录
     ArrayList<ChatRecordDTO> getChatHistory(@Param("userId") String userId,

@@ -41,6 +41,15 @@ public interface ChatService {
     Integer cacheChatHistory(ChatRecordDTO record);
     
     /**
+     * 缓存群聊聊天记录
+     *
+     * @param record 聊天记录
+     *
+     * @return 缓存成功的条数
+     */
+    Integer cacheChatGroupHistory(ChatRecordDTO record);
+    
+    /**
      * 获取缓存的聊天记录
      *
      * @param userId 用户id
@@ -48,6 +57,15 @@ public interface ChatService {
      * @return 聊天记录
      */
     ArrayList<ChatRecordDTO> getChatHistoryCache(String userId);
+    
+    /**
+     * 获取缓存的群聊聊天记录
+     *
+     * @param userId 用户id
+     *
+     * @return 聊天记录
+     */
+    ArrayList<ChatRecordDTO> getChatGroupHistoryCache(String userId);
     
     /**
      * 删除聊天记录缓存
