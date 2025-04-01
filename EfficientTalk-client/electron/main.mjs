@@ -8,7 +8,8 @@ import {
     Menu,
     ipcMain,
     Notification,
-    nativeImage
+    nativeImage,
+    dialog
 } from "electron";
 
 // Node模块
@@ -24,9 +25,32 @@ const __dirname = path.dirname(__filename);
 
 // 持久化存储仓库
 const configStore = new Store();
+// 仓库键表
+const storeKeys = {
+    users: "users",
+    systemSettingConfig: "systemSettingConfig",
+};
+const defaultSystemSettingConfig = {
+    // 系统通知模块
+    moduleNotice: {
+        enable: true,
+    },
+    // 存储模块
+    moduleCache: {
+        localCache: true,
+    },
+    // 文件模块
+    moduleFile: {
+        downloadPath: path.join(app.getPath("downloads"), "易飞讯")
+    },
+    moduleAuth: {
+        autoLogin: false,
+        acceptLicense: false
+    }
+};
 const initStore = () => {
-    if (!configStore.has("downloadPath")) {
-        configStore.set("downloadPath", path.join(app.getPath("downloads"), "易飞讯"));
+    if (!configStore.has(storeKeys.users)) {
+        configStore.set(storeKeys.users, {});
     }
 };
 
@@ -113,7 +137,7 @@ const createWindow = () => {
         downloadFileNameMap.delete(fileId);
 
         // TODO 修改为通用下载路径
-        item.setSavePath(path.join(configStore.get("downloadPath"), fileName));
+        item.setSavePath(path.join(configStore.get(storeKeys.systemSettingConfig).moduleFile.downloadPath, fileName));
 
         item.on("updated", (event, state) => {
             if (state === "interrupted") {
@@ -419,10 +443,41 @@ ipcMain.handle("download", (event, params) => {
 
 // 显示通知
 ipcMain.handle("show-notification", (event, params) => {
-    new Notification({
-        title: params.title,
-        body: params.body,
-        icon: nativeImage.createFromPath(path.join(__dirname, iconPath))
-    }).show();
+    if (configStore.get(storeKeys.systemSettingConfig).moduleNotice.enable) {
+        new Notification({
+            title: params.title,
+            body: params.body,
+            icon: nativeImage.createFromPath(path.join(__dirname, iconPath))
+        }).show();
+    }
+});
+
+// 从云端加载用户系统设置
+ipcMain.handle("load-system-setting-config", (event, params) => {
+    if (params.config === null) {
+        configStore.set(`${storeKeys.users}.${params.userId}.${storeKeys.systemSettingConfig}`, defaultSystemSettingConfig);
+        return defaultSystemSettingConfig;
+    }
+    else {
+        configStore.set(`${storeKeys.users}.${params.userId}.${storeKeys.systemSettingConfig}`, params.config);
+    }
+});
+
+// 获取系统设置
+ipcMain.handle("get-system-setting-config", (event, userId) => {
+    return configStore.get(`${storeKeys.users}.${userId}.${storeKeys.systemSettingConfig}`);
+});
+
+// 保存系统设置
+ipcMain.handle("set-system-setting-config", (event, config) => {
+    configStore.set(`${storeKeys.users}.${config.userId}.${storeKeys.systemSettingConfig}.${config.module}.${config.key}`, config.value);
+});
+
+// 选择系统路径
+ipcMain.handle("select-system-path", (event) => {
+    return dialog.showOpenDialogSync(mainWindow, {
+        title: "选择路径",
+        properties: ["openDirectory"]
+    });
 });
 // 业务功能 end ##########################################################################################################

@@ -49,6 +49,7 @@
     import { saveCurUserData } from "../database/cur-user.js";
     import { message } from "ant-design-vue";
     import MainWindowController from "../window-controller/main-window-controller.js";
+    import UserApi from "../api/modules/UserApi.js";
 
     const accountInput = ref("");
     const passwordInput = ref("");
@@ -74,6 +75,24 @@
                     const data = res.data.userData;
                     // 保存当前登录用户信息到数据库中
                     await saveCurUserData(data);
+
+                    // 加载云端用户设置
+                    let params = {
+                        userId: data.userId,
+                        config: null
+                    };
+                    if (res.data.systemConfig === null) {
+                        MainWindowController.loadSystemSettingConfig(params).then((config) => {
+                            UserApi.saveUserSystemSetting({
+                                userId: data.userId,
+                                config: JSON.stringify(config)
+                            });
+                        });
+                    }
+                    else {
+                        params.config = JSON.parse(res.data.systemConfig);
+                        MainWindowController.loadSystemSettingConfig(params);
+                    }
 
                     // 处理登录
                     MainWindowController.hideMainWindow();

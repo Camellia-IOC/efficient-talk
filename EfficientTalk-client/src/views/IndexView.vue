@@ -65,12 +65,14 @@
 <style scoped
        lang="scss"
 >
+  @use "/src/assets/style/global-variable.scss";
+
   .index-view-container {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background-color: transparent;
+    background-color: global-variable.$background-color;
 
     // 标题栏高度
     $app-header-height: 50px;

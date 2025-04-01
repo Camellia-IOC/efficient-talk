@@ -40,4 +40,21 @@
 		SET online_state = #{onlineState}
 		WHERE id = #{userId}
 	</update>
+
+	<!--保存用户系统设置-->
+	<insert id="saveUserSystemSetting"
+			parameterType="com.ETGroup.EfficientTalkServer.entity.request.user.SaveUserSystemSettingRequestParam">
+		INSERT INTO user_sysyem_setting_config (user_id, setting_config)
+		VALUES (#{userId}, #{config})
+		ON DUPLICATE KEY
+			UPDATE user_id        = #{userId},
+				   setting_config = #{config}
+	</insert>
+
+	<!--获取用户系统设置-->
+	<select id="getUserSystemSetting" resultType="java.lang.String">
+		SELECT setting_config
+		FROM user_sysyem_setting_config
+		WHERE user_id = #{userId}
+	</select>
 </mapper>

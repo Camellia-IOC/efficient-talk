@@ -36,4 +36,26 @@ export default class UserApi {
             data
         });
     };
+
+    /**
+     * 保存用户系统设置
+     * @param data
+     */
+    static saveUserSystemSetting = (data) => {
+        return service.post({
+            url: this.requestPath + "/saveUserSystemSetting",
+            data
+        });
+    };
+
+    /**
+     * 获取用户系统设置
+     * @param data
+     */
+    static getUserSystemSetting = (data) => {
+        return service.get({
+            url: this.requestPath + "/getUserSystemSetting",
+            data
+        });
+    };
 }

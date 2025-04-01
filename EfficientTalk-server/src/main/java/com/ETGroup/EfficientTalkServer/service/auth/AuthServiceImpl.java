@@ -1,6 +1,7 @@
 package com.ETGroup.EfficientTalkServer.service.auth;
 
 import com.ETGroup.EfficientTalkServer.entity.PO.PermissionPO;
+import com.ETGroup.EfficientTalkServer.mapper.UserMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ETGroup.EfficientTalkServer.entity.PO.UserPO;
 import com.ETGroup.EfficientTalkServer.entity.request.auth.LoginRequestParam;
@@ -19,6 +20,9 @@ import java.util.ArrayList;
 public class AuthServiceImpl extends ServiceImpl<AuthMapper, UserPO> implements AuthService {
     @Resource
     private AuthMapper authMapper;
+    
+    @Resource
+    private UserMapper userMapper;
     
     /**
      * 用户登录
@@ -40,6 +44,7 @@ public class AuthServiceImpl extends ServiceImpl<AuthMapper, UserPO> implements 
                                                .equals(password));
             if (loginResponseVO.getPermission()) {
                 loginResponseVO.setUserData(authMapper.getUserLoginDTO(param.getUserId()));
+                loginResponseVO.setSystemConfig(userMapper.getUserSystemSetting(param.getUserId()));
             }
         }
         

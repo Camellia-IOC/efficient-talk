@@ -92,4 +92,37 @@ export default class MainWindowController {
     static showNotification = (params) => {
         systemController.showNotification(params);
     };
+
+    /**
+     * 从云端加载用户设置
+     * @param params 用户Id/用户设置
+     */
+    static loadSystemSettingConfig = (params) => {
+        return systemController.loadSystemSettingConfig(params);
+    };
+
+    /**
+     * 获取系统设置
+     * @param userId 用户ID
+     * @returns {Promise<Object>} 系统设置
+     */
+    static getSystemSettingConfig = (userId) => {
+        return systemController.getSystemSettingConfig(userId);
+    };
+
+    /**
+     * 设置系统设置
+     * @param config 系统设置
+     */
+    static setSystemSettingConfig = (config) => {
+        systemController.setSystemSettingConfig(config);
+    };
+
+    /**
+     * 选择系统路径
+     * @returns 系统路径
+     */
+    static selectSystemPath = () => {
+        return systemController.selectSystemPath();
+    };
 }

@@ -50,8 +50,8 @@
           <label class="state-label">隐身</label>
         </div>
       </div>
-      <div v-for="(item,index) in navConfig"
-           :key="index"
+      <div v-for="(item) in navConfig"
+           :key="item.index"
            class="nav-item no-drag"
            :class="{ 'nav-item-active': selectedNavIndex === item.index }"
            @click="handleNavChange(item.index, item.path)"
@@ -82,15 +82,13 @@
     </div>
     <div class="nav-footer">
       <div class="nav-item no-drag"
+           :class="{ 'nav-item-active': selectedNavIndex === item.index }"
+           v-for="(item) in footerNavConfig"
+           :key="item.index"
+           @click="handleNavChange(item.index, item.path)"
       >
         <div class="nav-item-icon">
-          <QuestionCircleOutlined/>
-        </div>
-      </div>
-      <div class="nav-item no-drag"
-      >
-        <div class="nav-item-icon">
-          <BarsOutlined/>
+          <component :is="item.icon"/>
         </div>
       </div>
       <div class="nav-item no-drag"
@@ -124,7 +122,7 @@
         AppstoreFilled,
         QuestionCircleOutlined,
         PoweroffOutlined,
-        BarsOutlined,
+        SettingOutlined,
         FrownFilled,
         EyeInvisibleFilled,
         BellOutlined,
@@ -200,6 +198,21 @@
             icon: AppstoreOutlined,
             iconActive: AppstoreFilled,
             path: "/app/app-store"
+        }
+    ];
+
+    const footerNavConfig = [
+        {
+            name: "关于我们",
+            index: "footer-1",
+            icon: QuestionCircleOutlined,
+            path: "/app/about-us"
+        },
+        {
+            name: "系统设置",
+            index: "footer-2",
+            icon: SettingOutlined,
+            path: "/app/system-setting"
         }
     ];
 
@@ -365,6 +378,10 @@
       align-items: center;
       width: 100%;
       height: 40%;
+
+      .nav-item-active {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
 
       .nav-item {
         display: flex;

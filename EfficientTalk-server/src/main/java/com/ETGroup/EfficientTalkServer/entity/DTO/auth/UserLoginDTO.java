@@ -19,4 +19,6 @@ public class UserLoginDTO {
     private String deptId;
     
     private String jobId;
+    
+    private String token;
 }

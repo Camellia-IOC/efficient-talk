@@ -17,7 +17,8 @@
 			   users.avatar   as userAvatar,
 			   users.org_id   as orgId,
 			   users.dept_id  as deptId,
-			   users.job_id   as jobId
+			   users.job_id   as jobId,
+			   users.token    as token
 		FROM users
 		WHERE users.id = #{userId}
 	</select>

@@ -40,5 +40,9 @@ contextBridge.exposeInMainWorld("systemController", {
     copyToClipboard: (content) => ipcRenderer.invoke("copy-to-clipboard", content),
     readFromClipboard: () => ipcRenderer.invoke("read-from-clipboard"),
     download: (params) => ipcRenderer.invoke("download", params),
-    showNotification: (params) => ipcRenderer.invoke("show-notification", params)
+    showNotification: (params) => ipcRenderer.invoke("show-notification", params),
+    loadSystemSettingConfig: (config) => ipcRenderer.invoke("load-system-setting-config", config),
+    getSystemSettingConfig: (userId) => ipcRenderer.invoke("get-system-setting-config", userId),
+    setSystemSettingConfig: (config) => ipcRenderer.invoke("set-system-setting-config", config),
+    selectSystemPath: () => ipcRenderer.invoke("select-system-path"),
 });

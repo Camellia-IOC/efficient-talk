@@ -11,4 +11,6 @@ public class LoginResponseVO {
     
     @JsonProperty("userData")
     private UserLoginDTO userData;
+    
+    private String systemConfig;
 }

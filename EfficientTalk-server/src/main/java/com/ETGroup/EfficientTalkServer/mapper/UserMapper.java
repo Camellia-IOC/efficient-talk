@@ -34,4 +34,21 @@ public interface UserMapper {
      * @return 设置结果
      */
     Integer setUserOnlineState(@Param("userId") String userId, @Param("onlineState") String onlineState);
+    
+    /**
+     * 保存用户系统设置
+     *
+     * @param userId 用户ID
+     * @param config 系统设置
+     */
+    void saveUserSystemSetting(@Param("userId") String userId,@Param("config") String config);
+    
+    /**
+     * 获取用户系统设置
+     *
+     * @param userId 用户ID
+     *
+     * @return 用户系统设置
+     */
+    String getUserSystemSetting(@Param("userId") String userId);
 }

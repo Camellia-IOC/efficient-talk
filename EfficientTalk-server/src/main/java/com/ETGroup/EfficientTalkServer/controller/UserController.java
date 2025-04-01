@@ -1,10 +1,12 @@
 package com.ETGroup.EfficientTalkServer.controller;
 
+import com.ETGroup.EfficientTalkServer.entity.request.user.SaveUserSystemSettingRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.user.SetOnlineStateRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.entity.response.user.UserBasicInfoResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.user.UserDetailResponseVO;
+import com.ETGroup.EfficientTalkServer.mapper.UserMapper;
 import com.ETGroup.EfficientTalkServer.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Resource
     private UserService userService;
+    
+    @Resource
+    private UserMapper userMapper;
     
     @Operation(summary = "获取用户详细信息")
     @GetMapping("/getUserDetail")
@@ -43,6 +48,32 @@ public class UserController {
         }
         else {
             return ResponseData.error(ResponseConfig.LOGIN_FAILED);
+        }
+    }
+    
+    @Operation(summary = "保存用户系统设置")
+    @PostMapping("/saveUserSystemSetting")
+    public ResponseData<Void> saveUserSystemSetting(@RequestBody SaveUserSystemSettingRequestParam param) {
+        try {
+            userMapper.saveUserSystemSetting(param.getUserId(), param.getConfig());
+            return ResponseData.success();
+        }
+        catch (Exception e) {
+            log.error("保存用户系统设置失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "获取用户系统设置")
+    @GetMapping("/getUserSystemSetting")
+    public ResponseData<String> getUserSystemSetting(@RequestParam String userId) {
+        try {
+            String config = userMapper.getUserSystemSetting(userId);
+            return ResponseData.success(config);
+        }
+        catch (Exception e) {
+            log.error("获取用户系统设置失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
         }
     }
 }
