@@ -17,37 +17,29 @@ public interface ChatService {
      * 保存聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 保存成功的条数
      */
-    Integer saveChatHistory(ChatRecordDTO record);
+    void saveChatHistory(ChatRecordDTO record);
     
     /**
      * 保存群聊聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 保存成功条数
      */
-    Integer saveGroupChatHistory(ChatRecordDTO record);
+    void saveGroupChatHistory(ChatRecordDTO record);
     
     /**
      * 缓存聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 缓存成功的条数
      */
-    Integer cacheChatHistory(ChatRecordDTO record);
+    void cacheChatHistory(ChatRecordDTO record);
     
     /**
      * 缓存群聊聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 缓存成功的条数
      */
-    Integer cacheChatGroupHistory(ChatRecordDTO record);
+    void cacheChatGroupHistory(ChatRecordDTO record);
     
     /**
      * 获取缓存的聊天记录
@@ -71,10 +63,8 @@ public interface ChatService {
      * 删除聊天记录缓存
      *
      * @param userId 用户ID
-     *
-     * @return 是否删除成功
      */
-    Boolean deleteChatHistoryCache(String userId);
+    void deleteChatHistoryCache(String userId);
     
     /**
      * 保存对话列表

@@ -39,36 +39,48 @@ public class ChatServiceImpl implements ChatService {
      * 保存聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 保存成功的条数
      */
     @Override
-    public Integer saveChatHistory(ChatRecordDTO record) {
-        return chatMapper.saveChatHistory(record);
+    public void saveChatHistory(ChatRecordDTO record) {
+        try {
+            chatMapper.saveChatHistory(record);
+        }
+        catch (Exception e) {
+            log.error("保存聊天记录失败", e);
+            throw e;
+        }
     }
     
     /**
      * 缓存聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 缓存成功的条数
      */
     @Override
-    public Integer cacheChatHistory(ChatRecordDTO record) {
-        return chatMapper.cacheChatHistory(record);
+    public void cacheChatHistory(ChatRecordDTO record) {
+        try {
+            chatMapper.cacheChatHistory(record);
+        }
+        catch (Exception e) {
+            log.error("缓存聊天记录失败", e);
+            throw e;
+        }
     }
     
     /**
      * 缓存群聊聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 缓存成功的条数
      */
     @Override
-    public Integer cacheChatGroupHistory(ChatRecordDTO record) {
-        return chatMapper.cacheChatGroupHistory(record);
+    public void cacheChatGroupHistory(ChatRecordDTO record) {
+        try {
+            chatMapper.cacheChatGroupHistory(record);
+        }
+        catch (Exception e) {
+            log.error("缓存群聊聊天记录失败", e);
+            throw e;
+        }
     }
     
     /**
@@ -110,19 +122,16 @@ public class ChatServiceImpl implements ChatService {
      * 删除聊天记录缓存
      *
      * @param userId 用户ID
-     *
-     * @return 是否删除成功
      */
     @Override
-    public Boolean deleteChatHistoryCache(String userId) {
+    public void deleteChatHistoryCache(String userId) {
         try {
             chatMapper.deleteChatHistoryCache(userId);
             chatMapper.deleteChatGroupHistoryCache(userId);
-            return true;
         }
         catch (Exception e) {
             log.error("删除缓存失败", e);
-            return false;
+            throw e;
         }
     }
     
@@ -445,11 +454,15 @@ public class ChatServiceImpl implements ChatService {
      * 保存群聊聊天记录
      *
      * @param record 聊天记录
-     *
-     * @return 保存成功条数
      */
     @Override
-    public Integer saveGroupChatHistory(ChatRecordDTO record) {
-        return chatMapper.saveGroupChatHistory(record);
+    public void saveGroupChatHistory(ChatRecordDTO record) {
+        try {
+            chatMapper.saveGroupChatHistory(record);
+        }
+        catch (Exception e) {
+            log.error("保存群聊聊天记录失败", e);
+            throw e;
+        }
     }
 }

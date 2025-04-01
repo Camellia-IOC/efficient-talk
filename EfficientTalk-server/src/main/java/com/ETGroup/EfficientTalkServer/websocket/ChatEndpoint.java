@@ -11,7 +11,6 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
@@ -112,12 +111,7 @@ public class ChatEndpoint {
             }
             
             // 删除数据库中的缓存记录
-            if (chatService.deleteChatHistoryCache(userId)) {
-                log.info("清理聊天记录缓存成功");
-            }
-            else {
-                log.error("清理聊天记录缓存失败");
-            }
+            chatService.deleteChatHistoryCache(userId);
         }
         catch (IOException e) {
             log.error("获取缓存消息失败", e);
@@ -134,10 +128,10 @@ public class ChatEndpoint {
             // 如果是群聊消息
             if (msg.getIsGroup()) {
                 msg.setOwner(msg.getSender());
-                if (chatService.saveGroupChatHistory(msg) == 1) {
-                    log.info("保存群聊聊天记录成功");
-                }
+                // 保存群聊消息
+                chatService.saveGroupChatHistory(msg);
                 
+                // 获取群聊成员，批量发送
                 ArrayList<String> groupMemberIdList = socialMapper.getChatGroupMemberIdList(msg.getReceiver());
                 for (String memberId : groupMemberIdList) {
                     // 如果当前成员是发送者，则跳过
@@ -153,7 +147,6 @@ public class ChatEndpoint {
                         redisUtils.listRightPush(key, JSON.toJSONString(msg));
                         redisUtils.setKeyTimeout(key, 60 * 60 * 24 * 7);
                         chatService.cacheChatGroupHistory(msg);
-                        log.info("缓存群聊聊天记录成功");
                     }
                     else {
                         // 设置消息信息
@@ -166,9 +159,7 @@ public class ChatEndpoint {
             }
             else {
                 msg.setOwner(msg.getSender());
-                if (chatService.saveChatHistory(msg) == 1) {
-                    log.info("保存聊天记录成功");
-                }
+                chatService.saveChatHistory(msg);
                 
                 // 如果接收者不是发送者，则转发消息
                 if (!msg.getReceiver()
@@ -216,10 +207,5 @@ public class ChatEndpoint {
         }
         
         log.info("连接关闭:{}", session);
-    }
-    
-    @Autowired
-    public void setRedisUtils(RedisUtils redisUtils) {
-        this.redisUtils = redisUtils;
     }
 }
