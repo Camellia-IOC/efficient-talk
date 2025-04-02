@@ -46,4 +46,5 @@ contextBridge.exposeInMainWorld("systemController", {
     getAssignedSystemSettingConfig: (params) => ipcRenderer.invoke("get-assigned-system-setting-config", params),
     setSystemSettingConfig: (config) => ipcRenderer.invoke("set-system-setting-config", config),
     selectSystemPath: () => ipcRenderer.invoke("select-system-path"),
+    openExternalLink: (url) => ipcRenderer.invoke("open-external-link", url)
 });

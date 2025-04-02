@@ -96,6 +96,70 @@
         </div>
       </div>
     </div>
+    <div class="setting-block-container">
+      <label>关于我们</label>
+      <div class="setting-area">
+        <div class="setting-item">
+          <label class="item-label"
+                 style="display: flex;align-items: center;gap: 10px;"
+          >
+            <CodeFilled style="color: #1677FF;"/>
+            项目名称
+          </label>
+          <a-button type="link">易飞讯（EfficientTalk）</a-button>
+        </div>
+        <a-divider class="divider"/>
+        <div class="setting-item">
+          <label class="item-label"
+                 style="display: flex;align-items: center;gap: 10px;"
+          >
+            <GithubOutlined/>
+            GitHub仓库地址
+          </label>
+          <a-button type="link"
+                    @click="MainWindowController.openExternalLink('https://github.com/Camellia-IOC/efficient-talk')"
+          >https://github.com/Camellia-IOC/efficient-talk
+          </a-button>
+        </div>
+        <a-divider class="divider"/>
+        <div class="setting-item">
+          <label class="item-label"
+                 style="display: flex;align-items: center;gap: 10px;"
+          >
+            <HeartFilled style="color: red"/>
+            给小易打个分吧
+          </label>
+          <a-rate v-model:value="appRateStar"
+                  allow-half
+          />
+        </div>
+        <a-divider class="divider"/>
+        <div class="setting-item">
+          <label class="item-label"
+                 style="display: flex;align-items: center;gap: 10px;"
+          >
+            <QuestionCircleFilled style="color: gray"/>
+            在使用中遇到问题
+          </label>
+          <a-button size="small"
+                    @click="MainWindowController.openExternalLink('https://github.com/Camellia-IOC/efficient-talk/issues/new')"
+          >反馈
+          </a-button>
+        </div>
+        <a-divider class="divider"/>
+        <div class="setting-item">
+          <label class="item-label"
+                 style="display: flex;align-items: center;gap: 10px;"
+          >
+            <CopyrightCircleOutlined style="color: black"/>
+            版权所有
+          </label>
+          <label class="item-label" style="color: gray;">
+            Copyright © 2021-2025 LittleQ. All Rights Reserved.
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -109,10 +173,18 @@
     import UserApi from "../api/modules/UserApi.js";
     import { useCurLoginUserStore } from "../store/CurLoginUserStore.js";
     import { getUserHistoryList } from "../database/user-list.js";
+    import {
+        GithubOutlined,
+        HeartFilled,
+        CodeFilled,
+        QuestionCircleFilled,
+        CopyrightCircleOutlined
+    } from "@ant-design/icons-vue";
 
     // 系统设置对象
     const systemSettingConfig = ref();
     const userList = ref([]);
+    const appRateStar = ref(0);
 
     const curLoginUserStore = useCurLoginUserStore();
 

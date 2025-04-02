@@ -134,4 +134,12 @@ export default class MainWindowController {
     static selectSystemPath = () => {
         return systemController.selectSystemPath();
     };
+
+    /**
+     * 打开外部链接
+     * @param url 外部链接
+     */
+    static openExternalLink = (url) => {
+        systemController.openExternalLink(url);
+    }
 }

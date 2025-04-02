@@ -9,7 +9,8 @@ import {
     ipcMain,
     Notification,
     nativeImage,
-    dialog
+    dialog,
+    shell
 } from "electron";
 
 // Node模块
@@ -484,5 +485,10 @@ ipcMain.handle("select-system-path", (event) => {
         title: "选择路径",
         properties: ["openDirectory"]
     });
+});
+
+// 打开外部链接
+ipcMain.handle("open-external-link", (event, url) => {
+    shell.openExternal(url).then();
 });
 // 业务功能 end ##########################################################################################################
