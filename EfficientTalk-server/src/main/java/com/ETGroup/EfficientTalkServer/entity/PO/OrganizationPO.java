@@ -8,4 +8,6 @@ public class OrganizationPO {
     private String orgName;
     private String orgLogo;
     private String diskId;
+    private String createTime;
+    private String owner;
 }

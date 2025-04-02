@@ -138,4 +138,7 @@ public interface CloudDiskMapper {
      * @return 文件信息
      */
     FileDownloadInfoResponseVO getFileDownloadInfo(@Param("diskId") String diskId, @Param("fileId") String fileId);
+    
+    // 创建组织云盘
+    void createOrgCloudDisk(@Param("diskId") String diskId, @Param("orgId") String orgId, @Param("capacity") Long capacity);
 }

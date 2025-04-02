@@ -8,6 +8,7 @@ import com.ETGroup.EfficientTalkServer.entity.response.social.FriendListResponse
 import com.ETGroup.EfficientTalkServer.entity.response.social.NewFriendsResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.social.OrgTreeResponseVO;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public interface SocialService {
@@ -72,7 +73,7 @@ public interface SocialService {
     /**
      * 获取组织树
      *
-     * @param orgId 组织ID
+     * @param orgId    组织ID
      * @param parentId 父节点ID
      *
      * @return 好友分组列表
@@ -87,4 +88,14 @@ public interface SocialService {
      * @return 组织信息
      */
     OrganizationPO getOrganizationInfo(String orgId);
+    
+    /**
+     * 创建组织
+     *
+     * @param orgId   组织ID
+     * @param orgName 组织名称
+     * @param logo    组织LOGO
+     * @param owner   组织创建者
+     */
+    void createOrganization(String orgId, String orgName, MultipartFile logo, String owner);
 }

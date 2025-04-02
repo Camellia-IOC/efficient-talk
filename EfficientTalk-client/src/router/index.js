@@ -4,6 +4,7 @@ import {
 } from "vue-router";
 import AuthView from "../views/AuthView.vue";
 import IndexView from "../views/IndexView.vue";
+import { useCurLoginUserStore } from "../store/CurLoginUserStore.js";
 
 const router = createRouter({
     // history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,6 +48,12 @@ const router = createRouter({
                     path: "cloud-disk",
                     name: "cloud-disk",
                     component: () => import("../views/CloudDiskView.vue"),
+                    beforeEnter: () => {
+                        const curLoginUserStore = useCurLoginUserStore();
+                        if (curLoginUserStore.curLoginUser.orgId === null) {
+                            return "/app/without-org";
+                        }
+                    },
                     children: [
                         {
                             // 云盘-最近文件
@@ -78,7 +85,13 @@ const router = createRouter({
                     // 通知公告
                     path: "notification",
                     name: "notification",
-                    component: () => import("../views/NoticeAndTodoView.vue")
+                    component: () => import("../views/NoticeAndTodoView.vue"),
+                    beforeEnter: () => {
+                        const curLoginUserStore = useCurLoginUserStore();
+                        if (curLoginUserStore.curLoginUser.orgId === null) {
+                            return "/app/without-org";
+                        }
+                    }
                 },
                 {
                     // 应用中心
@@ -91,6 +104,12 @@ const router = createRouter({
                     path: "system-setting",
                     name: "system-setting",
                     component: () => import("../views/SystemSettingView.vue")
+                },
+                {
+                    // 创建/加入组织
+                    path: "without-org",
+                    name: "without-org",
+                    component: () => import("../views/WithoutOrgView.vue")
                 }
             ]
         },

@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OSSConfig {
-    
     @Value("${minio.endpoint}")
     private String minioEndpoint;
     
@@ -37,6 +36,14 @@ public class OSSConfig {
     @Getter
     @Value("${minio.chat-group-image-bucket}")
     private String chatGroupImageBucketName;
+    
+    @Getter
+    @Value("${minio.system-org-logo}")
+    private String systemOrgLogoBucketName;
+    
+    @Getter
+    @Value("${minio.system-user-avatar}")
+    private String systemUserAvatarBucketName;
     
     @Bean
     public MinioClient minioClient() {

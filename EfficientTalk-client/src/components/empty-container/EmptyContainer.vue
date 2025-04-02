@@ -3,6 +3,7 @@
     <a-empty :image="simpleImage"
              :description="props.description"
     />
+    <slot name="extra"/>
   </div>
 </template>
 
@@ -36,6 +37,7 @@
 >
   .empty-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;

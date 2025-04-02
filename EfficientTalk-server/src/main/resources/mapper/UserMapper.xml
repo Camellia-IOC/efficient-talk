@@ -57,4 +57,13 @@
 		FROM user_sysyem_setting_config
 		WHERE user_id = #{userId}
 	</select>
+
+	<!--更新用户组织信息-->
+	<update id="updateUserOrgInfo">
+		UPDATE users
+		SET org_id      = #{orgId},
+			dept_id     = #{deptId},
+			employee_id = #{employeeId}
+		WHERE id = #{userId}
+	</update>
 </mapper>

@@ -7,6 +7,7 @@ import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteR
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public interface SocialMapper {
      *
      * @return 退出结果
      */
-    Integer quitChatGroup(@Param("userId") String userId, @Param("groupId") String groupId);
+    Integer removeChatGroupMember(@Param("userId") String userId, @Param("groupId") String groupId);
     
     /**
      * 根据名称获取组织成员列表
@@ -117,15 +118,42 @@ public interface SocialMapper {
     
     /**
      * 创建群聊
+     *
      * @param chatGroup 群聊对象
+     *
      * @return 创建结果
      */
     Integer createChatGroup(ChatGroupPO chatGroup);
     
     /**
      * 添加群聊成员
+     *
      * @param chatGroupMember 群聊成员对象
+     *
      * @return 添加结果
      */
     Integer addChatGroupMember(ChatGroupMemberPO chatGroupMember);
+    
+    /**
+     * 创建新的组织
+     *
+     * @param organization 组织对象
+     */
+    void createOrganization(OrganizationPO organization);
+    
+    /**
+     * 检查组织ID是否存在
+     *
+     * @param orgId 组织ID
+     *
+     * @return 存在结果
+     */
+    Integer checkOrgIdExist(@Param("orgId") String orgId);
+    
+    /**
+     * 创建新的部门
+     *
+     * @param department 部门对象
+     */
+    void createDepartment(DepartmentPO department);
 }

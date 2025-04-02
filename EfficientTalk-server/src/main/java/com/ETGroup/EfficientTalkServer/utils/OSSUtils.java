@@ -25,6 +25,7 @@ public class OSSUtils {
     
     /**
      * 获取聊天图片存储bucket名称
+     *
      * @return bucket名称
      */
     public String getChatImageBucketName() {
@@ -33,6 +34,7 @@ public class OSSUtils {
     
     /**
      * 获取聊天文件存储bucket名称
+     *
      * @return bucket名称
      */
     public String getChatFileBucketName() {
@@ -59,6 +61,24 @@ public class OSSUtils {
      */
     public String getChatGroupFileBucketName(String groupId) {
         return ossConfig.getChatGroupFileBucketName() + "-" + groupId;
+    }
+    
+    /**
+     * 获取系统组织logo存储bucket名称
+     *
+     * @return bucket名称
+     */
+    public String getSystemOrgLogoBucketName() {
+        return ossConfig.getSystemOrgLogoBucketName();
+    }
+    
+    /**
+     * 获取系统用户头像存储bucket名称
+     *
+     * @return bucket名称
+     */
+    public String getSystemUserAvatarBucket() {
+        return ossConfig.getSystemUserAvatarBucketName();
     }
     
     /**
@@ -143,7 +163,7 @@ public class OSSUtils {
      * @param fileId     文件id
      * @param file       文件
      *
-     * @return Boolean
+     * @return 文件名
      */
     public String upload(String bucketName, String fileId, MultipartFile file) {
         String originalFilename = file.getOriginalFilename();

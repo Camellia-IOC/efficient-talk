@@ -252,7 +252,7 @@
 	</select>
 
 	<!--退出群聊-->
-	<delete id="quitChatGroup">
+	<delete id="removeChatGroupMember">
 		DELETE
 		FROM chat_group_member
 		WHERE user_id = #{userId}
@@ -286,5 +286,24 @@
 	<insert id="addChatGroupMember">
 		INSERT INTO chat_group_member (id, group_id, user_id, create_time)
 		VALUES (#{id}, #{groupId}, #{userId}, #{createTime})
+	</insert>
+
+	<!--创建新的组织-->
+	<insert id="createOrganization">
+		INSERT INTO organizations (org_id, org_name, org_logo, disk_id, create_time, owner)
+		VALUES (#{orgId}, #{orgName}, #{orgLogo}, #{diskId}, NOW(), #{owner})
+	</insert>
+
+	<!--判断组织ID是否存在-->
+	<select id="checkOrgIdExist" resultType="java.lang.Integer">
+		SELECT EXISTS(SELECT 1
+					  FROM organizations
+					  WHERE LOWER(org_id) = #{orgId})
+	</select>
+
+	<!--创建部门-->
+	<insert id="createDepartment">
+		INSERT INTO departments (id, dept_id, dept_name, org_id, parent_id, level, tag, sort_order, admin)
+		VALUES (#{id}, #{deptId}, #{deptName}, #{orgId}, #{parentId}, #{level}, #{tag}, #{sortOrder}, #{admin})
 	</insert>
 </mapper>

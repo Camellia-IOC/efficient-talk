@@ -148,6 +148,17 @@ export default class SocialApi {
     };
 
     /**
+     * 移除群聊成员
+     * @param data
+     */
+    static removeChatGroupMember = (data) => {
+        return service.delete({
+            url: this.requestPath + "/removeChatGroupMember",
+            data
+        });
+    };
+
+    /**
      * 根据名称获取组织成员
      * @param data
      */
@@ -176,6 +187,17 @@ export default class SocialApi {
     static inviteChatGroupMember = (data) => {
         return service.post({
             url: this.requestPath + "/inviteChatGroupMember",
+            data
+        });
+    };
+
+    /**
+     * 创建组织
+     * @param data
+     */
+    static createOrganization = (data) => {
+        return service.post({
+            url: this.requestPath + "/createOrganization",
             data
         });
     };

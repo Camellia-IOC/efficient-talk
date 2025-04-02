@@ -240,4 +240,10 @@
 		WHERE disk_id = #{diskId}
 		  AND file_id = #{fileId}
 	</select>
+
+	<!--创建组织云盘-->
+	<insert id="createOrgCloudDisk">
+		INSERT INTO cloud_disk (disk_id, org_id, disk_capacity)
+		VALUES (#{diskId}, #{orgId}, #{capacity})
+	</insert>
 </mapper>

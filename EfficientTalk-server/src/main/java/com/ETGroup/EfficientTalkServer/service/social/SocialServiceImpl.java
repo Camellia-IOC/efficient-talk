@@ -1,6 +1,7 @@
 package com.ETGroup.EfficientTalkServer.service.social;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.*;
+import com.ETGroup.EfficientTalkServer.entity.PO.DepartmentPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendInvitationPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
@@ -10,12 +11,18 @@ import com.ETGroup.EfficientTalkServer.entity.response.social.FriendInvitationLi
 import com.ETGroup.EfficientTalkServer.entity.response.social.FriendListResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.social.NewFriendsResponseVO;
 import com.ETGroup.EfficientTalkServer.entity.response.social.OrgTreeResponseVO;
+import com.ETGroup.EfficientTalkServer.mapper.CloudDiskMapper;
 import com.ETGroup.EfficientTalkServer.mapper.SocialMapper;
+import com.ETGroup.EfficientTalkServer.mapper.UserMapper;
+import com.ETGroup.EfficientTalkServer.utils.OSSUtils;
 import com.ETGroup.EfficientTalkServer.utils.UUIDUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,6 +34,18 @@ import java.util.Map;
 public class SocialServiceImpl implements SocialService {
     @Resource
     private SocialMapper socialMapper;
+    
+    @Resource
+    private OSSUtils ossUtils;
+    
+    @Value("${system-config.default-org-cloud-disk-capacity}")
+    private Long defaultCloudDiskCapacity;
+    
+    @Autowired
+    private CloudDiskMapper cloudDiskMapper;
+    
+    @Autowired
+    private UserMapper userMapper;
     
     /**
      * 获取好友列表
@@ -217,5 +236,52 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public OrganizationPO getOrganizationInfo(String orgId) {
         return socialMapper.getOrganizationInfo(orgId);
+    }
+    
+    /**
+     * 创建组织
+     *
+     * @param orgId   组织ID
+     * @param orgName 组织名称
+     * @param logo    组织LOGO
+     * @param owner   组织创建者
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createOrganization(String orgId, String orgName, MultipartFile logo, String owner) {
+        try {
+            OrganizationPO organization = new OrganizationPO();
+            if (socialMapper.checkOrgIdExist(orgId.toLowerCase()) == 1) {
+                throw new RuntimeException("组织ID已存在");
+            }
+            organization.setOrgId(orgId);
+            organization.setOrgName(orgName);
+            organization.setOwner(owner);
+            // 保存Logo
+            if (logo != null) {
+                String logoName = ossUtils.upload(ossUtils.getSystemOrgLogoBucketName(), orgId, logo);
+                String logoPath = ossUtils.getObjectUrl(ossUtils.getSystemOrgLogoBucketName(), logoName);
+                organization.setOrgLogo(logoPath);
+            }
+            // 创建云盘
+            String diskId = "org-cloud-disk-" + orgId.toLowerCase();
+            ossUtils.createBucket(diskId);
+            organization.setDiskId(diskId);
+            socialMapper.createOrganization(organization);
+            DepartmentPO department = new DepartmentPO();
+            department.setDeptId(UUIDUtils.generateUUID());
+            department.setId(orgId + '-' + department.getDeptId());
+            department.setDeptName(orgName);
+            department.setOrgId(orgId);
+            department.setLevel((byte) 0);
+            department.setAdmin(owner);
+            socialMapper.createDepartment(department);
+            cloudDiskMapper.createOrgCloudDisk(diskId, orgId, defaultCloudDiskCapacity);
+            userMapper.updateUserOrgInfo(owner, orgId, department.getDeptId(), 100000);
+        }
+        catch (Exception e) {
+            log.error("创建组织失败", e);
+            throw e;
+        }
     }
 }

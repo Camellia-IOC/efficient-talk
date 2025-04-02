@@ -41,7 +41,7 @@ public interface UserMapper {
      * @param userId 用户ID
      * @param config 系统设置
      */
-    void saveUserSystemSetting(@Param("userId") String userId,@Param("config") String config);
+    void saveUserSystemSetting(@Param("userId") String userId, @Param("config") String config);
     
     /**
      * 获取用户系统设置
@@ -51,4 +51,16 @@ public interface UserMapper {
      * @return 用户系统设置
      */
     String getUserSystemSetting(@Param("userId") String userId);
+    
+    /**
+     * 更新用户组织信息
+     * @param userId 用户ID
+     * @param orgId 组织ID
+     * @param deptId 部门ID
+     * @param employeeId 工号
+     */
+    void updateUserOrgInfo(@Param("userId") String userId,
+                           @Param("orgId") String orgId,
+                           @Param("deptId") String deptId,
+                           @Param("employeeId") int employeeId);
 }

@@ -54,6 +54,8 @@ minio:
   chat-image-bucket: chat-image
   chat-group-file-bucket: chat-group-file
   chat-group-image-bucket: chat-group-image
+  system-org-logo: system-org-logo
+  system-user-avatar: system-user-avatar
 
 mybatis-plus:
   configuration:
@@ -68,3 +70,7 @@ knife4j:
   enable: true
   setting:
     language: zh-CN
+
+system-config:
+  # 云盘默认大小：1G
+  default-org-cloud-disk-capacity: 1073741824

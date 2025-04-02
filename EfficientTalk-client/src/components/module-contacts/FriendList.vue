@@ -116,9 +116,24 @@
            class="type-org-list"
       >
         <div class="empty-list"
-             v-if="curLoginUser.orgId === null"
+             v-if="curLoginUserStore.curLoginUser.orgId === null"
         >
-          <EmptyContainer :description="'你还没有加入组织噢'"/>
+          <EmptyContainer :description="'你还没有加入组织噢'">
+            <template #extra>
+              <div style="display: flex;align-items: center;gap: 20px">
+                <a-button type="primary"
+                          @click="handleOrgCreatorDialogOpen('CREATE')"
+                >
+                  创建组织
+                </a-button>
+                <a-button type="primary"
+                          @click="handleOrgCreatorDialogOpen('JOIN')"
+                >
+                  加入组织
+                </a-button>
+              </div>
+            </template>
+          </EmptyContainer>
         </div>
         <a-spin v-else
                 :wrapper-class-name="'org-list'"
@@ -205,13 +220,16 @@
 
   <!--好友通知对话框-->
   <FriendInvitationDialog ref="friendInvitationDialog"
-                          :cur-login-user-id="curLoginUser.userId"
+                          :cur-login-user-id="curLoginUserStore.curLoginUser.userId"
   />
 
   <!--添加好友对话框-->
   <AddNewFriendDialog ref="addNewFriendDialog"
-                      :cur-login-user-id="curLoginUser.userId"
+                      :cur-login-user-id="curLoginUserStore.curLoginUser.userId"
   />
+
+  <!--组织创建/加入对话框-->
+  <OrgCreatorDialog ref="orgCreatorDialog"/>
 </template>
 
 <script setup>
@@ -230,13 +248,14 @@
         ApartmentOutlined
     } from "@ant-design/icons-vue";
     import SocialApi from "../../api/modules/SocialApi";
-    import { getCurUserData } from "../../database/cur-user.js";
     import FriendInvitationDialog from "../dialog/module-social/friend-invitations/FriendInvitationDialog.vue";
     import EmptyContainer from "../empty-container/EmptyContainer.vue";
     import AddNewFriendDialog from "../dialog/module-social/add-friend/AddNewFriendDialog.vue";
     import { message } from "ant-design-vue";
     import ChatGroupIcon from "../icon/ChatGroupIcon.vue";
     import { useRouter } from "vue-router";
+    import OrgCreatorDialog from "../dialog/module-social/org-creator/OrgCreatorDialog.vue";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     const router = useRouter();
 
@@ -254,11 +273,14 @@
         addNewFriendDialog.value.dialogOpen();
     };
 
-    // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
+    // 组织创建/加入对话框控制
+    const orgCreatorDialog = ref();
+    const handleOrgCreatorDialogOpen = (mode) => {
+        orgCreatorDialog.value.dialogOpen(mode);
     };
+
+    // 当前登录的用户信息
+    const curLoginUserStore = useCurLoginUserStore();
 
     // 加载标识符
     const isFriendListLoading = ref(true);
@@ -320,7 +342,7 @@
     // 获取好友列表
     const getFriendList = async () => {
         await SocialApi.getFriendList({
-            userId: curLoginUser.value.userId,
+            userId: curLoginUserStore.curLoginUser.userId,
         }).then((response) => {
             const res = response.data;
             if (res.code === 0) {
@@ -336,7 +358,7 @@
     // 获取群聊列表
     const getChatGroupList = () => {
         SocialApi.getChatGroupList({
-            userId: curLoginUser.value.userId,
+            userId: curLoginUserStore.curLoginUser.userId,
         }).then((response) => {
             const res = response.data;
             if (res.code === 0) {
@@ -356,7 +378,7 @@
     // 获取组织树
     const getOrgTree = async (parentId) => {
         const response = await SocialApi.getOrganizationTree({
-            orgId: curLoginUser.value.orgId,
+            orgId: curLoginUserStore.curLoginUser.orgId,
             parentId: parentId
         });
 
@@ -397,15 +419,13 @@
         // 订阅好友列表更新事件
         window.addEventListener("updateFriendList", handleUpdateFriendList);
 
-        await updateCurLoginUser();
-
         // 获取好友列表
         await getFriendList();
 
         // 获取群聊列表
         getChatGroupList();
 
-        if (curLoginUser.value.orgId != null) {
+        if (curLoginUserStore.curLoginUser.orgId != null) {
             // 获取组织树
             await getOrgTree(null);
         }

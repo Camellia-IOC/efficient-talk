@@ -5,6 +5,8 @@ import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupMemberListItem
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.OrgTreeUserNodeDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupMemberPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO;
+import com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO;
+import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.InviteChatGroupMemberRequestParam;
@@ -20,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -171,7 +174,7 @@ public class SocialController {
         try {
             ArrayList<String> response;
             Set<Object> cache = redisUtils.setMembers("chat_group:member:" + groupId);
-            if (cache != null) {
+            if (!cache.isEmpty()) {
                 response = new ArrayList<>();
                 for (Object id : cache) {
                     response.add((String) id);
@@ -192,7 +195,7 @@ public class SocialController {
     @DeleteMapping("/quitChatGroup")
     public ResponseData<Boolean> quitChatGroup(@RequestParam String userId, @RequestParam String groupId) {
         try {
-            if (socialMapper.quitChatGroup(userId, groupId) == 1) {
+            if (socialMapper.removeChatGroupMember(userId, groupId) == 1) {
                 redisUtils.setRemove("chat_group:member:" + groupId, userId);
                 return ResponseData.success(true);
             }
@@ -200,6 +203,22 @@ public class SocialController {
         }
         catch (Exception e) {
             log.error("退出群聊失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "移除群聊成员")
+    @DeleteMapping("/removeChatGroupMember")
+    public ResponseData<Boolean> removeChatGroupMember(@RequestParam String userId, @RequestParam String groupId) {
+        try {
+            if (socialMapper.removeChatGroupMember(userId, groupId) == 1) {
+                redisUtils.setRemove("chat_group:member:" + groupId, userId);
+                return ResponseData.success(true);
+            }
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+        catch (Exception e) {
+            log.error("移除群聊成员失败", e);
             return ResponseData.error(ResponseConfig.ERROR);
         }
     }
@@ -232,6 +251,21 @@ public class SocialController {
                 redisUtils.setAdd("chat_group:member:" + param.getGroupId(), id);
             }
             return ResponseData.success("邀请成功");
+        }
+        catch (Exception e) {
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "创建组织")
+    @PostMapping("/createOrganization")
+    public ResponseData<Void> createOrganization(@RequestParam String orgId,
+                                                 @RequestParam String orgName,
+                                                 @RequestParam(required = false) MultipartFile logo,
+                                                 @RequestParam String owner) {
+        try {
+            socialService.createOrganization(orgId, orgName, logo, owner);
+            return ResponseData.success();
         }
         catch (Exception e) {
             return ResponseData.error(ResponseConfig.ERROR);
