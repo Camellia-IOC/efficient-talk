@@ -79,7 +79,6 @@
         onUnmounted,
         ref
     } from "vue";
-    import { getCurUserData } from "../../database/cur-user.js";
     import { translateFileSize } from "../../utils/unit-utils.js";
     import { formatMessageTime } from "../../utils/time-utils.js";
     import { DownloadOutlined } from "@ant-design/icons-vue";
@@ -88,6 +87,7 @@
     import CloudDiskApi from "../../api/modules/CloudDiskApi.js";
     import { useRoute } from "vue-router";
     import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     // 分页器配置
     const paginationConfig = ref({
@@ -97,10 +97,7 @@
     const route = useRoute();
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore();
 
     // 加载标志
     const isLoading = ref(true);
@@ -192,7 +189,7 @@
     // 获取结果数据
     const getTableData = async () => {
         const response = await CloudDiskApi.getRecentCloudDiskFiles({
-            orgId: curLoginUser.value.orgId,
+            orgId: curLoginUserStore.curLoginUser.orgId,
             diskId: route.query.diskId,
             pageSize: paginationConfig.value.pageSize
         });
@@ -215,9 +212,6 @@
     };
 
     onBeforeMount(async () => {
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
-
         await getTableData();
     });
 

@@ -60,14 +60,11 @@
     } from "vue";
     import AppWindowController from "../window-controller/app-window-controller.js";
     import AppStoreApi from "../api/modules/AppStoreApi.js";
-    import { getCurUserData } from "../database/cur-user.js";
     import { NumberOutlined } from "@ant-design/icons-vue";
+    import { useCurLoginUserStore } from "../store/CurLoginUserStore.js";
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore()
 
     // 应用列表
     const isAppListLoading = ref(false);
@@ -88,10 +85,10 @@
 
     // 获取应用商店列表
     const getAppList = async () => {
-        if (curLoginUser.value.orgId !== null) {
+        if (curLoginUserStore.curLoginUser.orgId !== null) {
             isAppListLoading.value = true;
             const response = await AppStoreApi.getAppList({
-                orgId: curLoginUser.value.orgId,
+                orgId: curLoginUserStore.curLoginUser.orgId,
             });
 
             const res = response.data;
@@ -104,7 +101,6 @@
     };
 
     onBeforeMount(async () => {
-        await updateCurLoginUser();
         await getAppList();
     });
 </script>

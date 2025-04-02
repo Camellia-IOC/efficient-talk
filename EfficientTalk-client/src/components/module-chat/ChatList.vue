@@ -235,6 +235,7 @@
     import GroupCreatorDialog from "../dialog/module-chat/group-creator/GroupCreatorDialog.vue";
     import { useChatDataStore } from "../../store/ChatDataStore.js";
     import { ChatListObject } from "../../type/type.js";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     const props = defineProps({
         friendInfo: {
@@ -247,15 +248,12 @@
     const chatDataStore = useChatDataStore();
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore()
 
     // 创建群聊对话框控制
     const groupCreatorDialogRef = ref();
     const handleOpenGroupCreatorDialog = () => {
-        groupCreatorDialogRef.value.dialogOpen(curLoginUser.value.orgId, curLoginUser.value.userId);
+        groupCreatorDialogRef.value.dialogOpen(curLoginUserStore.curLoginUser.orgId, curLoginUserStore.curLoginUser.userId);
     };
 
     // 聊天列表加载标识符
@@ -406,24 +404,21 @@
     };
 
     onBeforeMount(async () => {
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
-
         // 读取聊天列表
         if (!chatDataStore.isChatListUpdated) {
             isFriendListLoading.value = true;
             // 判断是否使用本地存储
             if (await chatDataStore.checkIsUseLocalCache()) {
-                const localChatList = await getChatList(curLoginUser.value.userId);
+                const localChatList = await getChatList(curLoginUserStore.curLoginUser.userId);
                 if (localChatList !== null) {
                     chatDataStore.chatList = localChatList;
                 }
                 else {
-                    chatDataStore.chatList = await getCloudChatList(curLoginUser.value.userId);
+                    chatDataStore.chatList = await getCloudChatList(curLoginUserStore.curLoginUser.userId);
                 }
             }
             else {
-                chatDataStore.chatList = await getCloudChatList(curLoginUser.value.userId);
+                chatDataStore.chatList = await getCloudChatList(curLoginUserStore.curLoginUser.userId);
             }
 
             chatDataStore.isChatListUpdated = true;

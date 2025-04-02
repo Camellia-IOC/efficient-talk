@@ -61,17 +61,14 @@
     import { useRouter } from "vue-router";
     import { message } from "ant-design-vue";
     import SocialApi from "../api/modules/SocialApi.js";
-    import { getCurUserData } from "../database/cur-user.js";
     import CloudDiskApi from "../api/modules/CloudDiskApi.js";
     import { translateFileSize } from "../utils/unit-utils.js";
+    import { useCurLoginUserStore } from "../store/CurLoginUserStore.js";
 
     const router = useRouter();
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore();
 
     // 容量进度条配置
     const capacityConfig = ref({
@@ -122,9 +119,9 @@
     // 获取组织信息
     const orgInfo = ref({});
     const getOrganizationInfo = async () => {
-        if (curLoginUser.value.orgId !== null) {
+        if (curLoginUserStore.curLoginUser.orgId !== null) {
             const response = await SocialApi.getOrganizationInfo({
-                orgId: curLoginUser.value.orgId
+                orgId: curLoginUserStore.curLoginUser.orgId
             });
 
             const res = response.data;
@@ -174,16 +171,14 @@
     };
 
     onBeforeMount(async () => {
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
-
         // 获取组织信息
         await getOrganizationInfo();
 
         await getCloudDiskBasicInfo();
     });
 
-    onMounted(() => {});
+    onMounted(() => {
+    });
 </script>
 
 <style scoped

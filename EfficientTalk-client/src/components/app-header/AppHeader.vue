@@ -7,7 +7,7 @@
     </div>
     <div class="toolbar-container">
       <div class="org-info"
-           v-if="curLoginUser.orgId!==null"
+           v-if="curLoginUserStore.curLoginUser.orgId!==null"
       >
         <img :src="orgInfo.orgLogo"
              alt="org-logo"
@@ -58,7 +58,6 @@
 <script setup>
     import {
         onBeforeMount,
-        onUnmounted,
         ref
     } from "vue";
     import {
@@ -66,15 +65,14 @@
         CompressOutlined,
         ExpandOutlined,
         CloseOutlined,
-        SlackOutlined
     } from "@ant-design/icons-vue";
     import { Modal } from "ant-design-vue";
     import Logo from "../logo/Logo.vue";
     import SocialApi from "../../api/modules/SocialApi.js";
-    import { getCurUserData } from "../../database/cur-user.js";
     import { openAiAssistantChildWindow } from "../../window-controller/controller/ChildWindowController.js";
     import MainWindowController from "../../window-controller/main-window-controller.js";
     import AiAssistantIcon from "../icon/AiAssistantIcon.vue";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     // 窗口最大化状态
     const isMaximized = ref(false);
@@ -114,10 +112,7 @@
     };
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore()
 
     // 获取组织信息
     const orgInfo = ref({
@@ -127,9 +122,9 @@
         diskId: null
     });
     const getOrgInfo = async () => {
-        if (curLoginUser.value.orgId !== null) {
+        if (curLoginUserStore.curLoginUser.orgId !== null) {
             const response = await SocialApi.getOrganizationInfo({
-                orgId: curLoginUser.value.orgId
+                orgId: curLoginUserStore.curLoginUser.orgId
             });
 
             const res = response.data;
@@ -144,24 +139,13 @@
     // 打开AI助手窗口
     const openAiAssistantWindow = () => {
         const data = {
-            userId: curLoginUser.value.userId
+            userId: curLoginUserStore.curLoginUser.userId
         };
         openAiAssistantChildWindow(data);
     };
 
     onBeforeMount(async () => {
-        // 注册当前登录用户更新事件
-        window.addEventListener("updateCurLoginUser", updateCurLoginUser);
-
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
-
         await getOrgInfo();
-    });
-
-    onUnmounted(() => {
-        // 注销当前登录用户更新事件
-        window.removeEventListener("updateCurLoginUser", updateCurLoginUser);
     });
 </script>
 

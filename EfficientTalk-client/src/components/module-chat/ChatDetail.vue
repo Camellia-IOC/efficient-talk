@@ -143,7 +143,7 @@
                       v-show="isSelectMessageMode"
                       @change="checkedValue=>handleMessageSelect(checkedValue.target.checked,item)"
           ></a-checkbox>
-          <div v-if="item.sender !== curLoginUser.userId"
+          <div v-if="item.sender !== curLoginUserStore.curLoginUser.userId"
                class="others-message"
           >
             <div class="message-avatar"
@@ -327,7 +327,7 @@
           >
             <div class="message-info">
               <div class="user-name">
-                {{ curLoginUser.userName }}
+                {{ curLoginUserStore.curLoginUser.userName }}
               </div>
               <div class="message-content-container">
                 <a-dropdown :trigger="['contextmenu']"
@@ -472,15 +472,15 @@
               </div>
             </div>
             <div class="message-avatar">
-              <img v-if="curLoginUser.userAvatar!==null&&curLoginUser.userAvatar!==undefined"
-                   :src="curLoginUser.userAvatar"
+              <img v-if="curLoginUserStore.curLoginUser.userAvatar!==null&&curLoginUserStore.curLoginUser.userAvatar!==undefined"
+                   :src="curLoginUserStore.curLoginUser.userAvatar"
                    class="avatar"
                    alt="avatar"
               />
               <a-avatar v-else
                         class="avatar"
                         style="display:flex;justify-content:center;align-items:center;font-size: 24px"
-              >{{ curLoginUser.userName.substring(0, 2) }}
+              >{{ curLoginUserStore.curLoginUser.userName.substring(0, 2) }}
               </a-avatar>
             </div>
           </div>
@@ -764,7 +764,6 @@
         getChatHistory,
         saveChatRecord
     } from "../../database/chat-history.js";
-    import { getCurUserData } from "../../database/cur-user.js";
     import {
         formatMessageTime,
         getCurrentTimeStamp
@@ -832,13 +831,13 @@
             message.error("未选择消息");
             return;
         }
-        userSelectorDialog.value.dialogOpen(curLoginUser.value.orgId, messageList);
+        userSelectorDialog.value.dialogOpen(curLoginUserStore.curLoginUser.orgId, messageList);
     };
 
     // 群聊成员邀请对话框
     const groupMemberInviteDialog = ref();
     const handleGroupMemberInviteDialogOpen = () => {
-        groupMemberInviteDialog.value.dialogOpen(curLoginUser.value.orgId, props.chatInfo.userId);
+        groupMemberInviteDialog.value.dialogOpen(curLoginUserStore.curLoginUser.orgId, props.chatInfo.userId);
     };
 
     // 获取群聊成员列表
@@ -875,7 +874,7 @@
         },
         quitChatGroup: async () => {
             const response = await SocialApi.quitChatGroup({
-                userId: curLoginUser.value.userId,
+                userId: curLoginUserStore.curLoginUser.userId,
                 groupId: props.chatInfo.userId
             });
 
@@ -896,10 +895,6 @@
 
     // 当前登录的用户信息
     const curLoginUserStore = useCurLoginUserStore();
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
 
     // WebSocket连接
     const websocketStore = useWebSocketStore();
@@ -1070,9 +1065,9 @@
                 for (let j = 0; j < messageList.length; j++) {
                     const newMessage = {
                         id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
-                        sender: curLoginUser.value.userId,
-                        senderAvatar: curLoginUser.value.userAvatar || null,
-                        senderName: curLoginUser.value.userName || null,
+                        sender: curLoginUserStore.curLoginUser.userId,
+                        senderAvatar: curLoginUserStore.curLoginUser.userAvatar || null,
+                        senderName: curLoginUserStore.curLoginUser.userName || null,
                         receiver: userList[i],
                         type: messageList[j].type,
                         fileId: messageList[j].fileId,
@@ -1220,9 +1215,9 @@
         else {
             const message = {
                 id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
-                sender: curLoginUser.value.userId,
-                senderAvatar: curLoginUser.value.userAvatar || null,
-                senderName: curLoginUser.value.userName || null,
+                sender: curLoginUserStore.curLoginUser.userId,
+                senderAvatar: curLoginUserStore.curLoginUser.userAvatar || null,
+                senderName: curLoginUserStore.curLoginUser.userName || null,
                 receiver: props.chatInfo.userId,
                 type: "text",
                 fileId: null,
@@ -1255,7 +1250,7 @@
         formData.append("fileType", file.fileType);
         formData.append("fileSize", file.fileSize);
         formData.append("file", file.origin);
-        formData.append("sender", curLoginUser.value.userId);
+        formData.append("sender", curLoginUserStore.curLoginUser.userId);
         formData.append("receiver", props.chatInfo.userId);
         formData.append("isGroup", props.chatInfo.isGroup);
 
@@ -1275,7 +1270,7 @@
         formData.append("imageType", image.fileType);
         formData.append("imageSize", image.fileSize);
         formData.append("image", image.origin);
-        formData.append("sender", curLoginUser.value.userId);
+        formData.append("sender", curLoginUserStore.curLoginUser.userId);
         formData.append("receiver", props.chatInfo.userId);
         formData.append("isGroup", props.chatInfo.isGroup);
 
@@ -1307,9 +1302,9 @@
                 // 发送消息
                 const message = {
                     id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
-                    sender: curLoginUser.value.userId,
-                    senderAvatar: curLoginUser.value.userAvatar || null,
-                    senderName: curLoginUser.value.userName || null,
+                    sender: curLoginUserStore.curLoginUser.userId,
+                    senderAvatar: curLoginUserStore.curLoginUser.userAvatar || null,
+                    senderName: curLoginUserStore.curLoginUser.userName || null,
                     receiver: props.chatInfo.userId,
                     type: messageItem.type,
                     fileId: messageItem.fileId,
@@ -1403,7 +1398,7 @@
      */
     const getCloudChatHistory = async (friendId, lastTime, isGroup) => {
         const response = await ChatApi.getChatHistory({
-            userId: curLoginUser.value.userId,
+            userId: curLoginUserStore.curLoginUser.userId,
             friendId: friendId,
             pageSize: historyPageConfig.value.pageSize,
             lastTime: lastTime,
@@ -1431,7 +1426,7 @@
         // 判断是否使用本地缓存
         let historyPage;
         if (await chatDataStore.checkIsUseLocalCache()) {
-            historyPage = await getChatHistory(friendId, curLoginUser.value.userId, props.chatInfo.isGroup, chatHistory.value[0].time, historyPageConfig.value.pageSize);
+            historyPage = await getChatHistory(friendId, curLoginUserStore.curLoginUser.userId, props.chatInfo.isGroup, chatHistory.value[0].time, historyPageConfig.value.pageSize);
             // 如果本地数据为空，则从云端获取
             if (historyPage.length === 0) {
                 historyPage = await getCloudChatHistory(friendId, null, props.chatInfo.isGroup);
@@ -1459,7 +1454,7 @@
     // 打开聊天记录浏览窗口
     const handleOpenChatHistoryWindow = () => {
         const data = {
-            userId: curLoginUser.value.userId,
+            userId: curLoginUserStore.curLoginUser.userId,
             friendId: props.chatInfo.userId,
             isGroup: props.chatInfo.isGroup
         };
@@ -1480,7 +1475,7 @@
 
         let historyPage;
         if (await chatDataStore.checkIsUseLocalCache()) {
-            historyPage = await getChatHistory(friendId, curLoginUser.value.userId, isGroup, null, historyPageConfig.value.pageSize);
+            historyPage = await getChatHistory(friendId, curLoginUserStore.curLoginUser.userId, isGroup, null, historyPageConfig.value.pageSize);
             // 如果本地数据为空，则从云端获取
             if (historyPage.length === 0) {
                 historyPage = await getCloudChatHistory(friendId, null, isGroup);
@@ -1586,9 +1581,6 @@
         window.addEventListener("messageReceive", handleMessageReceive);
         // 订阅聊天对象变化事件
         window.addEventListener("chatObjectChange", handleChatObjectChange);
-
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
 
         if (props.chatInfo !== null) {
             await reloadChatHistory(props.chatInfo.userId, props.chatInfo.isGroup);

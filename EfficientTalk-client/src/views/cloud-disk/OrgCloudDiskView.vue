@@ -174,7 +174,7 @@
               <a-button @click.stop="handleCloudDiskItemEditorDialogOpen(record)"
                         shape="circle"
                         style="display:flex;justify-content:center;align-items:center;font-size: 18px;"
-                        v-show="record.creatorId===curLoginUser.userId"
+                        v-show="record.creatorId===curLoginUserStore.curLoginUser.userId"
               >
                 <FormOutlined/>
               </a-button>
@@ -227,31 +227,28 @@
     import { useRoute } from "vue-router";
     import EmptyContainer from "../../components/empty-container/EmptyContainer.vue";
     import FileUploaderDialog from "../../components/dialog/module-cloud-disk/file-uploader/FileUploaderDialog.vue";
-    import { getCurUserData } from "../../database/cur-user.js";
     import FolderCreatorDialog from "../../components/dialog/module-cloud-disk/folder-creator/FolderCreatorDialog.vue";
     import CloudDiskItemEditorDialog
         from "../../components/dialog/module-cloud-disk/cloud-disk-item-editor/CloudDiskItemEditorDialog.vue";
     import { openFilePreviewChildWindow } from "../../window-controller/controller/ChildWindowController.js";
     import { themeColor } from "../../config/config.js";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     const route = useRoute();
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore()
 
     // 文件夹创建对话框
     const folderCreatorDialogRef = ref();
     const handleFolderCreatorDialogOpen = () => {
-        folderCreatorDialogRef.value.dialogOpen(openedFolder.value[openedFolder.value.length - 1].folderId, curLoginUser.value.userId, route.query.orgId, route.query.diskId);
+        folderCreatorDialogRef.value.dialogOpen(openedFolder.value[openedFolder.value.length - 1].folderId, curLoginUserStore.curLoginUser.userId, route.query.orgId, route.query.diskId);
     };
 
     // 文件上传对话框
     const fileUploaderDialogRef = ref();
     const handleFileUploaderDialogOpen = () => {
-        fileUploaderDialogRef.value.dialogOpen(openedFolder.value[openedFolder.value.length - 1].folderId, curLoginUser.value.userId, route.query.orgId, route.query.diskId);
+        fileUploaderDialogRef.value.dialogOpen(openedFolder.value[openedFolder.value.length - 1].folderId, curLoginUserStore.curLoginUser.userId, route.query.orgId, route.query.diskId);
     };
 
     // 编辑对话框
@@ -515,9 +512,6 @@
     };
 
     onBeforeMount(async () => {
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
-
         // 接收云盘ID
         openedFolder.value.push({
             folderId: route.query.diskId,

@@ -12,13 +12,13 @@
             </div>
           </template>
           <img class="user-avatar"
-               v-if="curLoginUser.userAvatar!==null"
-               :src="curLoginUser.userAvatar"
+               v-if="curLoginUserStore.curLoginUser.userAvatar!==null"
+               :src="curLoginUserStore.curLoginUser.userAvatar"
                alt="avatar"
           />
           <a-avatar class="user-avatar"
                     v-else
-          >{{ curLoginUser.userName.substring(0, 2) }}
+          >{{ curLoginUserStore.curLoginUser.userName.substring(0, 2) }}
           </a-avatar>
         </a-popover>
       </div>
@@ -88,7 +88,12 @@
            @click="handleNavChange(item.index, item.path)"
       >
         <div class="nav-item-icon">
-          <component :is="item.icon"/>
+          <component :is="item.iconActive"
+                     v-if="selectedNavIndex === item.index"
+          />
+          <component :is="item.icon"
+                     v-else
+          />
         </div>
       </div>
       <div class="nav-item no-drag"
@@ -120,35 +125,30 @@
         CloudOutlined,
         AppstoreOutlined,
         AppstoreFilled,
-        QuestionCircleOutlined,
         PoweroffOutlined,
         SettingOutlined,
         FrownFilled,
         EyeInvisibleFilled,
         BellOutlined,
-        BellFilled
+        BellFilled,
+        SettingFilled
     } from "@ant-design/icons-vue";
     import { useRouter } from "vue-router";
-    import { getCurUserData } from "../../database/cur-user.js";
     import { useWebSocketStore } from "../../store/WebSocketStore.js";
     import OnlineStateSwitcherDialog from "../dialog/module-chat/online-state-switcher/OnlineStateSwitcherDialog.vue";
     import MainWindowController from "../../window-controller/main-window-controller.js";
     import { useChatDataStore } from "../../store/ChatDataStore.js";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     const router = useRouter();
     const websocketStore = useWebSocketStore();
     const chatDataStore = useChatDataStore();
+    const curLoginUserStore = useCurLoginUserStore()
 
     // 用户状态切换对话框
     const onlineStateSwitcherDialogRef = ref();
     const handleOpenOnlineStateSwitcherDialog = () => {
         onlineStateSwitcherDialogRef.value.dialogOpen();
-    };
-
-    // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
     };
 
     // 处理退出登录
@@ -206,6 +206,7 @@
             name: "系统设置",
             index: "footer-1",
             icon: SettingOutlined,
+            iconActive: SettingFilled,
             path: "/app/system-setting"
         }
     ];
@@ -238,9 +239,6 @@
     };
 
     onBeforeMount(async () => {
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
-
         // 订阅导航索引变化事件
         window.addEventListener("navForceChange", handleNavIndexChange);
     });

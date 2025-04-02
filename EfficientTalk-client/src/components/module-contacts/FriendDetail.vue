@@ -38,13 +38,13 @@
         </a-descriptions>
       </div>
       <div class="operation-bar">
-        <a-button v-if="friendInfo.userId===curLoginUser.userId"
+        <a-button v-if="friendInfo.userId===curLoginUserStore.curLoginUser.userId"
                   class="operation-btn"
         >编辑资料
         </a-button>
         <a-button type="primary"
                   danger
-                  v-if="friendInfo.isFriend === true && friendInfo.userId !== curLoginUser.userId"
+                  v-if="friendInfo.isFriend === true && friendInfo.userId !== curLoginUserStore.curLoginUser.userId"
                   class="operation-btn"
                   @click="handleDeleteFriend"
         >删除好友
@@ -74,12 +74,12 @@
     } from "vue";
     import { useRouter } from "vue-router";
     import UserApi from "../../api/modules/UserApi.js";
-    import { getCurUserData } from "../../database/cur-user.js";
     import SocialApi from "../../api/modules/SocialApi.js";
     import { message } from "ant-design-vue";
     import Logo from "../logo/Logo.vue";
     import { themeColor } from "../../config/config.js";
     import EditInvitationDialog from "../dialog/module-social/add-friend/EditInvitationDialog.vue";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     const router = useRouter();
 
@@ -91,15 +91,12 @@
     });
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore()
 
     // 编辑添加信息对话框
     const editInvitationDialog = ref();
     const handleEditInvitationDialogOpen = () => {
-        editInvitationDialog.value.dialogOpen(curLoginUser.value.userId, props.friendId);
+        editInvitationDialog.value.dialogOpen(curLoginUserStore.curLoginUser.userId, props.friendId);
     };
 
     // 好友信息
@@ -121,7 +118,7 @@
     // 获取好友信息
     const getUserDetail = (userId) => {
         UserApi.getUserDetail({
-            curLoginUserId: curLoginUser.value.userId,
+            curLoginUserId: curLoginUserStore.curLoginUser.userId,
             userId: userId
         }).then((response) => {
             const res = response.data;
@@ -147,9 +144,6 @@
 
     // 监听传入参数变化
     watch(() => props.friendId, async (newValue, oldValue) => {
-        // 初始化当前登录的用户信息
-        await updateCurLoginUser();
-
         // 获取用户信息
         getUserDetail(newValue);
     });
@@ -157,7 +151,7 @@
     // 删除好友
     const handleDeleteFriend = () => {
         SocialApi.deleteFriend({
-            userId: curLoginUser.value.userId,
+            userId: curLoginUserStore.curLoginUser.userId,
             friendId: props.friendId
         }).then((response) => {
             const res = response.data;
