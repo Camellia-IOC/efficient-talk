@@ -24,7 +24,7 @@ export const useChatDataStore = defineStore("chat-data-store", () => {
 
     // 当前聊天对象
     const curChatId = ref("");
-    const curSelectedChatInfo = ref(null);
+    const curSelectedChatInfo = ref();
 
     // 未读消息总数
     const totalUnreadCount = computed(() => {

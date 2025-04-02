@@ -1,5 +1,5 @@
 <template>
-  <div v-if="chatInfo!==null"
+  <div v-if="chatInfo!==null&&chatInfo!==undefined"
        class="chat-detail"
   >
     <div class="chat-header">
