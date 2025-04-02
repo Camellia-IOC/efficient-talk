@@ -10,9 +10,16 @@
            v-if="curLoginUserStore.curLoginUser.orgId!==null"
       >
         <img :src="orgInfo.orgLogo"
-             alt="org-logo"
+             alt="logo"
              class="org-logo"
-        />
+             v-if="orgInfo.orgLogo!==null&&orgInfo.orgLogo!==undefined"
+        >
+        <div v-else
+             class="org-logo"
+             style="display: flex;justify-content: center;align-items: center;background-color: #1677FF"
+        >
+          <HomeOutlined style="font-size: 18px;color: white"/>
+        </div>
         <label class="org-name">{{ orgInfo.orgName }}</label>
         <a-tag color="blue">组织归属</a-tag>
       </div>
@@ -58,13 +65,15 @@
 <script setup>
     import {
         onBeforeMount,
-        ref
+        ref,
+        watch
     } from "vue";
     import {
         MinusOutlined,
         CompressOutlined,
         ExpandOutlined,
         CloseOutlined,
+        HomeOutlined,
     } from "@ant-design/icons-vue";
     import { Modal } from "ant-design-vue";
     import Logo from "../logo/Logo.vue";
@@ -112,7 +121,10 @@
     };
 
     // 当前登录的用户信息
-    const curLoginUserStore = useCurLoginUserStore()
+    const curLoginUserStore = useCurLoginUserStore();
+    watch(() => curLoginUserStore.curLoginUser.orgId, () => {
+        getOrgInfo();
+    });
 
     // 获取组织信息
     const orgInfo = ref({

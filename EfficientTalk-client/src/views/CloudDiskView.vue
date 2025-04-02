@@ -8,7 +8,14 @@
           <img :src="orgInfo.orgLogo"
                alt="logo"
                class="logo"
+               v-if="orgInfo.orgLogo!==null&&orgInfo.orgLogo!==undefined"
           >
+          <div v-else
+               class="logo"
+               style="display: flex;justify-content: center;align-items: center;background-color: #1677FF"
+          >
+            <HomeOutlined style="font-size: 36px;color: white"/>
+          </div>
         </div>
         <div class="org-detail">
           <div class="org-name">{{ orgInfo.orgName }}</div>
@@ -32,7 +39,9 @@
 
       <div class="disk-info">
         <div class="info-label">
-          <label>已使用：{{ translateFileSize(capacityConfig.usedCapacity) }}</label>
+          <label>已使用：{{
+              translateFileSize(capacityConfig.usedCapacity === null ? 0 : capacityConfig.usedCapacity)
+            }}</label>
           <label>总容量：{{ translateFileSize(capacityConfig.totalCapacity) }}</label>
         </div>
         <div class="info-chart">
@@ -64,6 +73,7 @@
     import CloudDiskApi from "../api/modules/CloudDiskApi.js";
     import { translateFileSize } from "../utils/unit-utils.js";
     import { useCurLoginUserStore } from "../store/CurLoginUserStore.js";
+    import { HomeOutlined } from "@ant-design/icons-vue";
 
     const router = useRouter();
 
