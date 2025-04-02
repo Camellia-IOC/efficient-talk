@@ -79,7 +79,7 @@
           </div>
           <div class="message-avatar">
             <img class="avatar"
-                 :src="curLoginUser.userAvatar"
+                 :src="curLoginUserStore.curLoginUser.userAvatar"
                  alt="avatar"
             >
           </div>
@@ -106,23 +106,19 @@
     import {
         nextTick,
         onBeforeMount,
-        onMounted,
         ref
     } from "vue";
     import {
         askAiQuestion
     } from "../../utils/ai-assistant.js";
-    import { getCurUserData } from "../../database/cur-user.js";
     import { marked } from "marked";
     import { UUID } from "uuidjs";
     import { getCurrentTime } from "../../utils/time-utils.js";
     import AiApi from "../../api/modules/AiApi.js";
+    import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
 
     // 当前登录的用户信息
-    const curLoginUser = ref({});
-    const updateCurLoginUser = async () => {
-        curLoginUser.value = await getCurUserData();
-    };
+    const curLoginUserStore = useCurLoginUserStore();
 
     // 对话历史容器
     const aiChatHistoryElement = ref();
@@ -173,7 +169,7 @@
         const message = {
             id: UUID.generate(),
             session: curSessionId.value,
-            userId: curLoginUser.value.userId,
+            userId: curLoginUserStore.curLoginUser.userId,
             role: "user",
             content: questionInput.value,
             time: getCurrentTime()
@@ -201,13 +197,8 @@
     };
 
     onBeforeMount(async () => {
-        await updateCurLoginUser();
-        curSessionId.value = curLoginUser.value.userId;
+        curSessionId.value = curLoginUserStore.curLoginUser.userId;
         await getChatMessageHistory();
-    });
-
-    onMounted(() => {
-
     });
 </script>
 

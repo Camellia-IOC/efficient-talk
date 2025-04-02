@@ -107,6 +107,13 @@
                     {{ item.deptName }}
                   </div>
                 </div>
+                <a-button danger
+                          size="small"
+                          type="primary"
+                          @click="chatDetailDrawerConfig.removeChatGroupMember(item.userId)"
+                          v-if="chatInfo.creator!==item.userId&&chatInfo.creator===curLoginUserStore.curLoginUser.userId"
+                >移除
+                </a-button>
               </div>
             </div>
           </div>
@@ -734,8 +741,7 @@
         ref
     } from "vue";
     import {
-        message,
-        notification
+        message
     } from "ant-design-vue";
     import {
         FolderOutlined,
@@ -836,7 +842,11 @@
 
     // 群聊成员邀请对话框
     const groupMemberInviteDialog = ref();
-    const handleGroupMemberInviteDialogOpen = () => {
+    const handleGroupMemberInviteDialogOpen = async () => {
+        if (!await checkIsGroupMember()) {
+            message.error("您不是群聊成员，无法邀请新成员");
+            return;
+        }
         groupMemberInviteDialog.value.dialogOpen(curLoginUserStore.curLoginUser.orgId, props.chatInfo.userId);
     };
 
@@ -860,6 +870,13 @@
         isContentLoading: true,
         chatGroupMemberList: [],
         openDrawer: async () => {
+            if (props.chatInfo.isGroup) {
+                if (!await checkIsGroupMember()) {
+                    message.error("您不是群聊成员，无法查看群聊详细信息");
+                    return;
+                }
+            }
+
             if (!chatDetailDrawerConfig.value.drawerOpenDialog) {
                 chatDetailDrawerConfig.value.drawerOpenDialog = true;
                 await getChatGroupMemberList(props.chatInfo.userId);
@@ -889,6 +906,23 @@
             }
             else {
                 message.error("退出群聊失败");
+            }
+        },
+        removeChatGroupMember: async (userId) => {
+            const response = await SocialApi.removeChatGroupMember({
+                userId: userId,
+                groupId: props.chatInfo.userId,
+            });
+
+            const res = response.data;
+            if (res.code === 0) {
+                message.success("移除群聊成员成功");
+                chatDetailDrawerConfig.value.chatGroupMemberList = chatDetailDrawerConfig.value.chatGroupMemberList.filter((item) => {
+                    return item.userId !== userId;
+                });
+            }
+            else {
+                message.error("移除群聊成员失败");
             }
         }
     });
@@ -936,6 +970,21 @@
     const isAiGenerating = ref(false);
     const aiWriterInput = ref("");
     const aiResponseResultDialogContent = ref("");
+    const checkIsGroupMember = async () => {
+        const response = await SocialApi.getChatGroupMemberIdList({
+            groupId: props.chatInfo.userId
+        });
+
+        const res = response.data;
+        if (res.code === 0) {
+            const memberList = res.data;
+            return memberList.includes(curLoginUserStore.curLoginUser.userId);
+        }
+        else {
+            message.error("操作失败，请重试");
+            return false;
+        }
+    };
 
     // 打开小易帮写弹窗
     const writerHelperOpen = ref(false);
@@ -1199,21 +1248,22 @@
     };
 
     // 发送消息
-    const handleSend = () => {
+    const handleSend = async () => {
         if (chatInput.value === "") {
-            notification.error({
-                placement: "topRight",
-                message: "消息不能为空",
-                description: "请输入消息内容",
-                duration: 2,
-                top: 36
-            });
+            message.error("消息不能为空");
         }
         else if (websocketStore.onlineState === "OUTLINE") {
-            message.error("当前为离线状态，发送失败");
+            message.error("当前为离线状态，暂时无法发送");
         }
         else {
-            const message = {
+            if (props.chatInfo.isGroup) {
+                if (!await checkIsGroupMember()) {
+                    message.error("您不是群聊成员，无法发送消息");
+                    return;
+                }
+            }
+
+            const newMessage = {
                 id: dayjs().format("YYYY-MM-DD") + "-" + UUID.generate(),
                 sender: curLoginUserStore.curLoginUser.userId,
                 senderAvatar: curLoginUserStore.curLoginUser.userAvatar || null,
@@ -1225,19 +1275,19 @@
                 time: getCurrentTimeStamp(),
                 isGroup: props.chatInfo.isGroup
             };
-            websocketStore.sendMessage({...message});
-            chatHistory.value.push(message);
+            websocketStore.sendMessage({...newMessage});
+            chatHistory.value.push(newMessage);
 
             // 发送消息后滚动到底部
             scrollToBottom("smooth");
 
             // 广播消息
             window.dispatchEvent(new CustomEvent("messageSend", {
-                detail: message
+                detail: newMessage
             }));
 
             // 保存聊天记录
-            handleSaveChatHistory(message);
+            handleSaveChatHistory(newMessage);
         }
         chatInput.value = "";
     };
