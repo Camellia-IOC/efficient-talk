@@ -4,6 +4,7 @@ import com.ETGroup.EfficientTalkServer.entity.DTO.social.*;
 import com.ETGroup.EfficientTalkServer.entity.PO.*;
 import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
 import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.request.social.UpdateFriendGroupRequestParam;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -156,4 +157,42 @@ public interface SocialMapper {
      * @param department 部门对象
      */
     void createDepartment(DepartmentPO department);
+    
+    /**
+     * 创建新的好友分组
+     *
+     * @param group 分组对象
+     */
+    void addFriendGroup(FriendGroupPO group);
+    
+    /**
+     * 修改好友分组
+     *
+     * @param param 修改参数
+     */
+    void updateFriendGroup(UpdateFriendGroupRequestParam param);
+    
+    /**
+     * 获取好友分组下的好友列表
+     *
+     * @param userId  用户ID
+     * @param groupId 分组ID
+     *
+     * @return 好友列表
+     */
+    ArrayList<FriendListItemDTO> getFriendListByGroup(@Param("userId") String userId, @Param("groupId") String groupId);
+    
+    /**
+     * 获取所有好友
+     * @param userId 好友ID
+     * @return 好友列表
+     */
+    ArrayList<FriendListItemDTO> getAllFriendList(@Param("userId") String userId);
+    
+    /**
+     * 删除好友分组
+     * @param userId 用户ID
+     * @param groupId 分组ID
+     */
+    void deleteFriendGroup(@Param("userId") String userId,@Param("groupId") String groupId);
 }

@@ -71,3 +71,21 @@ export const openMediaFilePreviewChildWindow = (data, width = 800, height = 600,
     };
     ChildWindowController.openChildWindow(windowName, url, config, width, height, isChild);
 };
+
+/**
+ * 打开通讯录管理器窗口
+ * @param {object} data 窗口配置数据
+ * @param {number} width 窗口宽度
+ * @param {number} height 窗口高度
+ * @param {boolean} isChild 是否为子窗口
+ */
+export const openContactManagerChildWindow = (data, width = 600, height = 500, isChild = false) => {
+    const windowName = "contactManagerWindow";
+    const routerUrl = "child-window-contact-manager";
+    const url = `/child-window?windowName=${windowName}&url=${routerUrl}`;
+    const config = {
+        title: "通讯录管理器",
+        data: data
+    };
+    ChildWindowController.openChildWindow(windowName, url, config, width, height, isChild);
+};

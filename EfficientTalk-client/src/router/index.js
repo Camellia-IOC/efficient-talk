@@ -142,6 +142,12 @@ const router = createRouter({
                     path: "child-window-media-file-preview",
                     name: "child-window-media-file-preview",
                     component: () => import("../views/child-window/MediaFilePreviewView.vue")
+                },
+                {
+                    // 通讯录管理器
+                    path: "child-window-contact-manager",
+                    name: "child-window-contact-manager",
+                    component: () => import("../views/child-window/ContactManagerView.vue")
                 }
             ]
         },

@@ -2,14 +2,12 @@ package com.ETGroup.EfficientTalkServer.controller;
 
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.ChatGroupMemberListItemDTO;
+import com.ETGroup.EfficientTalkServer.entity.DTO.social.FriendListItemDTO;
 import com.ETGroup.EfficientTalkServer.entity.DTO.social.OrgTreeUserNodeDTO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupMemberPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.ChatGroupPO;
 import com.ETGroup.EfficientTalkServer.entity.PO.FriendGroupPO;
-import com.ETGroup.EfficientTalkServer.entity.PO.OrganizationPO;
-import com.ETGroup.EfficientTalkServer.entity.request.social.CreateFriendInviteRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.request.social.HandleFriendInviteRequestParam;
-import com.ETGroup.EfficientTalkServer.entity.request.social.InviteChatGroupMemberRequestParam;
+import com.ETGroup.EfficientTalkServer.entity.request.social.*;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseConfig;
 import com.ETGroup.EfficientTalkServer.entity.response.common.ResponseData;
 import com.ETGroup.EfficientTalkServer.entity.response.social.*;
@@ -268,6 +266,75 @@ public class SocialController {
             return ResponseData.success();
         }
         catch (Exception e) {
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "新增好友分组")
+    @PostMapping("/addFriendGroup")
+    public ResponseData<String> addFriendGroup(@RequestBody AddFriendGroupRequestParam param) {
+        try {
+            FriendGroupPO group = new FriendGroupPO();
+            group.setGroupId(UUIDUtils.generateUUID());
+            group.setGroupName(param.getGroupName());
+            group.setUserId(param.getUserId());
+            socialMapper.addFriendGroup(group);
+            return ResponseData.success("新增成功");
+        }
+        catch (Exception e) {
+            log.error("新增好友分组失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "修改好友分组")
+    @PutMapping("/updateFriendGroup")
+    public ResponseData<String> updateFriendGroup(@RequestBody UpdateFriendGroupRequestParam param) {
+        try {
+            socialMapper.updateFriendGroup(param);
+            return ResponseData.success("修改成功");
+        }
+        catch (Exception e) {
+            log.error("修改好友分组失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "根据分组获取好友列表")
+    @GetMapping("/getFriendListByGroup")
+    public ResponseData<ArrayList<FriendListItemDTO>> getFriendListByGroup(@RequestParam String userId, @RequestParam String groupId) {
+        try {
+            ArrayList<FriendListItemDTO> response = socialMapper.getFriendListByGroup(userId, groupId);
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取好友列表失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "获取所有好友")
+    @GetMapping("/getAllFriendList")
+    public ResponseData<ArrayList<FriendListItemDTO>> getAllFriendList(@RequestParam String userId) {
+        try {
+            ArrayList<FriendListItemDTO> response = socialMapper.getAllFriendList(userId);
+            return ResponseData.success(response);
+        }
+        catch (Exception e) {
+            log.error("获取好友列表失败", e);
+            return ResponseData.error(ResponseConfig.ERROR);
+        }
+    }
+    
+    @Operation(summary = "删除好友分组")
+    @DeleteMapping("/deleteFriendGroup")
+    public ResponseData<String> deleteFriendGroup(@RequestParam String userId, @RequestParam String groupId) {
+        try {
+            socialMapper.deleteFriendGroup(userId, groupId);
+            return ResponseData.success("删除成功");
+        }
+        catch (Exception e) {
+            log.error("删除好友分组失败", e);
             return ResponseData.error(ResponseConfig.ERROR);
         }
     }

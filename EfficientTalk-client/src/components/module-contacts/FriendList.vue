@@ -30,7 +30,10 @@
            v-if="activeType === 'FRIEND'"
       >
         <div class="friend-manager-container">
-          <a-button class="friend-manager-btn">通讯录管理器</a-button>
+          <a-button class="friend-manager-btn"
+                    @click="handleOpenContactManager"
+          >通讯录管理器
+          </a-button>
         </div>
         <a-spin :wrapper-class-name="'friend-group-list'"
                 :spinning="isFriendListLoading"
@@ -115,6 +118,12 @@
       <div v-else-if="activeType === 'ORG'"
            class="type-org-list"
       >
+        <div class="org-manager-container">
+          <a-button class="org-manager-btn"
+                    @click="handleOpenContactManager"
+          >组织管理器
+          </a-button>
+        </div>
         <div class="empty-list"
              v-if="curLoginUserStore.curLoginUser.orgId === null"
         >
@@ -256,6 +265,7 @@
     import { useRouter } from "vue-router";
     import OrgCreatorDialog from "../dialog/module-social/org-creator/OrgCreatorDialog.vue";
     import { useCurLoginUserStore } from "../../store/CurLoginUserStore.js";
+    import { openContactManagerChildWindow } from "../../window-controller/controller/ChildWindowController.js";
 
     const router = useRouter();
 
@@ -281,6 +291,14 @@
 
     // 当前登录的用户信息
     const curLoginUserStore = useCurLoginUserStore();
+
+    // 打开通讯录管理器
+    const handleOpenContactManager = () => {
+        const data = {
+            userId: curLoginUserStore.curLoginUser.userId
+        };
+        openContactManagerChildWindow(data);
+    };
 
     // 加载标识符
     const isFriendListLoading = ref(true);
@@ -664,6 +682,22 @@
         width: 100%;
         height: 100%;
 
+        $org-manager-height: 40px;
+
+        .org-manager-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: $org-manager-height;
+
+          .org-manager-btn {
+            width: 90%;
+            background-color: global-variable.$theme-color;
+            color: white;
+          }
+        }
+
         .empty-list {
           display: flex;
           justify-content: center;
@@ -679,7 +713,7 @@
           flex-direction: column;
           align-items: center;
           width: 100%;
-          height: 100%;
+          height: calc(100% - $org-manager-height);
 
           $org-info-bar-height: 50px;
 

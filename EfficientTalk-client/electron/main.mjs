@@ -444,7 +444,7 @@ ipcMain.handle("download", (event, params) => {
 
 // 显示通知
 ipcMain.handle("show-notification", (event, params) => {
-    if (configStore.get(storeKeys.systemSettingConfig).moduleNotice.enable) {
+    if (configStore.get(`${storeKeys.users}.${params.userId}.${storeKeys.systemSettingConfig}`).moduleNotice.enable) {
         new Notification({
             title: params.title,
             body: params.body,

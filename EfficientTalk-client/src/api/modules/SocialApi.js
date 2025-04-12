@@ -201,4 +201,64 @@ export default class SocialApi {
             data
         });
     };
+
+    /**
+     * 根据分组获取好友列表
+     * @param data
+     * @returns {*}
+     */
+    static getFriendListByGroup = (data) => {
+        return service.get({
+            url: this.requestPath + "/getFriendListByGroup",
+            data
+        });
+    };
+
+    /**
+     * 获取所有好友列表
+     * @param data
+     * @returns {*}
+     */
+    static getAllFriendList = (data) => {
+        return service.get({
+            url: this.requestPath + "/getAllFriendList",
+            data
+        });
+    };
+
+    /**
+     * 更新好友分组
+     * @param data
+     * @returns {*}
+     */
+    static updateFriendGroup = (data) => {
+        return service.put({
+            url: this.requestPath + "/updateFriendGroup",
+            data
+        });
+    };
+
+    /**
+     * 删除好友分组
+     * @param data
+     * @returns {*}
+     */
+    static deleteFriendGroup = (data) => {
+        return service.delete({
+            url: this.requestPath + "/deleteFriendGroup",
+            data
+        });
+    };
+
+    /**
+     * 添加好友分组
+     * @param data
+     * @returns {*}
+     */
+    static addFriendGroup = (data) => {
+        return service.post({
+            url: this.requestPath + "/addFriendGroup",
+            data
+        });
+    };
 }

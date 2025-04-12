@@ -306,4 +306,59 @@
 		INSERT INTO departments (id, dept_id, dept_name, org_id, parent_id, level, tag, sort_order, admin)
 		VALUES (#{id}, #{deptId}, #{deptName}, #{orgId}, #{parentId}, #{level}, #{tag}, #{sortOrder}, #{admin})
 	</insert>
+
+	<!--创建新的好友分组-->
+	<insert id="addFriendGroup">
+		INSERT INTO friend_groups (group_id, group_name, user_id)
+		VALUES (#{groupId}, #{groupName}, #{userId})
+	</insert>
+
+	<!--修改好友分组-->
+	<update id="updateFriendGroup">
+		UPDATE friends
+		SET group_id = #{groupId}
+		WHERE user_id = #{userId}
+		  AND friend_id = #{friendId}
+	</update>
+
+	<!--根据分组获取好友列表-->
+	<select id="getFriendListByGroup" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.FriendListItemDTO">
+		SELECT friends.friend_id        as userId,
+			   users.username           as userName,
+			   users.avatar             as userAvatar,
+			   users.org_id             as orgId,
+			   organizations.org_name   as orgName,
+			   friends.group_id         as groupId,
+			   friend_groups.group_name as groupName
+		FROM friends
+				 LEFT JOIN users ON users.id = friends.friend_id
+				 LEFT JOIN organizations ON organizations.org_id = users.org_id
+				 LEFT JOIN friend_groups ON friend_groups.group_id = friends.group_id
+		WHERE friends.user_id = #{userId}
+		  AND friends.group_id = #{groupId}
+	</select>
+
+	<!--获取所有好友列表-->
+	<select id="getAllFriendList" resultType="com.ETGroup.EfficientTalkServer.entity.DTO.social.FriendListItemDTO">
+		SELECT friends.friend_id        as userId,
+			   users.username           as userName,
+			   users.avatar             as userAvatar,
+			   users.org_id             as orgId,
+			   organizations.org_name   as orgName,
+			   friends.group_id         as groupId,
+			   friend_groups.group_name as groupName
+		FROM friends
+				 LEFT JOIN users ON users.id = friends.friend_id
+				 LEFT JOIN organizations ON organizations.org_id = users.org_id
+				 LEFT JOIN friend_groups ON friend_groups.group_id = friends.group_id
+		WHERE friends.user_id = #{userId}
+	</select>
+
+	<!--删除好友分组-->
+	<delete id="deleteFriendGroup">
+		DELETE
+		FROM friend_groups
+		WHERE group_id = #{groupId}
+		  AND user_id = #{userId}
+	</delete>
 </mapper>

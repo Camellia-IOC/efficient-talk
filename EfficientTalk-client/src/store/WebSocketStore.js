@@ -48,6 +48,7 @@ export const useWebSocketStore = defineStore("web-socket-store", () => {
             if (!messageData.isCache) {
                 // 如果不是缓存消息，则显示系统通知
                 MainWindowController.showNotification({
+                    userId: curLoginUserId.value,
                     title: messageData.senderName,
                     body: messageData.content,
                     icon: messageData.senderAvatar
